@@ -1,0 +1,75 @@
+{
+  "common": {
+    "siteName": "Car Retail",
+    "language": "Language",
+    "vietnamese": "Vietnamese",
+    "english": "English",
+    "home": "Home",
+    "admin": "Admin",
+    "news": "News",
+    "about": "About",
+    "contact": "Contact",
+    "policies": "Policies",
+    "support": "Support",
+    "viewDetails": "View details",
+    "learnMore": "Learn more",
+    "submit": "Submit",
+    "submitting": "Submitting…",
+    "success": "Submitted successfully. We will contact you soon.",
+    "error": "Submission failed. Please try again.",
+    "menuOpen": "Menu",
+    "menuClose": "Close"
+  },
+  "home": {
+    "title": "Sample Auto Dealer",
+    "subtitle": "Explore the latest electric and commercial vehicles.",
+    "lineupTitle": "Vehicle lineup",
+    "servicesTitle": "Services",
+    "newsTitle": "News",
+    "tradeInTitle": "Trade-in",
+    "tradeInDefault": "Fair used-car buyback, big savings on your next car."
+  },
+  "model": {
+    "variantsTitle": "Variants & pricing",
+    "featuresTitle": "Highlights",
+    "faqTitle": "FAQ",
+    "testDriveCta": "Book test drive",
+    "depositCta": "Place deposit"
+  },
+  "forms": {
+    "name": "Full name",
+    "phone": "Phone number",
+    "email": "Email",
+    "model": "Model",
+    "variant": "Variant",
+    "showroom": "Showroom",
+    "date": "Test drive date",
+    "time": "Time",
+    "message": "Message",
+    "consent": "I agree to the privacy policy and consent to be contacted.",
+    "testDriveTitle": "Book a test drive",
+    "testDriveSubtitle": "Pick a model and a time that works for you.",
+    "depositTitle": "Deposit / Consult",
+    "depositSubtitle": "Leave your details and our sales team will reach out."
+  },
+  "footer": {
+    "showrooms": "Showrooms",
+    "hotlines": "Hotlines",
+    "products": "Products",
+    "legal": "Legal"
+  },
+  "spec": {
+    "range": "Range",
+    "power": "Power",
+    "torque": "Torque",
+    "battery": "Battery",
+    "batteryType": "Battery type",
+    "chargeTimeFast": "Fast charge (10–70%)",
+    "drivetrain": "Drivetrain",
+    "wheelbase": "Wheelbase",
+    "seats": "Seats",
+    "trunk": "Trunk",
+    "airbags": "Airbags",
+    "payload": "Payload"
+  }
+}

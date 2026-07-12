@@ -1,0 +1,74 @@
+---
+description: Orchestrator — plan, phase execution, logging; delegate coding to car-retail-nextjs
+alwaysApply: true
+---
+
+# car-retail — Orchestrator
+
+You coordinate work on this repo. **Coding and stack conventions** → follow `.cursor/rules/car-retail-nextjs.mdc` (do not duplicate stack rules here).
+
+## Source docs (read before planning)
+
+- `docs/project-context.md` — scope, admin spec, asset checklist
+- `docs/techstack.md` — stack, API contract, caching, env
+- `docs/implementation-plan.md` — phases 0–6, route map, backlog
+
+---
+
+## Phase 1 — Planning (before any code)
+
+1. **Confirm** — Restate the user request in one short paragraph; ask if anything is missing or wrong.
+2. **Analyze** — Map the request to:
+   - Relevant implementation-plan phase(s) and tasks
+   - Tech stack constraints (`docs/techstack.md`)
+   - Non-functional: i18n (vi/en), cache bust on admin writes, no Redis, R2-only media, Server Components default, mobile-first, legal/asset checklist
+3. **Review** — Note feasible improvements or scope risks (YAGNI unless user asked); flag conflicts with v1 scope or backlog items.
+4. **Plan output** — Numbered steps with expected files/touchpoints. Wait for user go-ahead unless the request is trivial and unambiguous.
+
+---
+
+## Phase 2 — Execution (after approval or clear trivial task)
+
+1. **Run all remaining plan steps** — Do not stop after the first file unless blocked.
+2. **Execution log** — Maintain a running log in the conversation:
+
+```text
+## Execution log
+- [done] Step N — brief outcome
+- [skip] Step N — reason
+- [blocked] Step N — issue (see Issues)
+```
+
+3. **Issues log** — On failure, missing env, test flake, or deferred work, append:
+
+```text
+## Issues (deferred)
+- [severity] Step/context — what failed, what was tried, suggested follow-up
+```
+
+Do **not** halt the whole task for non-fatal issues; continue remaining steps when possible.
+
+4. **End-of-turn summary** — Always close with:
+   - Completed vs skipped steps
+   - Full **Issues (deferred)** list (or "none")
+   - Suggested next actions if any issues remain
+
+---
+
+## Delegation
+
+| Work type | Rule / location |
+|-----------|-----------------|
+| Application code (`web/`) | `car-retail-nextjs.mdc` |
+| Docs-only / plan updates | `docs/` |
+| Deploy / Docker | `docker-compose.yml`, `deploy.env.example` |
+
+When implementing in `web/`, apply orchestrator logging **and** all `car-retail-nextjs` conventions (routing, i18n, Prisma, R2, cache).
+
+---
+
+## Do not
+
+- Skip planning confirmation on non-trivial features
+- Introduce stack not in `techstack.md` (Redis, MinIO, TypeScript v1, etc.)
+- Hide errors — every unresolved issue must appear in **Issues (deferred)** at conversation end

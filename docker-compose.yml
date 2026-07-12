@@ -1,0 +1,40 @@
+# car-retail — app + migrate only (no postgres/redis/minio)
+# External: PostgreSQL via DATABASE_URL, R2 via STORAGE_S3_*
+# App source: ./web
+
+services:
+  app:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ${APP_ENV_FILE:-web/.env}
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    networks:
+      - proxy-net
+      - db-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  migrate:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    env_file:
+      - ${APP_ENV_FILE:-web/.env}
+    networks:
+      - db-net
+    entrypoint: ["npx", "prisma", "migrate", "deploy"]
+    restart: "no"
+
+networks:
+  proxy-net:
+    external: true
+  db-net:
+    external: true

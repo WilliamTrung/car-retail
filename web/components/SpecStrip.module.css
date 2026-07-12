@@ -1,0 +1,26 @@
+.strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--space-md);
+  margin: 0;
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.item {
+  text-align: center;
+}
+
+.item dt {
+  margin: 0 0 var(--space-xs);
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.item dd {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}

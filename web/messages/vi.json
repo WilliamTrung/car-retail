@@ -1,0 +1,75 @@
+{
+  "common": {
+    "siteName": "Car Retail",
+    "language": "Ngôn ngữ",
+    "vietnamese": "Tiếng Việt",
+    "english": "English",
+    "home": "Trang chủ",
+    "admin": "Quản trị",
+    "news": "Tin tức",
+    "about": "Về chúng tôi",
+    "contact": "Liên hệ",
+    "policies": "Chính sách",
+    "support": "Hỗ trợ",
+    "viewDetails": "Xem chi tiết",
+    "learnMore": "Tìm hiểu thêm",
+    "submit": "Gửi",
+    "submitting": "Đang gửi…",
+    "success": "Gửi thành công. Chúng tôi sẽ liên hệ sớm.",
+    "error": "Gửi thất bại. Vui lòng thử lại.",
+    "menuOpen": "Menu",
+    "menuClose": "Đóng"
+  },
+  "home": {
+    "title": "Đại lý Ô tô Mẫu",
+    "subtitle": "Khám phá dòng xe điện và xe thương mại mới nhất.",
+    "lineupTitle": "Dòng xe",
+    "servicesTitle": "Dịch vụ",
+    "newsTitle": "Tin tức",
+    "tradeInTitle": "Thu cũ đổi mới",
+    "tradeInDefault": "Mua xe cũ giá tốt, đổi xe mới siêu tiết kiệm."
+  },
+  "model": {
+    "variantsTitle": "Phiên bản & giá",
+    "featuresTitle": "Điểm nổi bật",
+    "faqTitle": "Câu hỏi thường gặp",
+    "testDriveCta": "Đăng ký lái thử",
+    "depositCta": "Đặt cọc"
+  },
+  "forms": {
+    "name": "Họ và tên",
+    "phone": "Số điện thoại",
+    "email": "Email",
+    "model": "Mẫu xe",
+    "variant": "Phiên bản",
+    "showroom": "Showroom",
+    "date": "Ngày lái thử",
+    "time": "Giờ",
+    "message": "Nội dung",
+    "consent": "Tôi đồng ý với chính sách bảo mật và cho phép liên hệ tư vấn.",
+    "testDriveTitle": "Đăng ký lái thử",
+    "testDriveSubtitle": "Chọn mẫu xe và thời gian phù hợp.",
+    "depositTitle": "Đặt cọc / Tư vấn",
+    "depositSubtitle": "Để lại thông tin, đội ngũ kinh doanh sẽ liên hệ."
+  },
+  "footer": {
+    "showrooms": "Showroom",
+    "hotlines": "Hotline",
+    "products": "Sản phẩm",
+    "legal": "Pháp lý"
+  },
+  "spec": {
+    "range": "Quãng đường",
+    "power": "Công suất",
+    "torque": "Mô-men xoắn",
+    "battery": "Pin",
+    "batteryType": "Loại pin",
+    "chargeTimeFast": "Sạc nhanh (10–70%)",
+    "drivetrain": "Dẫn động",
+    "wheelbase": "Chiều dài cơ sở",
+    "seats": "Số chỗ",
+    "trunk": "Khoang hành lý",
+    "airbags": "Túi khí",
+    "payload": "Tải trọng"
+  }
+}

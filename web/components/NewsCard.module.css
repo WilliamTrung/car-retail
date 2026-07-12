@@ -1,0 +1,48 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.placeholder {
+  aspect-ratio: 16 / 9;
+  border-radius: calc(var(--radius) - 2px);
+  background: linear-gradient(145deg, #e8ecf4, #d5dbe8);
+}
+
+.image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: calc(var(--radius) - 2px);
+  object-fit: cover;
+  background: #e8ecf4;
+}
+
+.title {
+  margin: 0 0 var(--space-sm);
+  font-size: 1.0625rem;
+}
+
+.title a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.title a:hover {
+  color: var(--color-accent);
+}
+
+.excerpt {
+  margin: 0 0 var(--space-md);
+  color: var(--color-muted);
+  font-size: 0.9375rem;
+}
+
+.link {
+  font-weight: 600;
+  font-size: 0.875rem;
+}

@@ -1,0 +1,31 @@
+# dependencies
+node_modules
+npm-debug.log*
+
+# next.js
+.next
+out
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# git
+.git
+.gitignore
+
+# docs & IDE
+docs
+.cursor
+*.md
+!README.md
+
+# docker
+Dockerfile*
+docker-compose*.yml
+deploy.env.example
+
+# misc
+coverage
+.DS_Store

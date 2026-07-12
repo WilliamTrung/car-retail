@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+web/node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+web/.next/
+web/out/
+.next/
+out/
+
+# Production / build
+build/
+dist/
+*.tsbuildinfo
+
+# Testing
+coverage/
+
+# Environment secrets (keep *.example templates)
+.env
+.env.*
+!.env.example
+!**/.env.example
+deploy.env
+!deploy.env.example
+!**/deploy.env.example
+
+# Logs & debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.pem
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Prisma local DB (if used)
+web/prisma/*.db
+web/prisma/*.db-journal
+
+# Misc local artifacts
+*.local
+.cache/
+.turbo/
+.vercel/

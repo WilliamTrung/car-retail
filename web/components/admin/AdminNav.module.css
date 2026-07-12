@@ -1,0 +1,57 @@
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) 0 var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-lg);
+}
+
+.brand a {
+  font-weight: 700;
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  flex: 1;
+}
+
+.nav a {
+  font-size: 0.875rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--color-muted);
+}
+
+.nav a:hover {
+  background: var(--color-surface);
+  color: inherit;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.8125rem;
+}
+
+.role {
+  color: var(--color-muted);
+  text-transform: lowercase;
+}
+
+.user button {
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+}

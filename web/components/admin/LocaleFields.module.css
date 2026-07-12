@@ -1,0 +1,37 @@
+.wrap {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  margin: 0 0 var(--space-md);
+}
+
+.wrap legend {
+  font-weight: 600;
+  padding: 0 var(--space-xs);
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: 0.875rem;
+  margin-bottom: var(--space-sm);
+}
+
+.field {
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+}
+
+textarea.field {
+  resize: vertical;
+}
+
+.missing {
+  color: #b45309;
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+}

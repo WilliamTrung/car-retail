@@ -1,0 +1,404 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Enums ---
+
+enum AdminRole {
+  SUPER_ADMIN
+  EDITOR
+  SALES
+}
+
+enum LeadType {
+  TEST_DRIVE
+  DEPOSIT
+  CONSULT
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
+enum MenuPlacement {
+  HEADER
+  FOOTER
+}
+
+enum MediaFolder {
+  VEHICLES
+  HEROES
+  NEWS
+  POLICIES
+  SITE
+}
+
+// --- Site & navigation ---
+
+model SiteSettings {
+  id               String   @id @default("singleton")
+  dealerName       Json // { vi, en }
+  legalEntity      Json // { vi, en }
+  mst              String?
+  email            String?
+  copyright        Json? // { vi, en }
+  logoMediaId      String?
+  faviconMediaId   String?
+  socialLinks      Json? // [{ platform, url }]
+  privacyPolicyUrl Json? // { vi, en }
+  consentTemplate  Json? // { vi, en }
+  seoDefaults      Json? // { vi: { title, description }, en: {...} }
+  disclaimers      Json? // { vi, en }
+  brandStory       Json? // { vi: { title, body }, en: {...} }
+  tradeInBlock     Json? // { vi: { title, body, ctaLabel }, en, imageMediaId? }
+  promoCountdown   Json? // { enabled, endAt, label: { vi, en } }
+  ctaTestDrive     Json? // { label: { vi, en }, routeKey }
+  ctaDeposit       Json? // { label: { vi, en }, routeKey }
+  maintenanceMode  Boolean  @default(false)
+  updatedAt        DateTime @updatedAt
+
+  logoMedia    MediaAsset? @relation("SiteLogo", fields: [logoMediaId], references: [id], onDelete: SetNull)
+  faviconMedia MediaAsset? @relation("SiteFavicon", fields: [faviconMediaId], references: [id], onDelete: SetNull)
+}
+
+model Hotline {
+  id         String    @id @default(cuid())
+  label      Json // { vi, en }
+  phone      String
+  sortOrder  Int       @default(0)
+  showroomId String?
+  showroom   Showroom? @relation(fields: [showroomId], references: [id], onDelete: SetNull)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([sortOrder])
+}
+
+model MenuItem {
+  id        String        @id @default(cuid())
+  label     Json // { vi, en }
+  routeKey  String
+  placement MenuPlacement
+  sortOrder Int           @default(0)
+  visible   Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([placement, sortOrder])
+}
+
+// --- Attributes ---
+
+model Unit {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json // { vi, en }
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AttributeKey {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  groupKey  String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([groupKey, sortOrder])
+}
+
+model AttributeTemplate {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  name      Json // { vi, en }
+  items     Json // [{ key, unit, defaultValue, showInStrip, sortOrder, groupKey }]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// --- Vehicle catalog ---
+
+model VehicleLine {
+  id        String           @id @default(cuid())
+  key       String           @unique
+  name      Json // { vi, en }
+  sortOrder Int              @default(0)
+  segments  VehicleSegment[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model VehicleSegment {
+  id        String         @id @default(cuid())
+  lineId    String
+  line      VehicleLine    @relation(fields: [lineId], references: [id], onDelete: Cascade)
+  key       String
+  name      Json // { vi, en }
+  sortOrder Int            @default(0)
+  models    VehicleModel[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@unique([lineId, key])
+  @@index([lineId, sortOrder])
+}
+
+model VehicleModel {
+  id          String   @id @default(cuid())
+  segmentId   String
+  segment     VehicleSegment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  name        Json // { vi, en }
+  slug        Json // { vi, en }
+  tagline     Json?
+  description Json?
+  meta        Json? // { vi: { title, description }, en: {...} }
+  heroMediaId String?
+  gallery     Json? // string[] media asset ids
+  attributes  Json     @default("[]") // [{ key, value, unit }]
+  published   Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  heroMedia       MediaAsset?      @relation("ModelHero", fields: [heroMediaId], references: [id], onDelete: SetNull)
+  variants        VehicleVariant[]
+  featureSections FeatureSection[]
+  faqs            ModelFaq[]
+  leads           Lead[]
+
+  @@index([segmentId, sortOrder])
+  @@index([published])
+}
+
+model VehicleVariant {
+  id             String       @id @default(cuid())
+  modelId        String
+  model          VehicleModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  name           Json // { vi, en }
+  price          Decimal?     @db.Decimal(14, 0)
+  attributes     Json         @default("[]") // [{ key, value, unit }]
+  allowDeposit   Boolean      @default(true)
+  allowTestDrive Boolean      @default(true)
+  published      Boolean      @default(false)
+  sortOrder      Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  leads Lead[]
+
+  @@index([modelId, sortOrder])
+}
+
+model FeatureSection {
+  id           String       @id @default(cuid())
+  modelId      String
+  model        VehicleModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  title        Json // { vi, en }
+  body         Json // { vi, en }
+  imageMediaId String?
+  sortOrder    Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  imageMedia MediaAsset? @relation("FeatureSectionImage", fields: [imageMediaId], references: [id], onDelete: SetNull)
+
+  @@index([modelId, sortOrder])
+}
+
+model ModelFaq {
+  id        String       @id @default(cuid())
+  modelId   String
+  model     VehicleModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  question  Json // { vi, en }
+  answer    Json // { vi, en }
+  sortOrder Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([modelId, sortOrder])
+}
+
+// --- Homepage CMS ---
+
+model HeroSlide {
+  id           String   @id @default(cuid())
+  title        Json // { vi, en }
+  subtitle     Json?
+  ctaLabel     Json?
+  ctaRouteKey  String?
+  imageMediaId String?
+  sortOrder    Int      @default(0)
+  published    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  imageMedia MediaAsset? @relation("HeroSlideImage", fields: [imageMediaId], references: [id], onDelete: SetNull)
+
+  @@index([sortOrder])
+}
+
+model ServiceBlock {
+  id           String   @id @default(cuid())
+  title        Json // { vi, en }
+  description  Json?
+  iconKey      String?
+  linkRouteKey String?
+  sortOrder    Int      @default(0)
+  published    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([sortOrder])
+}
+
+// --- Content ---
+
+model NewsPost {
+  id              String    @id @default(cuid())
+  slug            Json // { vi, en }
+  title           Json // { vi, en }
+  excerpt         Json?
+  body            Json // { vi, en }
+  meta            Json?
+  featuredMediaId String?
+  publishedAt     DateTime?
+  featured        Boolean   @default(false)
+  published       Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  featuredMedia MediaAsset? @relation("NewsFeatured", fields: [featuredMediaId], references: [id], onDelete: SetNull)
+
+  @@index([published, publishedAt])
+}
+
+model Page {
+  id        String   @id @default(cuid())
+  pageType  String // about, contact, custom
+  slug      Json // { vi, en }
+  title     Json // { vi, en }
+  body      Json // { vi, en }
+  meta      Json?
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([pageType])
+  @@index([published])
+}
+
+model PolicyDocument {
+  id         String   @id @default(cuid())
+  slug       Json // { vi, en }
+  title      Json // { vi, en }
+  body       Json? // { vi, en } optional html
+  pdfMediaId String?
+  sortOrder  Int      @default(0)
+  published  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  pdfMedia MediaAsset? @relation("PolicyPdf", fields: [pdfMediaId], references: [id], onDelete: SetNull)
+
+  @@index([sortOrder])
+}
+
+model FaqItem {
+  id        String   @id @default(cuid())
+  question  Json // { vi, en }
+  answer    Json // { vi, en }
+  sortOrder Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder])
+}
+
+// --- Showrooms & leads ---
+
+model Showroom {
+  id        String    @id @default(cuid())
+  name      Json // { vi, en }
+  address   Json // { vi, en }
+  city      String
+  phone     String?
+  hours     Json? // { vi, en }
+  typeTag   String? // 1S, 2S, 3S
+  lat       Float?
+  lng       Float?
+  sortOrder Int       @default(0)
+  published Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  hotlines Hotline[]
+  leads    Lead[]
+
+  @@index([city, sortOrder])
+}
+
+model Lead {
+  id         String     @id @default(cuid())
+  type       LeadType
+  status     LeadStatus @default(NEW)
+  locale     String // vi | en
+  payload    Json // form fields: name, phone, email, date, time, consent, etc.
+  modelId    String?
+  variantId  String?
+  showroomId String?
+  notes      String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  model    VehicleModel?   @relation(fields: [modelId], references: [id], onDelete: SetNull)
+  variant  VehicleVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  showroom Showroom?       @relation(fields: [showroomId], references: [id], onDelete: SetNull)
+
+  @@index([type, status, createdAt])
+  @@index([locale])
+}
+
+// --- Media ---
+
+model MediaAsset {
+  id        String      @id @default(cuid())
+  r2Key     String      @unique
+  publicUrl String
+  folder    MediaFolder
+  mimeType  String?
+  sizeBytes Int?
+  altText   Json? // { vi, en }
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  siteLogos         SiteSettings[]   @relation("SiteLogo")
+  siteFavicons      SiteSettings[]   @relation("SiteFavicon")
+  modelHeroes       VehicleModel[]   @relation("ModelHero")
+  featureSections   FeatureSection[] @relation("FeatureSectionImage")
+  heroSlides        HeroSlide[]      @relation("HeroSlideImage")
+  newsFeatured      NewsPost[]       @relation("NewsFeatured")
+  policyPdfs        PolicyDocument[] @relation("PolicyPdf")
+
+  @@index([folder, createdAt])
+}
+
+// --- Admin auth ---
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String?
+  role         AdminRole @default(EDITOR)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}

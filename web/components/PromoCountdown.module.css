@@ -1,0 +1,18 @@
+.banner {
+  background: var(--color-primary);
+  color: #fff;
+  text-align: center;
+  padding: var(--space-md) var(--space-lg);
+}
+
+.label {
+  margin: 0 0 var(--space-xs);
+  font-size: 0.9375rem;
+}
+
+.timer {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}

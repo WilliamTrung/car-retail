@@ -1,0 +1,13 @@
+.admin {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-lg);
+}
+
+.admin h1 {
+  margin: 0 0 var(--space-md);
+}
+
+.admin p {
+  color: var(--color-muted);
+}
