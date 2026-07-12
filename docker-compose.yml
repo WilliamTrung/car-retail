@@ -7,6 +7,9 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+      network: db-net
     restart: unless-stopped
     env_file:
       - ${APP_ENV_FILE:-web/.env}
@@ -26,6 +29,7 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+      target: migrator
     env_file:
       - ${APP_ENV_FILE:-web/.env}
     networks:

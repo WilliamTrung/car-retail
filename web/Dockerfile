@@ -6,7 +6,12 @@ FROM base AS deps
 COPY package.json package-lock.json* ./
 RUN npm ci
 
+FROM deps AS migrator
+COPY prisma ./prisma
+
 FROM base AS builder
+ARG DATABASE_URL=postgresql://build:build@127.0.0.1:5432/build
+ENV DATABASE_URL=${DATABASE_URL}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate
