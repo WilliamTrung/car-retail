@@ -529,6 +529,7 @@ async function main() {
 
   console.log("Seed complete.");
   console.log(`Admin: ${adminEmail} / (from ADMIN_PASSWORD env or default "change-me")`);
+  console.log("Run npm run db:seed:media to purge R2, upload images, and save public URLs.");
 }
 
 main()

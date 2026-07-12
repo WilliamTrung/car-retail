@@ -1,5 +1,6 @@
 import {
   DeleteObjectCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
@@ -81,6 +82,41 @@ export async function deleteFromR2(key) {
       Key: key,
     })
   );
+}
+
+/** @returns {Promise<string[]>} */
+export async function listAllR2Keys() {
+  const r2 = getR2Client();
+  if (!r2) {
+    throw new Error("R2 is not configured. Set STORAGE_S3_* environment variables.");
+  }
+
+  const keys = [];
+  let continuationToken;
+
+  do {
+    const page = await r2.client.send(
+      new ListObjectsV2Command({
+        Bucket: r2.config.bucket,
+        ContinuationToken: continuationToken,
+      })
+    );
+    for (const item of page.Contents ?? []) {
+      if (item.Key) keys.push(item.Key);
+    }
+    continuationToken = page.IsTruncated ? page.NextContinuationToken : undefined;
+  } while (continuationToken);
+
+  return keys;
+}
+
+/** Delete every object in the configured R2 bucket. */
+export async function purgeR2Bucket() {
+  const keys = await listAllR2Keys();
+  for (const key of keys) {
+    await deleteFromR2(key);
+  }
+  return keys.length;
 }
 
 export function getPublicUrl(key) {
