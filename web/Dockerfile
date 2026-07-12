@@ -11,7 +11,9 @@ COPY prisma ./prisma
 
 FROM base AS builder
 ARG DATABASE_URL=postgresql://build:build@127.0.0.1:5432/build
+ARG NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ENV DATABASE_URL=${DATABASE_URL}
+ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate
