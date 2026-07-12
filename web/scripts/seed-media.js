@@ -1,6 +1,6 @@
 /**
- * Purge all R2 objects, re-upload seed media from prisma/seed-media-data.js,
- * link CMS records, and write public URLs to prisma/seed-media-urls.js.
+ * Purge R2, fetch dealer reference photos from prisma/seed-media-data.js,
+ * upload to R2, link CMS records, write prisma/seed-media-urls.js.
  *
  * Run: npm run db:seed:media
  */

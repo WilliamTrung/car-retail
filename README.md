@@ -85,8 +85,10 @@ Optional dev data:
 
 ```bash
 npm run db:seed:mock        # richer mock content
-npm run db:seed:media       # placeholder SVG media to R2
+npm run db:seed:media       # purge R2, import dealer photos → seed-media-data.js
 ```
+
+Seed manifests (`web/prisma/seed-media-data.js`, `seed-media-urls.js`) are **committed in git**. VPS runs the same scripts from `$HOME/repo/car-retail` after `git pull` — only secrets live outside the repo (`~/prod/shared/.../secrets/`).
 
 ### 4. Run dev server
 
@@ -163,7 +165,7 @@ See [docs/deploy-checklist.md](docs/deploy-checklist.md) for VPS paths and sign-
 | `npm run db:deploy` | Prisma migrate deploy |
 | `npm run db:seed` | Seed base data |
 | `npm run db:seed:mock` | Seed mock/demo content |
-| `npm run db:seed:media` | Upload placeholder media to R2 |
+| `npm run db:seed:media` | Purge R2, re-upload from `prisma/seed-media-data.js`, write URLs |
 
 ## License
 
