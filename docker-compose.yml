@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile
       args:
         DATABASE_URL: ${DATABASE_URL}
-      network: db-net
+      network: host
     restart: unless-stopped
     env_file:
       - ${APP_ENV_FILE:-web/.env}
