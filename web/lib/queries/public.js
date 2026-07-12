@@ -4,6 +4,21 @@ import { pickLocale } from "@/lib/attributes";
 
 const REVALIDATE = 300;
 
+/** Prisma Decimal is not serializable to client components or unstable_cache. */
+function serializeVariants(variants) {
+  return variants.map((variant) => ({
+    ...variant,
+    price: variant.price != null ? Number(variant.price) : null,
+  }));
+}
+
+function serializeModels(models) {
+  return models.map((model) => ({
+    ...model,
+    variants: serializeVariants(model.variants ?? []),
+  }));
+}
+
 export const getSiteSettings = unstable_cache(
   () =>
     prisma.siteSettings.findUnique({
@@ -33,8 +48,8 @@ export const getUnits = unstable_cache(
 );
 
 export const getPublishedModels = unstable_cache(
-  () =>
-    prisma.vehicleModel.findMany({
+  async () => {
+    const models = await prisma.vehicleModel.findMany({
       where: { published: true },
       include: {
         heroMedia: true,
@@ -45,8 +60,10 @@ export const getPublishedModels = unstable_cache(
         segment: { include: { line: true } },
       },
       orderBy: { sortOrder: "asc" },
-    }),
-  ["public-models", "v3"],
+    });
+    return serializeModels(models);
+  },
+  ["public-models", "v4"],
   { revalidate: REVALIDATE, tags: ["models"] }
 );
 
@@ -57,7 +74,7 @@ export const getHeroSlides = unstable_cache(
       include: { imageMedia: true },
       orderBy: { sortOrder: "asc" },
     }),
-  ["public-hero-slides", "v3"],
+  ["public-hero-slides", "v4"],
   { revalidate: REVALIDATE, tags: ["hero"] }
 );
 
@@ -152,8 +169,8 @@ export async function getNewsBySlug(locale, slug) {
 
 export async function getModelWithDetails(id) {
   return unstable_cache(
-    () =>
-      prisma.vehicleModel.findUnique({
+    async () => {
+      const model = await prisma.vehicleModel.findUnique({
         where: { id },
         include: {
           heroMedia: true,
@@ -165,8 +182,11 @@ export async function getModelWithDetails(id) {
           faqs: { orderBy: { sortOrder: "asc" } },
           segment: { include: { line: true } },
         },
-      }),
-    [`public-model-${id}`, "v2"],
+      });
+      if (!model) return null;
+      return { ...model, variants: serializeVariants(model.variants ?? []) };
+    },
+    [`public-model-${id}`, "v3"],
     { revalidate: REVALIDATE, tags: ["models"] }
   )();
 }

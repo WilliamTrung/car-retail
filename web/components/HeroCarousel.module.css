@@ -35,7 +35,6 @@
   background: linear-gradient(135deg, var(--color-navy-dark) 0%, var(--color-navy-light) 100%);
 }
 
-/* Legibility Overlay: Left-heavy dark gradient */
 .overlay {
   position: absolute;
   inset: 0;
@@ -46,6 +45,15 @@
     rgba(11, 19, 43, 0.15) 100%
   );
   z-index: 1;
+}
+
+.slide[data-has-image="true"] .overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(11, 19, 43, 0.72) 0%,
+    rgba(11, 19, 43, 0.35) 45%,
+    rgba(11, 19, 43, 0.05) 100%
+  );
 }
 
 .inner {

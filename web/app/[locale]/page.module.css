@@ -65,9 +65,9 @@
 .modelHero[data-has-image="true"] .modelHeroOverlay {
   background: linear-gradient(
     0deg,
-    rgba(11, 19, 43, 0.9) 0%,
-    rgba(11, 19, 43, 0.45) 55%,
-    rgba(11, 19, 43, 0.2) 100%
+    rgba(11, 19, 43, 0.82) 0%,
+    rgba(11, 19, 43, 0.28) 55%,
+    rgba(11, 19, 43, 0.08) 100%
   );
 }
 
