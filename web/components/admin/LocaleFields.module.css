@@ -1,12 +1,18 @@
 .wrap {
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-md);
-  margin: 0 0 var(--space-md);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin: 0 0 var(--space-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .wrap legend {
-  font-weight: 600;
+  font-weight: 800;
+  color: var(--color-navy-dark);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   padding: 0 var(--space-xs);
 }
 
@@ -14,24 +20,52 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
-  font-size: 0.875rem;
-  margin-bottom: var(--space-sm);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--color-muted);
+  margin-bottom: var(--space-md);
+}
+
+.label:last-child {
+  margin-bottom: 0;
 }
 
 .field {
   width: 100%;
-  padding: 0.5rem 0.625rem;
+  padding: 0.75rem 0.95rem;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   font: inherit;
+  font-weight: 400;
+  background: #f8fafc;
+  color: var(--color-text);
+  transition: var(--transition-fast);
+  margin-top: 0.25rem;
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 86, 198, 0.1);
 }
 
 textarea.field {
   resize: vertical;
 }
 
+/* Missing translation warning label badge */
 .missing {
-  color: #b45309;
-  font-size: 0.75rem;
-  margin-left: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #92400e;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-left: var(--space-sm);
 }

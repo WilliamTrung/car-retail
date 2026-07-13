@@ -126,9 +126,9 @@ Per [docker-compose-convention](https://github.com/) — app manages itself only
 **VPS paths:**
 ```text
 $HOME/repo/car-retail
-~/prod/shared/car-retail/secrets/app/.env
-~/prod/shared/car-retail/secrets/deploy.env
-~/prod/shared/car-retail/logs/
+~/dev/shared/car-retail/secrets/app/.env
+~/dev/shared/car-retail/secrets/deploy.env
+~/dev/shared/car-retail/logs/
 ```
 
 **Repo files:**

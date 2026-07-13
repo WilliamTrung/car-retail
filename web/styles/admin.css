@@ -1,0 +1,142 @@
+/*fallback CSS styling for raw inputs/selects/buttons scoped to the admin panel */
+
+.admin-body select {
+  padding: 0.5rem 1.75rem 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.25rem;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.admin-body select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 86, 198, 0.1);
+}
+
+.admin-body button {
+  padding: 0.5rem 1rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+}
+
+.admin-body button:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.admin-body button:active {
+  transform: translateY(1px);
+}
+
+.admin-body button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Scoped Table form elements overrides (Leads Update / Delete Buttons) */
+.admin-body table td select,
+.admin-body table td input[type="text"] {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8125rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: #f8fafc;
+  width: 100%;
+  max-width: 16rem;
+  font-family: var(--font-sans);
+  transition: var(--transition-fast);
+}
+
+.admin-body table td select:focus,
+.admin-body table td input[type="text"]:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(0, 86, 198, 0.08);
+}
+
+/* Style table buttons inline: e.g. status submit buttons and raw DeleteButtons */
+.admin-body table td button {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  background: #f1f5f9;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  margin-top: 0.25rem;
+  width: fit-content;
+}
+
+.admin-body table td button:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+/* Make raw table buttons that acts as 'Delete' have warning alert red outlines */
+.admin-body table td button[type="button"] {
+  background: #fef2f2;
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.admin-body table td button[type="button"]:hover {
+  background: #fee2e2;
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #b91c1c;
+}
+
+/* Make status form submit buttons have primary layouts */
+.admin-body table td button[type="submit"] {
+  background: var(--color-accent);
+  color: #ffffff;
+  border-color: var(--color-accent);
+}
+
+.admin-body table td button[type="submit"]:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+/* Adjust layout actions toolbar buttons inside panel.module.css */
+.admin-body div[class*="panel_actions"] button,
+.admin-body p[class*="panel_actions"] button,
+.admin-body div[class*="panel_actions"] a,
+.admin-body p[class*="panel_actions"] a {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-body div[class*="panel_actions"] button:hover,
+.admin-body p[class*="panel_actions"] button:hover,
+.admin-body div[class*="panel_actions"] a:hover,
+.admin-body p[class*="panel_actions"] a:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+}

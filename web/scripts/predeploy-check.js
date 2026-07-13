@@ -10,6 +10,13 @@ import { fileURLToPath } from "url";
 const root = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 const SCAN_DIRS = ["app", "components", "lib", "messages", "prisma"];
 const BANNED = [/vinfast/i, /vinfastauto\.com/i, /shop\.vinfastauto/i];
+/** Dev-only reference seed files may contain literal source URLs/names */
+const BANNED_EXCLUDE = [
+  "prisma/seed-media-data.js",
+  "prisma/seed-media-urls.js",
+  "prisma/seed-scraped.js",
+  "scripts/scrape-reference/output/manifest.json",
+];
 const WARN_DEFAULT_SECRET = /change-me-in-production/;
 
 /** @param {string} dir @param {string[]} files */
@@ -32,6 +39,8 @@ for (const dir of SCAN_DIRS) {
   const full = join(root, dir);
   try {
     for (const file of walk(full)) {
+      const rel = relative(root, file).replace(/\\/g, "/");
+      if (BANNED_EXCLUDE.some((p) => rel === p || rel.endsWith(p))) continue;
       const text = readFileSync(file, "utf8");
       for (const pattern of BANNED) {
         if (pattern.test(text)) {

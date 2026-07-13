@@ -54,7 +54,8 @@ Thumbs.db
 web/prisma/*.db
 web/prisma/*.db-journal
 
-# Misc local artifacts
+# Scrape output (screenshots local only; manifest committed)
+web/scripts/scrape-reference/output/screenshots/
 *.local
 .cache/
 .turbo/

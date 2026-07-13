@@ -197,7 +197,11 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* Automatic Promotional Overlay Modal Popup */}
-      <PromoModal locale={locale} models={models} badge={pickLocale(promo?.label, locale) || undefined} />
+      <PromoModal
+        locale={locale}
+        models={models.map((m) => ({ id: m.id, name: m.name }))}
+        badge={pickLocale(promo?.label, locale) || undefined}
+      />
     </>
   );
 }

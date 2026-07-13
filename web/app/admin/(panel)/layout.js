@@ -8,9 +8,13 @@ export default async function AdminPanelLayout({ children }) {
   if (!session) redirect("/admin/login");
 
   return (
-    <div className={panelStyles.panel}>
+    <div className={panelStyles.panelContainer}>
       <AdminNav session={session} />
-      {children}
+      <main className={panelStyles.mainContent}>
+        <div className={panelStyles.contentInner}>
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

@@ -13,8 +13,13 @@
     "db:studio": "prisma studio",
     "db:seed": "node prisma/seed.js",
     "db:seed:mock": "node prisma/seed-mock.js",
+    "db:seed:scraped": "node prisma/seed-bootstrap.js && node prisma/seed-scraped.js",
     "db:seed:media": "node scripts/seed-media.js",
     "db:seed:media:reference": "node scripts/seed-media-reference.js",
+    "db:reset": "node scripts/reset-all.js",
+    "db:reseed": "node scripts/reset-all.js && npm run db:seed:scraped && npm run db:seed:media",
+    "scrape:reference": "node scripts/scrape-reference/playwright-scrape.js",
+    "scrape:generate": "node scripts/scrape-reference/generate-seed.js",
     "predeploy:check": "node scripts/predeploy-check.js"
   },
   "prisma": {
@@ -32,6 +37,7 @@
     "@eslint/eslintrc": "^3.3.0",
     "eslint": "^9.22.0",
     "eslint-config-next": "^15.2.4",
+    "playwright": "^1.51.1",
     "prisma": "^6.5.0"
   }
 }

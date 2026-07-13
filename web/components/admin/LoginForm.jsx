@@ -38,20 +38,46 @@ export default function LoginForm() {
   }
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
-      <h1>Admin login</h1>
-      {error ? <p className={styles.error}>{error}</p> : null}
-      <label>
-        Email
-        <input name="email" type="email" required autoComplete="username" />
-      </label>
-      <label>
-        Password
-        <input name="password" type="password" required autoComplete="current-password" />
-      </label>
-      <button type="submit" disabled={loading}>
-        {loading ? "Signing in…" : "Sign in"}
-      </button>
-    </form>
+    <div className={styles.wrapper}>
+      <div className={styles.card}>
+        <div className={styles.header}>
+          <div className={styles.logoBadge}>🛡️</div>
+          <h1 className={styles.title}>Car Retail Admin</h1>
+          <p className={styles.subtitle}>Enter your credentials to manage dealership systems</p>
+        </div>
+
+        <form className={styles.form} onSubmit={handleSubmit}>
+          {error && <div className={styles.error}>{error}</div>}
+          
+          <label className={styles.field}>
+            <span className={styles.label}>Email Address</span>
+            <input 
+              name="email" 
+              type="email" 
+              required 
+              autoComplete="username" 
+              placeholder="e.g. admin@example.com"
+              className={styles.input}
+            />
+          </label>
+          
+          <label className={styles.field}>
+            <span className={styles.label}>Password</span>
+            <input 
+              name="password" 
+              type="password" 
+              required 
+              autoComplete="current-password" 
+              placeholder="••••••••"
+              className={styles.input}
+            />
+          </label>
+          
+          <button type="submit" className={styles.submit} disabled={loading}>
+            {loading ? "Verifying Credentials…" : "Sign In"}
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }

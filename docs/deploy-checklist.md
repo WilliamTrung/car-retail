@@ -6,17 +6,17 @@ Use on VPS after Phases 0–5 are complete locally.
 
 ```text
 $HOME/repo/car-retail
-~/prod/shared/car-retail/secrets/app/.env
-~/prod/shared/car-retail/secrets/deploy.env
-~/prod/shared/car-retail/logs/
+~/dev/shared/car-retail/secrets/app/.env
+~/dev/shared/car-retail/secrets/deploy.env
+~/dev/shared/car-retail/logs/
 ```
 
 ## 2. Secrets
 
 Copy from repo examples and fill real values:
 
-- `web/.env.example` → `~/prod/shared/car-retail/secrets/app/.env`
-- `deploy.env.example` → `~/prod/shared/car-retail/secrets/deploy.env`
+- `web/.env.example` → `~/dev/shared/car-retail/secrets/app/.env`
+- `deploy.env.example` → `~/dev/shared/car-retail/secrets/deploy.env`
 
 Required:
 
@@ -41,9 +41,72 @@ docker network create db-net
 ```bash
 cd $HOME/repo/car-retail
 git pull
-docker compose --env-file ~/prod/shared/car-retail/secrets/deploy.env run --rm migrate
-docker compose --env-file ~/prod/shared/car-retail/secrets/deploy.env up -d --build
+deploy car-retail
 ```
+
+Or manually:
+
+```bash
+docker compose --env-file ~/dev/shared/car-retail/secrets/deploy.env run --rm migrate
+docker compose --env-file ~/dev/shared/car-retail/secrets/deploy.env up -d --build
+```
+
+## 4.1 Seeding (git repo only)
+
+All seed scripts and manifest data live **in the repo** — nothing is maintained separately on the VPS.
+
+| Path | Purpose |
+|------|---------|
+| `web/prisma/seed.js` | Base catalog, CMS, admin user |
+| `web/prisma/seed-media-data.js` | Media manifest (stable IDs, r2Keys, links) |
+| `web/prisma/seed-media-urls.js` | Generated public URLs (committed after local seed) |
+| `web/scripts/seed-media.js` | Purge R2 + re-upload from manifest |
+
+**VPS holds only:** `$HOME/repo/car-retail` (git clone) and `~/dev/shared/car-retail/secrets/` (runtime env). No orphan seed files outside the clone.
+
+**Workflow:** change seed data locally → commit → push → on VPS `git pull` → run from checkout:
+
+```bash
+cd $HOME/repo/car-retail/web
+docker run --rm \
+  --env-file ~/dev/shared/car-retail/secrets/app/.env \
+  --network db-net \
+  -v "$HOME/repo/car-retail/web:/app" \
+  -w /app node:22-alpine \
+  sh -c 'apk add --no-cache libc6-compat && npm ci --omit=dev && node prisma/seed.js'
+
+docker run --rm \
+  --env-file ~/dev/shared/car-retail/secrets/app/.env \
+  --network db-net \
+  -v "$HOME/repo/car-retail/web:/app" \
+  -w /app node:22-alpine \
+  sh -c 'apk add --no-cache libc6-compat && npm ci --omit=dev && node scripts/seed-media.js'
+```
+
+Prefer running `db:seed:media` locally, committing `seed-media-data.js` + `seed-media-urls.js`, then VPS only needs `git pull` before the media seed step (R2 + DB update). Do not edit seed manifests only on the VPS.
+
+## 4.2 Reference scrape + full reseed (dev)
+
+Scrape dealer/OEM sites with Playwright, generate catalog seed, wipe DB + R2, reload:
+
+```bash
+cd web
+npm run scrape:reference    # Playwright → scripts/scrape-reference/output/manifest.json
+npm run scrape:generate     # → prisma/seed-scraped.js, seed-media-data.js, docs/reference-site-layouts.md
+npm run db:reseed           # reset DB + R2, bootstrap, scraped catalog, media upload
+```
+
+**Legal:** literal VinFast names/images in generated seed files are **dev reference only** — replace before public launch ([project-context.md](./project-context.md)).
+
+On VPS (from repo checkout with env):
+
+```bash
+docker run --rm --env-file ~/dev/shared/car-retail/secrets/app/.env --network db-net \
+  -v "$HOME/repo/car-retail/web:/app" -w /app node:22-alpine \
+  sh -c 'apk add --no-cache libc6-compat && npm ci && npm run db:reseed'
+```
+
+Requires Playwright + Chromium on the machine running `scrape:reference` (typically local dev, not VPS).
 
 ## 5. Post-deploy verification
 
@@ -59,7 +122,7 @@ docker compose --env-file ~/prod/shared/car-retail/secrets/deploy.env up -d --bu
 ## 6. Rollback
 
 ```bash
-docker compose --env-file ~/prod/shared/car-retail/secrets/deploy.env down
+docker compose --env-file ~/dev/shared/car-retail/secrets/deploy.env down
 git checkout <previous-tag>
-docker compose --env-file ~/prod/shared/car-retail/secrets/deploy.env up -d --build
+docker compose --env-file ~/dev/shared/car-retail/secrets/deploy.env up -d --build
 ```

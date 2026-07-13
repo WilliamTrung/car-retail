@@ -1,5 +1,5 @@
 import "@/styles/globals.css";
-import styles from "./layout.module.css";
+import "@/styles/admin.css";
 
 export const metadata = {
   title: "Admin — Car Retail",
@@ -8,8 +8,8 @@ export const metadata = {
 export default function AdminLayout({ children }) {
   return (
     <html lang="vi">
-      <body>
-        <main className={styles.admin}>{children}</main>
+      <body className="admin-body" style={{ margin: 0, padding: 0, background: "var(--color-bg)" }}>
+        {children}
       </body>
     </html>
   );

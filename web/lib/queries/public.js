@@ -63,7 +63,7 @@ export const getPublishedModels = unstable_cache(
     });
     return serializeModels(models);
   },
-  ["public-models", "v5"],
+  ["public-models", "v6"],
   { revalidate: REVALIDATE, tags: ["models"] }
 );
 
@@ -74,7 +74,7 @@ export const getHeroSlides = unstable_cache(
       include: { imageMedia: true },
       orderBy: { sortOrder: "asc" },
     }),
-  ["public-hero-slides", "v5"],
+  ["public-hero-slides", "v6"],
   { revalidate: REVALIDATE, tags: ["hero"] }
 );
 
