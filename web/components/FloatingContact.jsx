@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Link } from "@/lib/i18n/navigation";
+import { Link, usePathname } from "@/lib/i18n/navigation";
 import styles from "./FloatingContact.module.css";
 
 /**
@@ -13,6 +13,8 @@ import styles from "./FloatingContact.module.css";
  */
 export default function FloatingContact({ locale, primaryPhone = "", testDriveRoute = "/book-test-drive" }) {
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const pathname = usePathname();
+  const hasStickyBar = /\/models\//.test(pathname);
 
   // Clean the phone number for tel: link and Zalo link
   const cleanPhone = primaryPhone ? primaryPhone.replace(/\D/g, "") : "";
@@ -34,7 +36,7 @@ export default function FloatingContact({ locale, primaryPhone = "", testDriveRo
   return (
     <div className={styles.container}>
       {/* Floating Action Column - Bottom Left */}
-      <div className={styles.widgets}>
+      <div className={`${styles.widgets} ${hasStickyBar ? styles.widgetsAboveSticky : ""}`}>
         {telUrl && (
           <a
             href={telUrl}
@@ -97,7 +99,7 @@ export default function FloatingContact({ locale, primaryPhone = "", testDriveRo
       {/* Back to Top button - Bottom Right */}
       <button
         type="button"
-        className={`${styles.scrollTop} ${showScrollTop ? styles.scrollTopVisible : ""}`}
+        className={`${styles.scrollTop} ${showScrollTop ? styles.scrollTopVisible : ""} ${hasStickyBar ? styles.scrollTopAboveSticky : ""}`}
         onClick={scrollToTop}
         aria-label="Scroll to top"
         title="Về đầu trang"

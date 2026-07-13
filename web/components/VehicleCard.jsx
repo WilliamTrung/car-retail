@@ -18,81 +18,72 @@ export default function VehicleCard({ locale, model, priceLabel }) {
   const prices = model.variants.map((v) => v.price).filter(Boolean);
   const minPrice = prices.length ? prices.reduce((a, b) => (Number(a) < Number(b) ? a : b)) : null;
 
-  // Format Starting Price
-  const startingPriceText = minPrice
-    ? (locale === "vi" 
-       ? `Giá chỉ từ: ${formatPriceFrom(minPrice, locale)}` 
-       : `Price from: ${formatPriceFrom(minPrice, locale)}`)
-    : null;
-
-  // Parse attributes dynamically from JSON field
   let attributes = [];
   try {
-    attributes = typeof model.attributes === "string" 
-      ? JSON.parse(model.attributes) 
-      : (model.attributes ?? []);
+    attributes =
+      typeof model.attributes === "string"
+        ? JSON.parse(model.attributes)
+        : (model.attributes ?? []);
   } catch {
     attributes = [];
   }
 
-  // Extract core specifications for grid list
   const rangeAttr = attributes.find((a) => a.key === "range");
   const seatsAttr = attributes.find((a) => a.key === "seats");
-  const batteryAttr = attributes.find((a) => a.key === "battery");
 
   return (
     <article className={styles.card}>
-      {/* Zoom-on-hover Image Wrapper */}
-      <div className={styles.imageWrapper}>
-        {imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={imageUrl} alt={alt} className={styles.image} loading="lazy" />
-        ) : (
-          <div className={styles.placeholder} aria-hidden="true" />
-        )}
-      </div>
+      <Link href={{ pathname: "/models/[slug]", params: { slug } }} className={styles.imageLink}>
+        <div className={styles.imageStage}>
+          {imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={imageUrl} alt={alt} className={styles.image} loading="lazy" />
+          ) : (
+            <div className={styles.placeholder} aria-hidden="true" />
+          )}
+        </div>
+      </Link>
 
-      <div className={styles.info}>
-        <h3 className={styles.name}>{name}</h3>
+      <div className={styles.body}>
+        <Link href={{ pathname: "/models/[slug]", params: { slug } }} className={styles.nameLink}>
+          <h3 className={styles.name}>{name}</h3>
+        </Link>
         {tagline ? <p className={styles.tagline}>{tagline}</p> : null}
-        
-        {startingPriceText ? <p className={styles.price}>{startingPriceText}</p> : null}
-        
-        {/* Specifications strip inside card */}
-        {(rangeAttr || seatsAttr || batteryAttr) && (
-          <div className={styles.specStrip}>
-            {seatsAttr && (
-              <span className={styles.specItem} title="Số chỗ ngồi">
-                💺 {seatsAttr.value} {locale === "vi" ? "chỗ" : "seats"}
-              </span>
-            )}
-            {rangeAttr && (
-              <span className={styles.specItem} title="Quãng đường đi được">
-                ⚡ {rangeAttr.value} km
-              </span>
-            )}
-            {batteryAttr && (
-              <span className={styles.specItem} title="Dung lượng pin">
-                🔋 {batteryAttr.value} kWh
-              </span>
-            )}
-          </div>
+
+        {minPrice ? (
+          <p className={styles.price}>
+            <span className={styles.priceLabel}>{locale === "vi" ? "Giá từ" : "From"}</span>
+            {formatPriceFrom(minPrice, locale)}
+          </p>
+        ) : null}
+
+        {(rangeAttr || seatsAttr) && (
+          <ul className={styles.specs}>
+            {rangeAttr ? (
+              <li>
+                <span className={styles.specKey}>{locale === "vi" ? "Quãng đường" : "Range"}</span>
+                <span className={styles.specVal}>{rangeAttr.value} km</span>
+              </li>
+            ) : null}
+            {seatsAttr ? (
+              <li>
+                <span className={styles.specKey}>{locale === "vi" ? "Chỗ ngồi" : "Seats"}</span>
+                <span className={styles.specVal}>{seatsAttr.value}</span>
+              </li>
+            ) : null}
+          </ul>
         )}
       </div>
 
-      {/* Double CTA Buttons */}
       <div className={styles.ctaRow}>
         <Link
-          href={{ pathname: "/models/[slug]", params: { slug } }}
-          className={styles.btnSecondary}
-        >
-          {priceLabel}
-        </Link>
-        <Link
-          href={{ pathname: "/deposit", query: { model: model.id } }}
+          href={{ pathname: "/book-test-drive", query: { model: model.id } }}
           className={styles.btnPrimary}
         >
-          {locale === "vi" ? "Đặt cọc" : "Deposit"}
+          {locale === "vi" ? "Lái thử" : "Test drive"}
+        </Link>
+        <Link href={{ pathname: "/models/[slug]", params: { slug } }} className={styles.btnSecondary}>
+          {priceLabel}
         </Link>
       </div>
     </article>

@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { pickLocale } from "@/lib/attributes";
-import { formatPriceFrom, formatVnd } from "@/lib/format";
+import { formatPriceFrom } from "@/lib/format";
 import SpecStrip from "@/components/SpecStrip";
 import PageSection from "@/components/PageSection";
-import sectionStyles from "@/components/PageSection.module.css";
+import VariantCards from "@/components/VariantCards";
+import ModelFeatureSections from "@/components/ModelFeatureSections";
 import { Link } from "@/lib/i18n/navigation";
 import { routing } from "@/lib/i18n/routing";
 import {
@@ -14,8 +15,18 @@ import {
   getSiteSettings,
   getUnits,
 } from "@/lib/queries/public";
-import { buildPageMetadata, resolveMediaUrl, resolveOgImageUrl } from "@/lib/seo";
+import { buildPageMetadata, resolveOgImageUrl } from "@/lib/seo";
 import styles from "../../page.module.css";
+
+/** Skip footer/nav scrape noise in model descriptions. */
+function isUsableDescription(description, tagline) {
+  if (!description?.trim()) return false;
+  if (description.trim() === tagline?.trim()) return false;
+  if (/THÔNG\s+TIN\s+LIÊN\s+HỆ|HỖ TRỢ KHÁCH HÀNG|SHOWROOM NETWORK|QUICK LINKS|HOTLINES/i.test(description)) {
+    return false;
+  }
+  return true;
+}
 
 export async function generateStaticParams() {
   const models = await getPublishedModels();
@@ -71,7 +82,11 @@ export default async function ModelPage({ params }) {
   const name = pickLocale(details.name, locale);
   const tagline = pickLocale(details.tagline, locale);
   const description = pickLocale(details.description, locale);
+  const showDescription = isUsableDescription(description, tagline);
   const heroUrl = details.heroMedia?.publicUrl;
+  const heroAlt = details.heroMedia?.altText
+    ? pickLocale(details.heroMedia.altText, locale)
+    : name;
   const attributes = Array.isArray(details.attributes) ? details.attributes : [];
   const segmentName = details.segment ? pickLocale(details.segment.name, locale) : "";
 
@@ -82,86 +97,81 @@ export default async function ModelPage({ params }) {
   const startingPrice = minPrice ? formatPriceFrom(minPrice, locale) : null;
 
   return (
-    <>
-      <header
-        className={styles.modelHero}
-        data-has-image={heroUrl ? "true" : "false"}
-        style={heroUrl ? { backgroundImage: `url(${heroUrl})` } : undefined}
-      >
-        <div className={styles.modelHeroOverlay} />
-        <div className={styles.modelHeroInner}>
-          {segmentName ? <span className={styles.modelHeroSegment}>{segmentName}</span> : null}
-          <h1>{name}</h1>
-          {tagline ? <p className={styles.modelHeroTagline}>{tagline}</p> : null}
-          {startingPrice ? <p className={styles.modelHeroPrice}>{startingPrice}</p> : null}
-          <div className={styles.ctaRow}>
-            <Link
-              href={{ pathname: "/book-test-drive", query: { model: details.id } }}
-              className={styles.ctaPrimary}
-            >
-              {t("testDriveCta")}
-            </Link>
-            <Link
-              href={{ pathname: "/deposit", query: { model: details.id } }}
-              className={styles.ctaSecondary}
-            >
-              {t("depositCta")}
-            </Link>
+    <div className={styles.modelPageRoot}>
+      <header className={styles.modelHeroDealer}>
+        <div className={styles.modelHeroGrid}>
+          <div className={styles.modelHeroCopy}>
+            {segmentName ? <span className={styles.modelHeroSegment}>{segmentName}</span> : null}
+            <h1>{name}</h1>
+            {tagline ? <p className={styles.modelHeroTaglineDealer}>{tagline}</p> : null}
+            {startingPrice ? (
+              <p className={styles.modelHeroPriceDealer}>
+                <span className={styles.modelHeroPriceLabel}>
+                  {locale === "vi" ? "Giá từ" : "From"}
+                </span>
+                {startingPrice}
+              </p>
+            ) : null}
+            <div className={styles.ctaRowDealer}>
+              <Link
+                href={{ pathname: "/book-test-drive", query: { model: details.id } }}
+                className={styles.ctaPrimaryDealer}
+              >
+                {t("testDriveCta")}
+              </Link>
+              <Link
+                href={{ pathname: "/deposit", query: { model: details.id } }}
+                className={styles.ctaSecondaryDealer}
+              >
+                {t("depositCta")}
+              </Link>
+            </div>
+          </div>
+
+          <div className={styles.modelHeroStage}>
+            {heroUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={heroUrl} alt={heroAlt} className={styles.modelHeroImage} />
+            ) : (
+              <div className={styles.modelHeroPlaceholder} aria-hidden="true" />
+            )}
           </div>
         </div>
       </header>
 
-      {description || attributes.length ? (
+      {showDescription || attributes.length ? (
         <section className={styles.modelIntro}>
-          {description ? <p className={styles.modelDescription}>{description}</p> : null}
+          {showDescription ? <p className={styles.modelDescription}>{description}</p> : null}
           <SpecStrip locale={locale} attributes={attributes} units={units} />
         </section>
       ) : null}
 
       {details.variants.length ? (
-        <PageSection title={t("variantsTitle")}>
-          <table className={styles.variantTable}>
-            <thead>
-              <tr>
-                <th>{locale === "vi" ? "Phiên bản" : "Variant"}</th>
-                <th>{locale === "vi" ? "Giá" : "Price"}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {details.variants.map((variant) => (
-                <tr key={variant.id}>
-                  <td>{pickLocale(variant.name, locale)}</td>
-                  <td>
-                    {variant.price
-                      ? formatPriceFrom(variant.price, locale)
-                      : formatVnd(variant.price)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <PageSection
+          title={t("variantsTitle")}
+          variant="dealer"
+          eyebrow={locale === "vi" ? "Phiên bản & giá" : "Variants & pricing"}
+        >
+          <VariantCards
+            locale={locale}
+            modelId={details.id}
+            variants={details.variants}
+            testDriveLabel={t("testDriveCta")}
+            depositLabel={t("depositCta")}
+          />
         </PageSection>
       ) : null}
 
       {details.featureSections.length ? (
-        <PageSection title={t("featuresTitle")}>
-          <div className={sectionStyles.grid}>
-            {details.featureSections.map((section) => (
-              <article key={section.id} className={styles.featureBlock}>
-                {section.imageMedia?.publicUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={section.imageMedia.publicUrl}
-                    alt={pickLocale(section.imageMedia.altText, locale) || pickLocale(section.title, locale)}
-                    className={styles.featureImage}
-                  />
-                ) : null}
-                <h3>{pickLocale(section.title, locale)}</h3>
-                <p>{pickLocale(section.body, locale)}</p>
-              </article>
-            ))}
+        <section className={styles.featuresWrap}>
+          <div className={styles.featuresHeading}>
+            <p className={styles.featuresEyebrow}>
+              {locale === "vi" ? "Điểm nổi bật" : "Highlights"}
+            </p>
+            <h2>{t("featuresTitle")}</h2>
           </div>
-        </PageSection>
+          <ModelFeatureSections locale={locale} sections={details.featureSections} />
+        </section>
       ) : null}
 
       {details.faqs.length ? (
@@ -197,6 +207,6 @@ export default async function ModelPage({ params }) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

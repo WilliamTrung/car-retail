@@ -1,34 +1,62 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  padding: var(--space-md);
+  height: 100%;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-smooth);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(0, 86, 198, 0.2);
+}
+
+.mediaWrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--color-dealer-stage);
+  overflow: hidden;
 }
 
 .placeholder {
-  aspect-ratio: 16 / 9;
-  border-radius: calc(var(--radius) - 2px);
+  width: 100%;
+  height: 100%;
   background: linear-gradient(145deg, #e8ecf4, #d5dbe8);
 }
 
 .image {
   width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: calc(var(--radius) - 2px);
+  height: 100%;
   object-fit: cover;
-  background: #e8ecf4;
+  transition: transform 0.5s ease;
+}
+
+.card:hover .image {
+  transform: scale(1.04);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: var(--space-md);
+  gap: var(--space-xs);
 }
 
 .title {
-  margin: 0 0 var(--space-sm);
+  margin: 0;
   font-size: 1.0625rem;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
 .title a {
-  color: var(--color-text);
+  color: var(--color-navy-dark);
   text-decoration: none;
 }
 
@@ -37,12 +65,33 @@
 }
 
 .excerpt {
-  margin: 0 0 var(--space-md);
+  margin: 0;
   color: var(--color-muted);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
 }
 
 .link {
-  font-weight: 600;
-  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: var(--space-sm);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.link::after {
+  content: "→";
+  transition: transform 0.2s ease;
+}
+
+.card:hover .link::after {
+  transform: translateX(3px);
 }

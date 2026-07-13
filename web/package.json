@@ -20,7 +20,8 @@
     "db:reseed": "node scripts/reset-all.js && npm run db:seed:scraped && npm run db:seed:media",
     "scrape:reference": "node scripts/scrape-reference/playwright-scrape.js",
     "scrape:generate": "node scripts/scrape-reference/generate-seed.js",
-    "predeploy:check": "node scripts/predeploy-check.js"
+    "predeploy:check": "node scripts/predeploy-check.js",
+    "test:ui": "node scripts/ui-smoke-extended.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

@@ -16,19 +16,23 @@ export default function NewsCard({ locale, post, ctaLabel }) {
 
   return (
     <article className={styles.card}>
-      {imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={imageUrl} alt={alt} className={styles.image} loading="lazy" />
-      ) : (
-        <div className={styles.placeholder} aria-hidden="true" />
-      )}
-      <h3 className={styles.title}>
-        <Link href={{ pathname: "/news/[slug]", params: { slug } }}>{title}</Link>
-      </h3>
-      {excerpt ? <p className={styles.excerpt}>{excerpt}</p> : null}
-      <Link href={{ pathname: "/news/[slug]", params: { slug } }} className={styles.link}>
-        {ctaLabel}
-      </Link>
+      <div className={styles.mediaWrap}>
+        {imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={imageUrl} alt={alt} className={styles.image} loading="lazy" />
+        ) : (
+          <div className={styles.placeholder} aria-hidden="true" />
+        )}
+      </div>
+      <div className={styles.body}>
+        <h3 className={styles.title}>
+          <Link href={{ pathname: "/news/[slug]", params: { slug } }}>{title}</Link>
+        </h3>
+        {excerpt ? <p className={styles.excerpt}>{excerpt}</p> : null}
+        <Link href={{ pathname: "/news/[slug]", params: { slug } }} className={styles.link}>
+          {ctaLabel}
+        </Link>
+      </div>
     </article>
   );
 }

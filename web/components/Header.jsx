@@ -34,12 +34,14 @@ function langSwitchHref(pathname, routeParams) {
  *   email?: string,
  *   primaryShowroom?: string,
  *   openingHours?: string,
+ *   modelNavItems?: { id: string, name: string, slug: string, imageUrl?: string | null }[],
  * }} props
  */
 export default function Header({
   dealerName,
   logoUrl,
   navItems = [],
+  modelNavItems = [],
   ctaTestDrive,
   ctaDeposit,
   locale: localeProp,
@@ -54,6 +56,8 @@ export default function Header({
   const routeParams = useParams();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [modelsOpen, setModelsOpen] = useState(false);
+  const [modelsPinned, setModelsPinned] = useState(false);
 
   const langHref = langSwitchHref(pathname, routeParams);
   const brand = dealerName || t("siteName");
@@ -61,6 +65,8 @@ export default function Header({
 
   useEffect(() => {
     setMenuOpen(false);
+    setModelsOpen(false);
+    setModelsPinned(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -133,6 +139,48 @@ export default function Header({
 
           {/* Nav list - Center (Desktop) / Slide Drawer (Mobile) */}
           <nav id="site-nav" className={`${styles.nav} ${menuOpen ? styles.navOpen : ""}`}>
+            {modelNavItems.length > 0 ? (
+              <div
+                className={`${styles.modelsNav} ${modelsOpen || modelsPinned ? styles.modelsNavOpen : ""}`}
+                onMouseEnter={() => setModelsOpen(true)}
+                onMouseLeave={() => setModelsOpen(false)}
+              >
+                <button
+                  type="button"
+                  className={styles.modelsTrigger}
+                  aria-expanded={modelsOpen || modelsPinned}
+                  aria-haspopup="true"
+                  onClick={() => {
+                    setModelsPinned((pinned) => !pinned);
+                    setModelsOpen(true);
+                  }}
+                >
+                  {locale === "vi" ? "Dòng xe" : "Models"}
+                  <span className={styles.chevron} aria-hidden="true" />
+                </button>
+                <div className={styles.modelsPanel}>
+                  {modelNavItems.map((model) => (
+                    <Link
+                      key={model.id}
+                      href={{ pathname: "/models/[slug]", params: { slug: model.slug } }}
+                      className={styles.modelLink}
+                      onClick={() => {
+                        setModelsOpen(false);
+                        setModelsPinned(false);
+                      }}
+                    >
+                      {model.imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={model.imageUrl} alt="" className={styles.modelThumb} />
+                      ) : (
+                        <span className={styles.modelThumbPlaceholder} aria-hidden="true" />
+                      )}
+                      <span className={styles.modelName}>{model.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             {navItems.map((item) => (
               <Link key={item.id} href={item.href} className={styles.navLink}>
                 {item.label}

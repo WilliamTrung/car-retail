@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import VehicleCard from "./VehicleCard";
 import { pickLocale } from "@/lib/attributes";
-import sectionStyles from "./PageSection.module.css";
 import styles from "./VehicleLineup.module.css";
 
 /**
@@ -15,58 +14,54 @@ import styles from "./VehicleLineup.module.css";
  * }} props
  */
 export default function VehicleLineup({ locale, models, sectionTitle, priceLabel }) {
-  const [selectedLineId, setSelectedLineId] = useState("all");
+  const [selectedSegment, setSelectedSegment] = useState("all");
 
-  // Extract unique lines dynamically from the list of published models
-  const uniqueLines = useMemo(() => {
-    const linesMap = new Map();
+  const segments = useMemo(() => {
+    const map = new Map();
     models.forEach((m) => {
-      const line = m.segment?.line;
-      if (line) {
-        linesMap.set(line.id, line);
-      }
+      const seg = m.segment;
+      if (seg) map.set(seg.key, seg);
     });
-    return Array.from(linesMap.values()).sort((a, b) => a.sortOrder - b.sortOrder);
+    return Array.from(map.values()).sort((a, b) => a.sortOrder - b.sortOrder);
   }, [models]);
 
-  // Filter models based on selection
   const filteredModels = useMemo(() => {
-    if (selectedLineId === "all") return models;
-    return models.filter((m) => m.segment?.line?.id === selectedLineId);
-  }, [models, selectedLineId]);
+    if (selectedSegment === "all") return models;
+    return models.filter((m) => m.segment?.key === selectedSegment);
+  }, [models, selectedSegment]);
 
   return (
-    <section className={styles.section}>
+    <section className={styles.section} id="lineup">
       <div className={styles.inner}>
         <div className={styles.header}>
-          <h2 className={styles.title}>{sectionTitle}</h2>
-          
-          {/* Horizontal Lineup Tabs (Only show if we have multiple vehicle lines) */}
-          {uniqueLines.length > 1 && (
-            <div className={styles.tabs} role="tablist" aria-label="Filter vehicles">
+          <div>
+            <p className={styles.eyebrow}>{locale === "vi" ? "Danh mục xe" : "Vehicle lineup"}</p>
+            <h2 className={styles.title}>{sectionTitle}</h2>
+          </div>
+
+          {segments.length > 1 && (
+            <div className={styles.tabs} role="tablist" aria-label="Filter by segment">
               <button
                 type="button"
                 role="tab"
-                aria-selected={selectedLineId === "all"}
-                onClick={() => setSelectedLineId("all")}
-                className={`${styles.tab} ${selectedLineId === "all" ? styles.tabActive : ""}`}
+                aria-selected={selectedSegment === "all"}
+                onClick={() => setSelectedSegment("all")}
+                className={`${styles.tab} ${selectedSegment === "all" ? styles.tabActive : ""}`}
               >
-                {locale === "vi" ? "Tất cả dòng xe" : "All Models"}
+                {locale === "vi" ? "Tất cả" : "All"}
               </button>
-              
-              {uniqueLines.map((line) => {
-                const lineName = pickLocale(line.name, locale);
-                const isActive = selectedLineId === line.id;
+              {segments.map((seg) => {
+                const isActive = selectedSegment === seg.key;
                 return (
                   <button
-                    key={line.id}
+                    key={seg.key}
                     type="button"
                     role="tab"
                     aria-selected={isActive}
-                    onClick={() => setSelectedLineId(line.id)}
+                    onClick={() => setSelectedSegment(seg.key)}
                     className={`${styles.tab} ${isActive ? styles.tabActive : ""}`}
                   >
-                    {lineName}
+                    {pickLocale(seg.name, locale)}
                   </button>
                 );
               })}
@@ -74,23 +69,22 @@ export default function VehicleLineup({ locale, models, sectionTitle, priceLabel
           )}
         </div>
 
-        {/* Dynamic vehicle grid */}
         {filteredModels.length > 0 ? (
-          <div className={`${sectionStyles.grid} ${sectionStyles.gridCols4} ${styles.gridAnimation}`}>
-            {filteredModels.map((model) => (
-              <VehicleCard
-                key={model.id}
-                locale={locale}
-                model={model}
-                priceLabel={priceLabel}
-              />
-            ))}
+          <div className={styles.trackWrap}>
+            <div className={styles.track} key={selectedSegment}>
+              {filteredModels.map((model) => (
+                <VehicleCard
+                  key={model.id}
+                  locale={locale}
+                  model={model}
+                  priceLabel={priceLabel}
+                />
+              ))}
+            </div>
           </div>
         ) : (
           <p className={styles.noVehicles}>
-            {locale === "vi" 
-              ? "Không có sản phẩm nào thuộc danh mục này." 
-              : "No models found in this category."}
+            {locale === "vi" ? "Không có sản phẩm nào thuộc danh mục này." : "No models in this category."}
           </p>
         )}
       </div>

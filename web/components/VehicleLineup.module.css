@@ -1,20 +1,21 @@
 .section {
-  padding: var(--space-xxl) var(--space-lg);
-  background: var(--color-surface);
+  padding: var(--space-xxl) 0;
+  background: var(--color-dealer-section);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .inner {
-  max-width: var(--max-width);
+  max-width: var(--max-width-wide);
   margin: 0 auto;
+  padding: 0 var(--space-lg);
 }
 
 .header {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
   margin-bottom: var(--space-xl);
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: var(--space-sm);
 }
 
 @media (min-width: 768px) {
@@ -22,80 +23,89 @@
     flex-direction: row;
     align-items: flex-end;
     justify-content: space-between;
-    padding-bottom: 0;
   }
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
 }
 
 .title {
   margin: 0;
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(1.5rem, 3vw, 2.125rem);
   font-weight: 800;
   color: var(--color-navy-dark);
 }
 
-/* Horizontal Scrollable Tabs */
 .tabs {
   display: flex;
-  gap: var(--space-sm);
+  gap: 0.25rem;
   overflow-x: auto;
   flex-wrap: nowrap;
-  padding-bottom: var(--space-xs);
+  padding-bottom: 2px;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Hide scrollbar for Firefox */
+  scrollbar-width: none;
 }
 
 .tabs::-webkit-scrollbar {
-  display: none; /* Hide scrollbar for Chrome/Safari */
+  display: none;
 }
 
 .tab {
-  background: transparent;
-  border: none;
-  font-size: 0.9375rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
   font-weight: 700;
   color: var(--color-muted);
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   cursor: pointer;
   white-space: nowrap;
-  position: relative;
   transition: var(--transition-fast);
 }
 
 .tab:hover {
   color: var(--color-accent);
+  border-color: rgba(0, 86, 198, 0.35);
 }
 
 .tabActive {
-  color: var(--color-accent);
-}
-
-.tabActive::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 100%;
-  height: 3px;
+  color: #fff;
   background: var(--color-accent);
-  border-radius: var(--radius-full);
+  border-color: var(--color-accent);
 }
 
-/* Grid Entry Animation */
-.gridAnimation {
-  animation: fadeIn 0.4s ease-out;
+.trackWrap {
+  margin: 0 calc(-1 * var(--space-lg));
+  padding: 0 var(--space-lg) var(--space-sm);
+}
+
+.track {
+  display: flex;
+  gap: var(--space-md);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--space-md);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  animation: fadeIn 0.35s ease-out;
 }
 
 .noVehicles {
   text-align: center;
   color: var(--color-muted);
   padding: var(--space-xxl) 0;
-  font-size: 1rem;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;

@@ -14,6 +14,17 @@
   flex-direction: column;
   gap: var(--space-sm);
   align-items: flex-start;
+  transition: bottom 0.2s ease;
+}
+
+.widgetsAboveSticky {
+  bottom: calc(var(--space-lg) + 4.5rem);
+}
+
+@media (max-width: 640px) {
+  .widgetsAboveSticky {
+    bottom: calc(var(--space-md) + 3.75rem);
+  }
 }
 
 .widget {
@@ -140,6 +151,16 @@
 .scrollTopVisible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.scrollTopAboveSticky {
+  bottom: calc(var(--space-lg) + 4.5rem);
+}
+
+@media (max-width: 640px) {
+  .scrollTopAboveSticky {
+    bottom: calc(var(--space-md) + 3.75rem);
+  }
 }
 
 .scrollTop .icon {

@@ -42,7 +42,185 @@
   max-width: 40rem;
 }
 
-/* Model detail full-bleed hero */
+/* Model detail — dealer stage hero */
+.modelPageRoot {
+  padding-bottom: 4.5rem;
+}
+
+.modelHeroDealer {
+  background: var(--color-dealer-stage);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-xl) var(--space-lg) 0;
+  overflow: hidden;
+}
+
+.modelHeroGrid {
+  max-width: var(--max-width-wide);
+  margin: 0 auto;
+  display: grid;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .modelHeroGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: var(--space-xl);
+    min-height: clamp(18rem, 38vw, 28rem);
+  }
+}
+
+.modelHeroCopy {
+  padding-bottom: var(--space-xl);
+}
+
+.modelHeroCopy h1 {
+  margin: 0 0 var(--space-sm);
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: 800;
+  color: var(--color-navy-dark);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.modelHeroSegment {
+  display: inline-block;
+  margin-bottom: var(--space-sm);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: rgba(0, 86, 198, 0.1);
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modelHeroTaglineDealer {
+  margin: 0 0 var(--space-md);
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  color: var(--color-muted);
+  max-width: 32rem;
+  line-height: 1.55;
+}
+
+.modelHeroPriceDealer {
+  margin: 0 0 var(--space-lg);
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+.modelHeroPriceLabel {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+  margin-bottom: 0.2rem;
+}
+
+.ctaRowDealer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.ctaPrimaryDealer,
+.ctaSecondaryDealer {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: var(--transition-smooth);
+}
+
+.ctaPrimaryDealer {
+  background: var(--color-accent);
+  color: #fff;
+  border: 1px solid var(--color-accent);
+}
+
+.ctaPrimaryDealer:hover {
+  background: var(--color-accent-hover);
+  color: #fff;
+}
+
+.ctaSecondaryDealer {
+  background: #fff;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.ctaSecondaryDealer:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.modelHeroStage {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 12rem;
+  padding: 0 var(--space-md);
+  overflow: visible;
+}
+
+@media (min-width: 900px) {
+  .modelHeroStage {
+    min-height: 100%;
+    padding: 0;
+  }
+}
+
+.modelHeroImage {
+  width: min(100%, 42rem);
+  max-height: clamp(14rem, 36vw, 26rem);
+  object-fit: contain;
+  object-position: center bottom;
+  display: block;
+}
+
+.modelHeroPlaceholder {
+  width: 80%;
+  height: 10rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, #dce4ef, #cbd5e1);
+}
+
+.featuresWrap {
+  margin-top: var(--space-xl);
+}
+
+.featuresHeading {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-lg) var(--space-lg);
+}
+
+.featuresEyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+}
+
+.featuresHeading h2 {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 1.875rem);
+  font-weight: 800;
+  color: var(--color-navy-dark);
+}
+
+/* Legacy full-bleed hero (unused) */
 .modelHero {
   position: relative;
   display: flex;
@@ -117,6 +295,12 @@
   max-width: var(--max-width);
   margin: 0 auto;
   padding: var(--space-xl) var(--space-lg) 0;
+}
+
+@media (max-width: 767px) {
+  .modelIntro {
+    padding-left: calc(var(--space-lg) + 3.5rem);
+  }
 }
 
 .modelDescription {
