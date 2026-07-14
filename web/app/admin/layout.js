@@ -2,7 +2,7 @@ import "@/styles/globals.css";
 import "@/styles/admin.css";
 
 export const metadata = {
-  title: "Admin — Car Retail",
+  title: "Quản trị — Car Retail",
 };
 
 export default function AdminLayout({ children }) {

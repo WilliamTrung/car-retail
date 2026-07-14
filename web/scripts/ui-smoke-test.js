@@ -13,6 +13,16 @@ function fail(msg) {
   console.error(`FAIL: ${msg}`);
 }
 
+async function dismissPromoModal(page) {
+  const backdrop = page.locator('[class*="PromoModal_backdrop"]');
+  if (await backdrop.isVisible({ timeout: 2000 }).catch(() => false)) {
+    const close = page.locator('[class*="PromoModal_closeBtn"]');
+    if (await close.isVisible().catch(() => false)) await close.click();
+    else await page.keyboard.press("Escape");
+    await backdrop.waitFor({ state: "hidden", timeout: 5000 }).catch(() => {});
+  }
+}
+
 async function main() {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
@@ -29,27 +39,39 @@ async function main() {
   // Home
   const homeRes = await page.goto(`${BASE}/vi`, { waitUntil: "networkidle", timeout: 30000 });
   if (!homeRes || homeRes.status() !== 200) fail(`Home /vi status ${homeRes?.status()}`);
+  await dismissPromoModal(page);
 
   const lineup = page.locator("#lineup");
   if (!(await lineup.isVisible())) fail("Home: #lineup section missing");
-  const cards = page.locator("#lineup article");
+  const cards = page.locator("#lineup a[class*='VehicleCard_card']");
   if ((await cards.count()) < 1) fail("Home: no vehicle cards in lineup");
+  const cardButtons = page.locator("#lineup a[class*='VehicleCard'] button");
+  if ((await cardButtons.count()) > 0) fail("Home: vehicle cards should not have buttons");
+  const href = await cards.first().getAttribute("href");
+  if (!href || !href.includes("/models/")) fail("Home: card should link to model detail");
 
   const modelsTrigger = page.getByRole("button", { name: /Dòng xe/i });
   if (!(await modelsTrigger.isVisible())) fail("Header: Models dropdown trigger missing");
   await modelsTrigger.click();
-  const modelLink = page.locator('a[href*="/vi/models/"]').first();
-  if (!(await modelLink.isVisible({ timeout: 3000 }))) fail("Header: models panel links not visible");
+  const expanded = await modelsTrigger.getAttribute("aria-expanded");
+  if (expanded !== "true") fail("Header: models dropdown should open on click");
 
-  // Model detail
+  await cards.first().click();
+  await page.waitForURL(/\/models\//, { timeout: 10000 });
+
+  // Model detail (known slug)
   await page.goto(`${BASE}/vi/models/vf-3`, { waitUntil: "networkidle", timeout: 30000 });
-  const h1 = page.locator("header h1").first();
-  if (!(await h1.isVisible())) fail("Model: hero h1 missing");
-  const heroImg = page.locator("header img").first();
-  if (!(await heroImg.isVisible())) fail("Model: hero stage image missing");
+  await dismissPromoModal(page);
+  const h1 = page.locator("h1").first();
+  if (!(await h1.isVisible())) fail("Model: product title missing");
+  const heroImg = page.locator('[class*="ModelGallery_mainImage"]').first();
+  if (!(await heroImg.isVisible())) fail("Model: gallery main image missing");
 
-  const variantCards = page.locator("section article h3").first();
-  if (!(await variantCards.isVisible())) fail("Model: variant cards missing");
+  const productPrice = page.locator('[class*="productPrice"]').first();
+  if (!(await productPrice.isVisible())) fail("Model: product price missing");
+
+  const tabDescription = page.getByRole("tab", { name: /Mô tả|Description/i });
+  if (!(await tabDescription.isVisible())) fail("Model: description tab missing");
 
   const stickyBar = page.locator('[class*="stickyBar"]').first();
   if (!(await stickyBar.isVisible())) fail("Model: sticky CTA bar missing");

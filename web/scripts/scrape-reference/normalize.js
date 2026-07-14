@@ -134,23 +134,66 @@ export function cleanModelName(name) {
 
 function mergeModel(existing, incoming, site) {
   const dealer = site.type === "wordpress-dealer";
-  return {
+  const merged = {
     ...existing,
     name: dealer && incoming.name
       ? { vi: cleanModelName(incoming.name.vi), en: cleanModelName(incoming.name.en || incoming.name.vi) }
       : existing.name || incoming.name,
     slug: dealer && incoming.slug ? incoming.slug : existing.slug || incoming.slug,
-    tagline: dealer && incoming.tagline ? incoming.tagline : existing.tagline || incoming.tagline,
-    description: dealer && incoming.description ? incoming.description : existing.description || incoming.description,
+    tagline: pickBetterLocale(existing.tagline, incoming.tagline, dealer),
+    description: pickBetterLocale(existing.description, incoming.description, dealer),
+    paragraphs: [...(existing.paragraphs || []), ...(incoming.paragraphs || [])],
+    highlights: [...(existing.highlights || []), ...(incoming.highlights || [])],
     attributes: incoming.attributes?.length ? incoming.attributes : existing.attributes,
     variants: mergeVariants(existing.variants, incoming.variants),
     images: mergeImages(existing.images, incoming.images),
-    featureSections: [...existing.featureSections, ...(incoming.featureSections || [])].slice(0, 6),
+    featureSections: dedupeFeatureSections([
+      ...(existing.featureSections || []),
+      ...(incoming.featureSections || []),
+    ]).slice(0, 8),
     faqs: [...existing.faqs, ...(incoming.faqs || [])].slice(0, 8),
     sources: [...existing.sources, { site: site.id, url: incoming.detailUrl }].filter(
       (s, i, arr) => arr.findIndex((x) => x.url === s.url) === i
     ),
   };
+  return merged;
+}
+
+function pickBetterLocale(a, b, preferIncoming) {
+  const av = cleanParagraph(a?.vi);
+  const bv = cleanParagraph(b?.vi);
+  if (preferIncoming && bv && !isNoiseCopy(bv) && bv.length >= (av?.length || 0)) return b;
+  if (av && !isNoiseCopy(av)) return a;
+  if (bv && !isNoiseCopy(bv)) return b;
+  return a || b;
+}
+
+function cleanParagraph(text) {
+  return String(text || "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isNoiseCopy(text) {
+  if (!text) return true;
+  if (/THÔNG\s+TIN\s+LIÊN HỆ|HỖ TRỢ KHÁCH HÀNG|Mô tả\.?\s*Mô tả/i.test(text)) return true;
+  if (/để biết thêm thông tin về sản phẩm và giá cả/i.test(text)) return true;
+  if (/liên hệ trực tiếp/i.test(text) && text.length < 120) return true;
+  return false;
+}
+
+function dedupeFeatureSections(sections) {
+  const seen = new Set();
+  const out = [];
+  for (const s of sections) {
+    const title = cleanParagraph(s.title?.vi || s.title);
+    if (!title) continue;
+    const key = title.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(s);
+  }
+  return out;
 }
 
 function mergeVariants(a = [], b = []) {
@@ -219,6 +262,9 @@ export function filterCatalogModels(models) {
 }
 
 export function sanitizeSlug(slug, key) {
+  if (ALLOWED_MODEL_KEYS.has(key)) {
+    return { vi: key, en: key };
+  }
   const vi = String(slug?.vi || key).split("/").filter(Boolean).pop() || key;
   const en = String(slug?.en || key).split("/").filter(Boolean).pop() || key;
   return { vi, en };

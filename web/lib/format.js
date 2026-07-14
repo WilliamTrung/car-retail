@@ -12,3 +12,10 @@ export function formatPriceFrom(amount, locale) {
   if (!formatted) return "";
   return locale === "vi" ? `Từ ${formatted} VNĐ` : `From ${formatted} VND`;
 }
+
+/** Compact price for lineup cards (reference dealer format). */
+export function formatCardPrice(amount, locale) {
+  const formatted = formatVnd(amount);
+  if (!formatted) return "";
+  return locale === "vi" ? `${formatted}Đ` : `${formatted} VND`;
+}

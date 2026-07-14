@@ -1,0 +1,111 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--color-muted);
+}
+
+.modeTabs {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.modeBtn,
+.modeActive {
+  padding: 0.25rem 0.65rem;
+  border: none;
+  background: #f8fafc;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modeActive {
+  background: var(--color-navy-dark);
+  color: #fff;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.35rem;
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: #f8fafc;
+}
+
+.toolBtn {
+  min-width: 2rem;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toolBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.editor {
+  min-height: 12rem;
+  padding: 0.75rem 0.95rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: #fff;
+  font: inherit;
+  line-height: 1.6;
+  outline: none;
+}
+
+.editor:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 86, 198, 0.1);
+}
+
+.editor ul,
+.editor ol {
+  margin: 0.5em 0;
+  padding-left: 1.35rem;
+}
+
+.source {
+  width: 100%;
+  min-height: 14rem;
+  padding: 0.75rem 0.95rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.source:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 86, 198, 0.1);
+}

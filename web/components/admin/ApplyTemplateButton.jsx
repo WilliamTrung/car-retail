@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { a } from "@/lib/admin/strings";
 
 /** @param {{ modelId: string, templates: { id: string, key: string, label: string }[] }} props */
 export default function ApplyTemplateButton({ modelId, templates }) {
@@ -9,7 +10,7 @@ export default function ApplyTemplateButton({ modelId, templates }) {
 
   async function handleApply() {
     if (!templateId) return;
-    if (!confirm("Replace model attributes with template items?")) return;
+    if (!confirm("Thay thế thông số xe bằng mẫu đã chọn?")) return;
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/models/${modelId}/apply-template`, {
@@ -19,12 +20,12 @@ export default function ApplyTemplateButton({ modelId, templates }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        alert(data.error || "Apply failed");
+        alert(data.error || "Áp dụng thất bại");
         return;
       }
       window.location.reload();
     } catch {
-      alert("Network error");
+      alert(a.networkError);
     } finally {
       setLoading(false);
     }
@@ -42,7 +43,7 @@ export default function ApplyTemplateButton({ modelId, templates }) {
         ))}
       </select>
       <button type="button" onClick={handleApply} disabled={loading}>
-        {loading ? "Applying…" : "Apply template"}
+        {loading ? "Đang áp dụng…" : "Áp dụng mẫu"}
       </button>
     </div>
   );

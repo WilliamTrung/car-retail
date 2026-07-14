@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { a } from "@/lib/admin/strings";
 import styles from "./AdminForm.module.css";
 
 /** @param {{ action: string, method?: string, children: React.ReactNode, successMessage?: string }} props */
-export default function AdminForm({ action, method = "POST", children, successMessage = "Saved." }) {
+export default function AdminForm({ action, method = "POST", children, successMessage = a.saved }) {
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,14 +27,14 @@ export default function AdminForm({ action, method = "POST", children, successMe
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || "Save failed");
+        setError(data.error || a.saveFailed);
         return;
       }
       setOk(successMessage);
       if (data.redirect) window.location.href = data.redirect;
       else window.location.reload();
     } catch {
-      setError("Network error");
+      setError(a.networkError);
     } finally {
       setLoading(false);
     }
@@ -45,7 +46,7 @@ export default function AdminForm({ action, method = "POST", children, successMe
       {error ? <p className={styles.error}>{error}</p> : null}
       {ok ? <p className={styles.ok}>{ok}</p> : null}
       <button type="submit" disabled={loading}>
-        {loading ? "Saving…" : "Save"}
+        {loading ? a.saving : a.save}
       </button>
     </form>
   );

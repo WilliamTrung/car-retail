@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { a } from "@/lib/admin/strings";
 
 /** @param {{ action: string, label?: string, confirmMessage?: string }} props */
 export default function DeleteButton({
   action,
-  label = "Delete",
-  confirmMessage = "Delete this item?",
+  label = a.delete,
+  confirmMessage = a.confirmDelete,
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -17,12 +18,12 @@ export default function DeleteButton({
       const res = await fetch(action, { method: "DELETE" });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        alert(data.error || "Delete failed");
+        alert(data.error || a.deleteFailed);
         return;
       }
       window.location.reload();
     } catch {
-      alert("Network error");
+      alert(a.networkError);
     } finally {
       setLoading(false);
     }

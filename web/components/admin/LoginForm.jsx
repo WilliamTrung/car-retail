@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { a } from "@/lib/admin/strings";
 import styles from "./LoginForm.module.css";
 
 export default function LoginForm() {
@@ -25,13 +26,13 @@ export default function LoginForm() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Login failed");
+        setError(data.error || a.login.failed);
         return;
       }
       router.push("/admin");
       router.refresh();
     } catch {
-      setError("Network error");
+      setError(a.networkError);
     } finally {
       setLoading(false);
     }
@@ -42,39 +43,39 @@ export default function LoginForm() {
       <div className={styles.card}>
         <div className={styles.header}>
           <div className={styles.logoBadge}>🛡️</div>
-          <h1 className={styles.title}>Car Retail Admin</h1>
-          <p className={styles.subtitle}>Enter your credentials to manage dealership systems</p>
+          <h1 className={styles.title}>{a.login.title}</h1>
+          <p className={styles.subtitle}>{a.login.subtitle}</p>
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
-          {error && <div className={styles.error}>{error}</div>}
-          
+          {error ? <div className={styles.error}>{error}</div> : null}
+
           <label className={styles.field}>
-            <span className={styles.label}>Email Address</span>
-            <input 
-              name="email" 
-              type="email" 
-              required 
-              autoComplete="username" 
-              placeholder="e.g. admin@example.com"
+            <span className={styles.label}>{a.login.email}</span>
+            <input
+              name="email"
+              type="email"
+              required
+              autoComplete="username"
+              placeholder="admin@example.com"
               className={styles.input}
             />
           </label>
-          
+
           <label className={styles.field}>
-            <span className={styles.label}>Password</span>
-            <input 
-              name="password" 
-              type="password" 
-              required 
-              autoComplete="current-password" 
+            <span className={styles.label}>{a.login.password}</span>
+            <input
+              name="password"
+              type="password"
+              required
+              autoComplete="current-password"
               placeholder="••••••••"
               className={styles.input}
             />
           </label>
-          
+
           <button type="submit" className={styles.submit} disabled={loading}>
-            {loading ? "Verifying Credentials…" : "Sign In"}
+            {loading ? a.login.verifying : a.login.submit}
           </button>
         </form>
       </div>

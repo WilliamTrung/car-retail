@@ -34,7 +34,14 @@
     "featuresTitle": "Highlights",
     "faqTitle": "FAQ",
     "testDriveCta": "Book test drive",
-    "depositCta": "Place deposit"
+    "depositCta": "Place deposit",
+    "quoteCta": "Register for a quote",
+    "callCta": "Call now",
+    "tabDescription": "Description",
+    "tabSpecs": "Specifications",
+    "breadcrumbHome": "Home",
+    "breadcrumbProducts": "Products",
+    "categoryLabel": "Category"
   },
   "forms": {
     "name": "Full name",

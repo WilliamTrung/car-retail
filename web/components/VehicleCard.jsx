@@ -1,14 +1,48 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { pickLocale } from "@/lib/attributes";
-import { formatPriceFrom } from "@/lib/format";
+import { formatCardPrice } from "@/lib/format";
 import styles from "./VehicleCard.module.css";
 
+const CARD_SPEC_KEYS = ["torque", "range", "seats", "power", "battery"];
+
 /**
- * @param {{ locale: string, model: object, priceLabel: string }} props
+ * @param {string} key
+ * @param {unknown} value
+ * @param {string} locale
  */
-export default function VehicleCard({ locale, model, priceLabel }) {
+function formatCardSpecLine(key, value, locale) {
+  const vi = locale === "vi";
+  const labels = {
+    torque: vi ? "Mô men xoắn cực đại" : "Max torque",
+    range: vi ? "Quãng đường đi" : "Range",
+    seats: vi ? "Số ghế" : "Seats",
+    power: vi ? "Công suất" : "Power",
+    battery: vi ? "Pin" : "Battery",
+  };
+  const suffix = {
+    torque: "Nm",
+    range: "km",
+    seats: vi ? " ghế" : " seats",
+    power: "kW",
+    battery: "kWh",
+  };
+  const label = labels[key] || key;
+  const unit = suffix[key] || "";
+  if (key === "seats") {
+    return `${label}: ${value}${unit}.`;
+  }
+  return `${label}: ${value}${unit}.`;
+}
+
+/**
+ * @param {{ locale: string, model: object }} props
+ */
+export default function VehicleCard({ locale, model }) {
+  const t = useTranslations("spec");
   const name = pickLocale(model.name, locale);
-  const tagline = pickLocale(model.tagline, locale);
   const slug = pickLocale(model.slug, locale);
   const imageUrl = model.heroMedia?.publicUrl;
   const alt = model.heroMedia?.altText
@@ -28,64 +62,52 @@ export default function VehicleCard({ locale, model, priceLabel }) {
     attributes = [];
   }
 
-  const rangeAttr = attributes.find((a) => a.key === "range");
-  const seatsAttr = attributes.find((a) => a.key === "seats");
+  const specLines = CARD_SPEC_KEYS.map((key) => attributes.find((a) => a.key === key))
+    .filter(Boolean)
+    .slice(0, 4)
+    .map((item) => {
+      try {
+        return formatCardSpecLine(item.key, item.value, locale);
+      } catch {
+        return `${t(item.key)}: ${item.value}.`;
+      }
+    });
 
   return (
-    <article className={styles.card}>
-      <Link href={{ pathname: "/models/[slug]", params: { slug } }} className={styles.imageLink}>
-        <div className={styles.imageStage}>
-          {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={imageUrl} alt={alt} className={styles.image} loading="lazy" />
-          ) : (
-            <div className={styles.placeholder} aria-hidden="true" />
-          )}
-        </div>
-      </Link>
-
-      <div className={styles.body}>
-        <Link href={{ pathname: "/models/[slug]", params: { slug } }} className={styles.nameLink}>
-          <h3 className={styles.name}>{name}</h3>
-        </Link>
-        {tagline ? <p className={styles.tagline}>{tagline}</p> : null}
-
-        {minPrice ? (
-          <p className={styles.price}>
-            <span className={styles.priceLabel}>{locale === "vi" ? "Giá từ" : "From"}</span>
-            {formatPriceFrom(minPrice, locale)}
-          </p>
-        ) : null}
-
-        {(rangeAttr || seatsAttr) && (
-          <ul className={styles.specs}>
-            {rangeAttr ? (
-              <li>
-                <span className={styles.specKey}>{locale === "vi" ? "Quãng đường" : "Range"}</span>
-                <span className={styles.specVal}>{rangeAttr.value} km</span>
-              </li>
-            ) : null}
-            {seatsAttr ? (
-              <li>
-                <span className={styles.specKey}>{locale === "vi" ? "Chỗ ngồi" : "Seats"}</span>
-                <span className={styles.specVal}>{seatsAttr.value}</span>
-              </li>
-            ) : null}
-          </ul>
+    <Link
+      href={{ pathname: "/models/[slug]", params: { slug } }}
+      className={styles.card}
+      aria-label={name}
+    >
+      <div className={styles.imageStage}>
+        {imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={imageUrl} alt={alt} className={styles.image} loading="lazy" />
+        ) : (
+          <div className={styles.placeholder} aria-hidden="true" />
         )}
       </div>
 
-      <div className={styles.ctaRow}>
-        <Link
-          href={{ pathname: "/book-test-drive", query: { model: model.id } }}
-          className={styles.btnPrimary}
-        >
-          {locale === "vi" ? "Lái thử" : "Test drive"}
-        </Link>
-        <Link href={{ pathname: "/models/[slug]", params: { slug } }} className={styles.btnSecondary}>
-          {priceLabel}
-        </Link>
+      <div className={styles.body}>
+        <h3 className={styles.name}>{name}</h3>
+
+        {minPrice ? (
+          <p className={styles.priceLine}>
+            <span className={styles.pricePrefix}>
+              {locale === "vi" ? "Giá từ:" : "From:"}
+            </span>{" "}
+            <span className={styles.priceValue}>{formatCardPrice(minPrice, locale)}</span>
+          </p>
+        ) : null}
+
+        {specLines.length > 0 ? (
+          <ul className={styles.bullets}>
+            {specLines.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        ) : null}
       </div>
-    </article>
+    </Link>
   );
 }

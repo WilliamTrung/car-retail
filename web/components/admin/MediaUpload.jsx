@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { a } from "@/lib/admin/strings";
 import styles from "./MediaUpload.module.css";
+
+const FOLDERS = ["SITE", "HEROES", "VEHICLES", "NEWS", "POLICIES"];
 
 export default function MediaUpload() {
   const [error, setError] = useState("");
@@ -19,13 +22,13 @@ export default function MediaUpload() {
       const res = await fetch("/api/admin/media", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Upload failed");
+        setError(data.error || a.uploadFailed);
         return;
       }
-      setOk(`Uploaded: ${data.id}`);
+      setOk(`${a.uploadSuccess}: ${data.id}`);
       window.location.reload();
     } catch {
-      setError("Network error");
+      setError(a.networkError);
     } finally {
       setLoading(false);
     }
@@ -34,31 +37,31 @@ export default function MediaUpload() {
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <label>
-        Folder
+        {a.media.folder}
         <select name="folder" defaultValue="SITE">
-          <option value="SITE">SITE</option>
-          <option value="HEROES">HEROES</option>
-          <option value="VEHICLES">VEHICLES</option>
-          <option value="NEWS">NEWS</option>
-          <option value="POLICIES">POLICIES</option>
+          {FOLDERS.map((folder) => (
+            <option key={folder} value={folder}>
+              {a.folders[folder] || folder}
+            </option>
+          ))}
         </select>
       </label>
       <label>
-        File
+        {a.media.file}
         <input name="file" type="file" required accept="image/*,application/pdf" />
       </label>
       <label>
-        Alt VI
+        {a.media.altVi}
         <input name="altVi" type="text" />
       </label>
       <label>
-        Alt EN
+        {a.media.altEn}
         <input name="altEn" type="text" />
       </label>
       {error ? <p className={styles.error}>{error}</p> : null}
       {ok ? <p className={styles.ok}>{ok}</p> : null}
       <button type="submit" disabled={loading}>
-        {loading ? "Uploading…" : "Upload to R2"}
+        {loading ? a.uploading : a.media.uploadR2}
       </button>
     </form>
   );

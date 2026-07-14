@@ -115,11 +115,11 @@ export default function TemplateItemsEditor({
       <p className={styles.hint}>Drag rows to set sort order. Sort order is saved from top to bottom.</p>
 
       {items.length === 0 ? (
-        <p className={styles.empty}>No template items yet. Add the first record below.</p>
+        <p className={styles.empty}>Chưa có mục mẫu. Thêm bản ghi đầu tiên bên dưới.</p>
       ) : (
         <div className={styles.list}>
           {items.map((row, index) => {
-            const label = specLabels[row.key] || row.key || "New item";
+            const label = specLabels[row.key] || row.key || "Mục mới";
             const isDragging = dragIndex === index;
             const isOver = overIndex === index && dragIndex !== null && dragIndex !== index;
 
@@ -213,7 +213,7 @@ export default function TemplateItemsEditor({
                 <button
                   type="button"
                   className={styles.removeBtn}
-                  aria-label={`Remove ${label}`}
+                  aria-label={`Xóa ${label}`}
                   onClick={() => removeRow(index)}
                 >
                   ×
@@ -239,7 +239,7 @@ export default function TemplateItemsEditor({
       </datalist>
 
       <button type="button" className={styles.addBtn} onClick={addRow}>
-        + Add item
+        + Thêm mục
       </button>
     </div>
   );

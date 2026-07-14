@@ -4,7 +4,7 @@ import { canAccess } from "@/lib/admin/roles";
 import prisma from "@/lib/prisma";
 import AdminForm from "@/components/admin/AdminForm";
 import LocaleFields from "@/components/admin/LocaleFields";
-import MediaSelect from "@/components/admin/MediaSelect";
+import MediaPicker from "@/components/admin/MediaPicker";
 import { pickLocale } from "@/lib/attributes";
 
 /** @param {{ params: Promise<{ id: string }> }} props */
@@ -31,35 +31,40 @@ export default async function NewsEditPage({ params }) {
 
   return (
     <>
-      <h1>Edit — {pickLocale(title, "vi")}</h1>
+      <h1>Sửa tin — {pickLocale(title, "vi")}</h1>
       <AdminForm action={`/api/admin/news/${id}`} method="PATCH">
         <LocaleFields prefix="slug" label="Slug" vi={slug.vi} en={slug.en} />
-        <LocaleFields prefix="title" label="Title" vi={title.vi} en={title.en} />
-        <LocaleFields prefix="excerpt" label="Excerpt" vi={excerpt.vi} en={excerpt.en} multiline />
-        <LocaleFields prefix="body" label="Body" vi={body.vi} en={body.en} multiline />
-        <MediaSelect
+        <LocaleFields prefix="title" label="Tiêu đề" vi={title.vi} en={title.en} />
+        <LocaleFields prefix="excerpt" label="Tóm tắt" vi={excerpt.vi} en={excerpt.en} multiline />
+        <LocaleFields prefix="body" label="Nội dung" vi={body.vi} en={body.en} multiline />
+        <MediaPicker
           name="featuredMediaId"
-          label="Featured image (OG fallback)"
+          label="Ảnh đại diện"
           value={post.featuredMediaId}
           assets={newsMedia}
           folder="NEWS"
         />
-        <label>
-          OG image media ID override (optional JSON meta)
-          <input
-            name="meta"
-            type="text"
-            defaultValue={JSON.stringify(meta)}
-            placeholder='{"vi":{"ogImageMediaId":"..."}}'
-          />
-        </label>
+        <MediaPicker
+          name="metaOgImageVi"
+          label="Ảnh OG (VI)"
+          value={meta.vi?.ogImageMediaId}
+          assets={newsMedia}
+          folder="NEWS"
+        />
+        <MediaPicker
+          name="metaOgImageEn"
+          label="Ảnh OG (EN)"
+          value={meta.en?.ogImageMediaId}
+          assets={newsMedia}
+          folder="NEWS"
+        />
         <label>
           <input name="published" type="checkbox" value="true" defaultChecked={post.published} />
-          Published
+          Đã xuất bản
         </label>
         <label>
           <input name="featured" type="checkbox" value="true" defaultChecked={post.featured} />
-          Featured on home
+          Nổi bật trang chủ
         </label>
       </AdminForm>
     </>

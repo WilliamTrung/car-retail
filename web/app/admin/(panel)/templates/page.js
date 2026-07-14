@@ -22,7 +22,7 @@ export default async function TemplatesPage() {
 
   return (
     <>
-      <h1>Attribute templates</h1>
+      <h1>Mẫu thông số</h1>
 
       {templates.map((tpl) => {
         const name = /** @type {{ vi?: string, en?: string }} */ (tpl.name);
@@ -33,7 +33,7 @@ export default async function TemplatesPage() {
                 Key
                 <input name="key" type="text" defaultValue={tpl.key} required />
               </label>
-              <LocaleFields prefix="name" label="Name" vi={name.vi} en={name.en} />
+              <LocaleFields prefix="name" label="Tên" vi={name.vi} en={name.en} />
               <TemplateItemsEditor
                 value={Array.isArray(tpl.items) ? tpl.items : []}
                 attributeKeys={attributeKeys}
@@ -41,18 +41,18 @@ export default async function TemplatesPage() {
                 specLabels={viMessages.spec}
               />
             </AdminForm>
-            <DeleteButton action={`/api/admin/templates/${tpl.id}`} confirmMessage={`Delete template ${tpl.key}?`} />
+            <DeleteButton action={`/api/admin/templates/${tpl.id}`} confirmMessage={`Xóa mẫu ${tpl.key}?`} />
           </div>
         );
       })}
 
-      <h2>Add template</h2>
-      <AdminForm action="/api/admin/templates" successMessage="Template created.">
+      <h2>Thêm mẫu</h2>
+      <AdminForm action="/api/admin/templates" successMessage="Đã tạo mẫu.">
         <label>
           Key
           <input name="key" type="text" required />
         </label>
-        <LocaleFields prefix="name" label="Name" />
+        <LocaleFields prefix="name" label="Tên" />
         <TemplateItemsEditor attributeKeys={attributeKeys} units={units} specLabels={viMessages.spec} />
       </AdminForm>
     </>

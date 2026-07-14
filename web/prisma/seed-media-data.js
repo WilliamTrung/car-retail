@@ -7,7 +7,7 @@ export const SEED_MEDIA_ASSETS = [
   {
     "id": "seed-media-ec-van-hero",
     "r2Key": "vehicles/ec-van-hero.png",
-    "sourceUrl": "https://vinfastdongsaigon.vn/wp-content/uploads/2022/11/vf3-thumb_1715586838.png",
+    "sourceUrl": "https://vinfastdongsaigon.vn/wp-content/uploads/2025/05/banner-ec-van-1024x576.png",
     "sourceSite": "vinfastdongsaigon",
     "publicUrl": "",
     "folder": "VEHICLES",
@@ -41,7 +41,7 @@ export const SEED_MEDIA_ASSETS = [
   {
     "id": "seed-media-limo-green-hero",
     "r2Key": "vehicles/limo-green-hero.png",
-    "sourceUrl": "https://vinfastdongsaigon.vn/wp-content/uploads/2022/11/vf3-thumb_1715586838.png",
+    "sourceUrl": "https://vinfastdongsaigon.vn/wp-content/uploads/2025/04/LimoGreen-768x453.png",
     "sourceSite": "vinfastdongsaigon",
     "publicUrl": "",
     "folder": "VEHICLES",
@@ -131,8 +131,8 @@ export const SEED_MEDIA_ASSETS = [
     "publicUrl": "",
     "folder": "VEHICLES",
     "altText": {
-      "vi": "Ảnh VF 5 Plus",
-      "en": "VF 5 Plus image"
+      "vi": "Ảnh VF 5",
+      "en": "VF 5 image"
     },
     "link": {
       "table": "vehicleModel",
@@ -210,8 +210,8 @@ export const SEED_MEDIA_ASSETS = [
   },
   {
     "id": "seed-media-vf-e34-hero",
-    "r2Key": "vehicles/vf-e34-hero.png",
-    "sourceUrl": "https://vinfastdongsaigon.vn/wp-content/uploads/2022/11/vf3-thumb_1715586838.png",
+    "r2Key": "vehicles/vf-e34-hero.webp",
+    "sourceUrl": "https://vinfastdongsaigon.vn/wp-content/uploads/2022/11/vinfast-vf-e34-img-banner-top.webp",
     "sourceSite": "vinfastdongsaigon",
     "publicUrl": "",
     "folder": "VEHICLES",

@@ -34,7 +34,14 @@
     "featuresTitle": "Điểm nổi bật",
     "faqTitle": "Câu hỏi thường gặp",
     "testDriveCta": "Đăng ký lái thử",
-    "depositCta": "Đặt cọc"
+    "depositCta": "Đặt cọc",
+    "quoteCta": "Đăng ký để nhận báo giá",
+    "callCta": "Gọi ngay",
+    "tabDescription": "Mô tả",
+    "tabSpecs": "Thông số kỹ thuật",
+    "breadcrumbHome": "Trang chủ",
+    "breadcrumbProducts": "Sản phẩm",
+    "categoryLabel": "Danh mục"
   },
   "forms": {
     "name": "Họ và tên",

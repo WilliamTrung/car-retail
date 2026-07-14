@@ -139,6 +139,21 @@
   position: relative;
 }
 
+@media (min-width: 768px) {
+  /* Bridge trigger → panel so hover does not drop in the gap */
+  .modelsNav:hover::before,
+  .modelsNavOpen::before,
+  .modelsNav:focus-within::before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: -0.5rem;
+    right: -0.5rem;
+    height: 0.5rem;
+    z-index: 1199;
+  }
+}
+
 .modelsTrigger {
   display: inline-flex;
   align-items: center;

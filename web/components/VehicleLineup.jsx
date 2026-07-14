@@ -10,10 +10,9 @@ import styles from "./VehicleLineup.module.css";
  *   locale: string,
  *   models: any[],
  *   sectionTitle: string,
- *   priceLabel: string,
  * }} props
  */
-export default function VehicleLineup({ locale, models, sectionTitle, priceLabel }) {
+export default function VehicleLineup({ locale, models, sectionTitle }) {
   const [selectedSegment, setSelectedSegment] = useState("all");
 
   const segments = useMemo(() => {
@@ -77,7 +76,6 @@ export default function VehicleLineup({ locale, models, sectionTitle, priceLabel
                   key={model.id}
                   locale={locale}
                   model={model}
-                  priceLabel={priceLabel}
                 />
               ))}
             </div>

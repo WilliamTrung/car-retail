@@ -63,7 +63,7 @@ export const getPublishedModels = unstable_cache(
     });
     return serializeModels(models);
   },
-  ["public-models", "v7"],
+  ["public-models", "v8"],
   { revalidate: REVALIDATE, tags: ["models"] }
 );
 
@@ -184,9 +184,20 @@ export async function getModelWithDetails(id) {
         },
       });
       if (!model) return null;
-      return { ...model, variants: serializeVariants(model.variants ?? []) };
+
+      const galleryIds = Array.isArray(model.gallery)
+        ? model.gallery.filter((id) => typeof id === "string" && id)
+        : [];
+      const galleryAssets = galleryIds.length
+        ? await prisma.mediaAsset.findMany({ where: { id: { in: galleryIds } } })
+        : [];
+      const galleryMedia = galleryIds
+        .map((id) => galleryAssets.find((asset) => asset.id === id))
+        .filter(Boolean);
+
+      return { ...model, galleryMedia, variants: serializeVariants(model.variants ?? []) };
     },
-    [`public-model-${id}`, "v3"],
+    [`public-model-${id}`, "v7"],
     { revalidate: REVALIDATE, tags: ["models"] }
   )();
 }

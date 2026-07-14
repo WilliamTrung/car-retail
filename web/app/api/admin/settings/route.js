@@ -19,10 +19,16 @@ function buildSeoDefaults(body) {
 }
 
 function buildTradeInBlock(body) {
-  return {
+  const block = {
     vi: { title: body.tradeInTitleVi || "", body: body.tradeInBodyVi || "" },
     en: { title: body.tradeInTitleEn || "", body: body.tradeInBodyEn || "" },
   };
+  if (body.tradeInImageMediaId) {
+    block.imageMediaId = body.tradeInImageMediaId;
+  } else if (body.tradeInImageMediaId === "") {
+    block.imageMediaId = null;
+  }
+  return block;
 }
 
 function buildPromoCountdown(body) {

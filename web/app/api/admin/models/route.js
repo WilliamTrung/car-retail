@@ -34,6 +34,7 @@ export async function POST(request) {
       tagline: body.taglineVi !== undefined ? biFromBody(body, "tagline") : undefined,
       description: body.descriptionVi !== undefined ? biFromBody(body, "description") : undefined,
       attributes: parseJsonField(body.attributes, []),
+      heroMediaId: body.heroMediaId || null,
       published: body.published === "true" || body.published === true,
       sortOrder: Number(body.sortOrder) || 0,
     },

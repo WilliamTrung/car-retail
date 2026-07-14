@@ -19,12 +19,18 @@ export async function scrapeWordPressDealer(page, site) {
       const href = a.href;
       const text = a.textContent?.trim() || "";
       const combined = `${text} ${href}`;
-      if (!reList.some((re) => re.test(combined)) && !/\/vf|mpv|limo|ec-van|ecvan/i.test(href)) continue;
+      if (!reList.some((re) => re.test(combined)) && !/\/vf|mpv|limo|ec-van|ecvan|minio|herio|nerio/i.test(href)) {
+        continue;
+      }
       if (href.includes("#") || href.includes("category") || href.includes("tin-tuc")) continue;
       const key = href.split("?")[0];
-      if (!links.has(key)) links.set(key, { url: key, text: text || href });
+      const score = /\/san-pham\//i.test(href) ? 2 : /\/danh-muc\//i.test(href) ? 1 : 0;
+      const prev = links.get(key);
+      if (!prev || score > prev.score) {
+        links.set(key, { url: key, text: text || href, score });
+      }
     }
-    return [...links.values()];
+    return [...links.values()].sort((a, b) => b.score - a.score);
   }, MODEL_PATTERNS.map((p) => ({ source: p.source, flags: p.flags })));
 
   const models = [];
@@ -55,33 +61,110 @@ async function scrapeModelDetail(page, link, site) {
   await page.waitForTimeout(1500);
 
   const data = await page.evaluate(() => {
-    const bodyText = document.body.innerText || "";
-    const title =
-      document.querySelector("h1")?.textContent?.trim() ||
-      document.title.replace(/\s*-\s*.+$/, "").trim();
-    const headings = [...document.querySelectorAll("h2, h3")]
-      .map((h) => h.textContent?.trim())
-      .filter(Boolean)
-      .slice(0, 8);
+    const NOISE = /^(mô tả|thông số|đăng ký|liên hệ|hỗ trợ|tin tức|danh mục|sản phẩm|trang chủ)$/i;
 
-    const imgs = [...document.querySelectorAll("img[src]")]
+    const title =
+      document.querySelector(".product_title, h1.entry-title, h1")?.textContent?.trim() ||
+      document.title.replace(/\s*[-|–—]\s*.+$/, "").trim();
+
+    const root =
+      document.querySelector(".product, .single-product, .woocommerce") ||
+      document.querySelector("main") ||
+      document.body;
+
+    const highlights = [];
+    for (const ul of root.querySelectorAll(
+      ".summary ul, .woocommerce-product-details__short-description ul, .product-summary ul, .entry-summary ul"
+    )) {
+      for (const li of ul.querySelectorAll("li")) {
+        const t = li.textContent?.trim().replace(/\s+/g, " ");
+        if (t && t.length > 4 && !NOISE.test(t)) highlights.push(t);
+      }
+    }
+
+    const descRoot =
+      document.querySelector("#tab-description") ||
+      document.querySelector(".woocommerce-Tabs-panel--description") ||
+      document.querySelector(".product-description") ||
+      document.querySelector(".entry-content");
+
+    const paragraphs = [];
+    const featureSections = [];
+
+    if (descRoot) {
+      for (const p of descRoot.querySelectorAll("p")) {
+        const t = p.textContent?.trim().replace(/\s+/g, " ");
+        if (t && t.length > 35 && !NOISE.test(t)) paragraphs.push(t);
+      }
+
+      for (const h of descRoot.querySelectorAll("h2, h3, h4")) {
+        const heading = h.textContent?.trim().replace(/\s+/g, " ");
+        if (!heading || heading.length < 8 || NOISE.test(heading)) continue;
+
+        let body = "";
+        let el = h.nextElementSibling;
+        while (el && !/^H[2-4]$/i.test(el.tagName)) {
+          if (el.tagName === "P") {
+            body = el.textContent?.trim().replace(/\s+/g, " ");
+            if (body && body !== heading) break;
+          } else if (el.tagName === "UL" || el.tagName === "OL") {
+            const items = [...el.querySelectorAll("li")]
+              .map((li) => li.textContent?.trim().replace(/\s+/g, " "))
+              .filter((t) => t && t.length > 8);
+            if (items.length) {
+              body = items.join(". ");
+              break;
+            }
+          } else if (el.tagName === "DIV") {
+            const innerP = el.querySelector("p");
+            const candidate = (innerP || el).textContent?.trim().replace(/\s+/g, " ");
+            if (candidate && candidate.length > 35 && candidate !== heading) {
+              body = candidate;
+              break;
+            }
+          }
+          el = el.nextElementSibling;
+        }
+
+        const img =
+          h.parentElement?.querySelector("img")?.src ||
+          h.nextElementSibling?.querySelector("img")?.src;
+        featureSections.push({
+          title: heading,
+          body: body || heading,
+          imageUrl: img ? img.split("?")[0] : null,
+        });
+      }
+    }
+
+    const galleryImgs = [
+      ...document.querySelectorAll(
+        ".woocommerce-product-gallery img, .flex-control-thumbs img, figure.woocommerce-product-gallery__image img, .product-gallery img"
+      ),
+    ]
+      .map((img) => img.src || img.dataset?.src || img.getAttribute("data-large_image"))
+      .filter(Boolean)
+      .map((s) => s.split("?")[0]);
+
+    const contentImgs = [...root.querySelectorAll("img[src]")]
       .map((img) => img.src)
-      .filter((src) => /wp-content\/uploads/i.test(src) && !/logo|icon/i.test(src))
+      .filter((src) => /wp-content\/uploads/i.test(src) && !/logo|icon|100x100|button\.gif/i.test(src))
       .map((src) => src.split("?")[0]);
 
-    const uniqueImgs = [...new Set(imgs)];
+    const imgs = [...new Set([...galleryImgs, ...contentImgs])];
 
+    const bodyText = root.innerText || "";
     const prices = [...bodyText.matchAll(/(\d{1,3}(?:\.\d{3})+)\s*₫/g)].map((m) => m[0]);
 
-    return { title, headings, bodyText: bodyText.slice(0, 8000), imgs: uniqueImgs, prices };
+    return { title, highlights, paragraphs, featureSections, imgs, prices, bodyText: bodyText.slice(0, 8000) };
   });
 
   const nameVi = data.title.replace(/VinFast\s*/i, "").trim() || link.text;
   const key = modelKeyFromName(nameVi);
   if (!key || key === "unknown") return null;
 
-      const slugPath = new URL(link.url).pathname.replace(/^\/|\/$/g, "");
-      const slugLeaf = slugPath.split("/").filter(Boolean).pop() || key;
+  const slugPath = new URL(link.url).pathname.replace(/^\/|\/$/g, "");
+  const slugLeaf = slugPath.split("/").filter(Boolean).pop() || key;
   const attributes = parseAttributes(data.bodyText);
   const priceFrom = parseVndPrice(data.prices.join(" "));
 
@@ -91,21 +174,32 @@ async function scrapeModelDetail(page, link, site) {
     sourceSite: site.id,
   }));
 
-  const featureSections = data.headings.slice(0, 4).map((h, i) => ({
-    title: { vi: h, en: h },
-    body: { vi: h, en: h },
-    sortOrder: i + 1,
-  }));
+  const featureSections = (data.featureSections.length ? data.featureSections : [])
+    .slice(0, 6)
+    .map((s, i) => ({
+      title: { vi: s.title, en: s.title },
+      body: { vi: s.body, en: s.body },
+      imageUrl: s.imageUrl,
+      sortOrder: i + 1,
+    }));
+
+  const leadParagraph = data.paragraphs[0] || null;
 
   return {
     key,
     name: { vi: nameVi, en: nameVi },
     slug: { vi: slugLeaf || key, en: key },
     segment: segmentForKey(key),
-    tagline: data.headings[0] ? { vi: data.headings[0], en: data.headings[0] } : null,
-    description: data.headings[1]
-      ? { vi: data.headings.slice(0, 3).join(". "), en: data.headings.slice(0, 3).join(". ") }
+    tagline: leadParagraph
+      ? { vi: leadParagraph.slice(0, 120), en: leadParagraph.slice(0, 120) }
+      : data.highlights[0]
+        ? { vi: data.highlights[0], en: data.highlights[0] }
+        : null,
+    description: leadParagraph
+      ? { vi: data.paragraphs.slice(0, 3).join(" "), en: data.paragraphs.slice(0, 3).join(" ") }
       : null,
+    paragraphs: data.paragraphs,
+    highlights: data.highlights,
     attributes,
     variants: priceFrom
       ? [{ name: { vi: "Giá từ", en: "From" }, price: priceFrom, published: true }]

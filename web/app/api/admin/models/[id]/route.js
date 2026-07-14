@@ -41,6 +41,7 @@ export async function PATCH(request, { params }) {
       attributes: body.attributes !== undefined ? parseJsonField(body.attributes, []) : undefined,
       meta: body.meta !== undefined ? parseJsonField(body.meta, undefined) : undefined,
       heroMediaId: body.heroMediaId !== undefined ? body.heroMediaId || null : undefined,
+      gallery: body.gallery !== undefined ? parseJsonField(body.gallery, []) : undefined,
       published: body.published !== undefined ? body.published === "true" || body.published === true : undefined,
       sortOrder: body.sortOrder !== undefined ? Number(body.sortOrder) : undefined,
     },

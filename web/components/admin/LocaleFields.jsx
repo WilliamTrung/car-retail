@@ -13,7 +13,7 @@ export default function LocaleFields({ prefix, vi = "", en = "", multiline = fal
         <Input className={styles.field} name={`${prefix}Vi`} defaultValue={vi} rows={multiline ? 4 : undefined} />
       </label>
       <label className={styles.label}>
-        EN {missing ? <span className={styles.missing}>missing EN</span> : null}
+        EN {missing ? <span className={styles.missing}>thiếu EN</span> : null}
         <Input className={styles.field} name={`${prefix}En`} defaultValue={en} rows={multiline ? 4 : undefined} />
       </label>
     </fieldset>

@@ -1,15 +1,15 @@
+import HtmlContent from "@/components/HtmlContent";
 import { pickLocale } from "@/lib/attributes";
 import styles from "./ModelFeatureSections.module.css";
-
 /**
  * Alternating image + copy blocks (dealer model detail pattern).
- * @param {{ locale: string, sections: object[] }} props
+ * @param {{ locale: string, sections: object[], embedded?: boolean }} props
  */
-export default function ModelFeatureSections({ locale, sections }) {
+export default function ModelFeatureSections({ locale, sections, embedded = false }) {
   if (!sections.length) return null;
 
   return (
-    <div className={styles.list}>
+    <div className={`${styles.list} ${embedded ? styles.listEmbedded : ""}`}>
       {sections.map((section, index) => {
         const imageUrl = section.imageMedia?.publicUrl;
         const reverse = index % 2 === 1;
@@ -33,7 +33,7 @@ export default function ModelFeatureSections({ locale, sections }) {
             </div>
             <div className={styles.copy}>
               <h3 className={styles.title}>{pickLocale(section.title, locale)}</h3>
-              <p className={styles.body}>{pickLocale(section.body, locale)}</p>
+              <HtmlContent html={pickLocale(section.body, locale)} className={styles.body} />
             </div>
           </article>
         );

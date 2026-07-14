@@ -6,6 +6,7 @@ import { readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { lineForSegment, filterCatalogModels, sanitizeSlug, cleanModelName } from "./normalize.js";
+import { enrichModel } from "./copy.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MANIFEST_PATH = join(__dirname, "output", "manifest.json");
@@ -260,11 +261,13 @@ function main() {
   const raw = JSON.parse(readFileSync(MANIFEST_PATH, "utf8"));
   const manifest = {
     ...raw,
-    models: filterCatalogModels(raw.models).map((m) => ({
-      ...m,
-      name: { vi: cleanModelName(m.name?.vi), en: cleanModelName(m.name?.en || m.name?.vi) },
-      slug: sanitizeSlug(m.slug, m.key),
-    })),
+    models: filterCatalogModels(raw.models).map((m) =>
+      enrichModel({
+        ...m,
+        name: { vi: cleanModelName(m.name?.vi), en: cleanModelName(m.name?.en || m.name?.vi) },
+        slug: sanitizeSlug(m.slug, m.key),
+      })
+    ),
   };
   const { assets, fallbacks } = buildMediaAssets(manifest);
   writeFileSync(SEED_SCRAPED, buildSeedScrapedSource(manifest), "utf8");

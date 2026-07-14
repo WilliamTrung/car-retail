@@ -136,7 +136,6 @@ export default async function HomePage({ params }) {
         locale={locale}
         models={models}
         sectionTitle={t("lineupTitle")}
-        priceLabel={tc("viewDetails")}
       />
 
       {/* Buyer Privileges Section */}

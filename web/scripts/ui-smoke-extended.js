@@ -20,9 +20,23 @@ async function shot(page, name) {
   await page.screenshot({ path: path.join(OUT, `${name}.png`), fullPage: false });
 }
 
+async function dismissPromoModal(page) {
+  const backdrop = page.locator('[class*="PromoModal_backdrop"]');
+  if (await backdrop.isVisible({ timeout: 2000 }).catch(() => false)) {
+    const close = page.locator('[class*="PromoModal_closeBtn"]');
+    if (await close.isVisible().catch(() => false)) {
+      await close.click();
+    } else {
+      await page.keyboard.press("Escape");
+    }
+    await backdrop.waitFor({ state: "hidden", timeout: 5000 }).catch(() => {});
+  }
+}
+
 async function checkPage(page, url, checks) {
   const res = await page.goto(url, { waitUntil: "networkidle", timeout: 45000 });
   if (!res || res.status() !== 200) fail(`${url} status ${res?.status()}`);
+  await dismissPromoModal(page);
   for (const check of checks) {
     await check(page, url);
   }
@@ -50,40 +64,39 @@ async function main() {
       await shot(p, "home-desktop");
     },
     async (p) => {
-      await p.getByRole("button", { name: /Dòng xe/i }).hover();
-      const panel = p.locator('[class*="modelsPanel"]');
-      if (!(await panel.isVisible())) fail("Header: models panel not shown on click");
-      await shot(p, "header-models-desktop");
+      const card = p.locator("#lineup a[class*='VehicleCard_card']").first();
+      if (!(await card.isVisible())) fail("Home: vehicle card missing");
+      const cardBtns = p.locator("#lineup a[class*='VehicleCard'] button");
+      if ((await cardBtns.count()) > 0) fail("Home: vehicle cards should not have buttons");
+      await card.hover();
+      await shot(p, "card-hover-desktop");
     },
   ]);
 
   await checkPage(page, `${BASE}/vi/models/vf-3`, [
     async (p) => {
-      const hero = p.locator('[class*="modelHeroDealer"]');
-      if (!(await hero.isVisible())) fail("Model: dealer hero missing");
-      const img = hero.locator("img").first();
-      const box = await img.boundingBox();
-      if (!box || box.width < 50) fail("Model: hero image too small or missing");
-      await shot(p, "model-hero-desktop");
+      const gallery = p.locator('[class*="ModelGallery_root"]');
+      if (!(await gallery.isVisible())) fail("Model: gallery missing");
+      const img = p.locator('[class*="ModelGallery_mainImage"]').first();
+      if (!(await img.isVisible())) fail("Model: gallery image missing");
+      await shot(p, "model-detail-desktop");
     },
     async (p) => {
-      const variants = p.locator('[class*="VariantCards"] article, section[class*="sectionDealer"] article');
-      if ((await variants.count()) < 1) fail("Model: no variant cards");
+      const price = p.locator('[class*="productPrice"]').first();
+      if (!(await price.isVisible())) fail("Model: price missing");
+      const quoteCta = p.getByRole("link", { name: /báo giá|quote/i });
+      if (!(await quoteCta.isVisible())) fail("Model: quote CTA missing");
     },
     async (p) => {
-      const features = p.locator('[class*="ModelFeatureSections"] article, [class*="featuresWrap"] + div article');
-      if ((await features.count()) < 1) {
-        const alt = p.locator('[class*="block"]').first();
-        if (!(await alt.isVisible())) fail("Model: no feature sections");
-      }
-      await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
-      await shot(p, "model-features-desktop");
+      const tab = p.getByRole("tab", { name: /Mô tả|Description/i });
+      if (!(await tab.isVisible())) fail("Model: tabs missing");
+      await tab.click();
+      await p.getByRole("tab", { name: /Thông số|Specifications/i }).click();
+      await shot(p, "model-specs-tab-desktop");
     },
     async (p) => {
-      await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
       const sticky = p.locator('[class*="stickyBar"]');
-      if (!(await sticky.isVisible())) fail("Model: sticky bar not visible after scroll");
-      await shot(p, "model-sticky-desktop");
+      if (!(await sticky.isVisible())) fail("Model: sticky bar missing");
     },
   ]);
 
@@ -107,8 +120,10 @@ async function main() {
 
   await checkPage(mobile, `${BASE}/vi`, [
     async (p) => {
-      const card = p.locator("#lineup article").first();
+      const card = p.locator("#lineup a[class*='VehicleCard_card']").first();
       if (!(await card.isVisible())) fail("Mobile home: card missing");
+      const cardBtns = p.locator("#lineup a[class*='VehicleCard'] button");
+      if ((await cardBtns.count()) > 0) fail("Mobile home: card has buttons");
       const box = await card.boundingBox();
       if (box && box.width > 400) fail(`Mobile home: card too wide (${box.width}px)`);
       await shot(p, "home-mobile");
@@ -123,9 +138,9 @@ async function main() {
 
   await checkPage(mobile, `${BASE}/vi/models/vf-3`, [
     async (p) => {
-      await shot(p, "model-hero-mobile");
-      const cta = p.getByRole("link", { name: /lái thử|test drive/i }).first();
-      if (!(await cta.isVisible())) fail("Mobile model: CTA missing");
+      await shot(p, "model-detail-mobile");
+      const quoteCta = p.getByRole("link", { name: /báo giá|quote/i }).first();
+      if (!(await quoteCta.isVisible())) fail("Mobile model: quote CTA missing");
     },
   ]);
 

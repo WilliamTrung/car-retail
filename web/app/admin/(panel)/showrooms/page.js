@@ -22,12 +22,12 @@ export default async function ShowroomsPage() {
 
   return (
     <>
-      <h1>Showrooms & hotlines</h1>
+      <h1>Showroom & hotline</h1>
       <p className={styles.muted}>
-        Manage showroom branches, addresses, hours, and phone hotlines shown in the header, footer, and contact page.
+        Quản lý chi nhánh, địa chỉ, giờ mở cửa và số điện thoại hiển thị trên header, footer và trang liên hệ.
       </p>
 
-      <h2>Showrooms</h2>
+      <h2>Showroom</h2>
       {showrooms.map((room) => {
         const name = /** @type {{ vi?: string, en?: string }} */ (room.name);
         const address = /** @type {{ vi?: string, en?: string }} */ (room.address);
@@ -35,75 +35,75 @@ export default async function ShowroomsPage() {
         return (
           <div key={room.id} className={styles.card}>
             <AdminForm action={`/api/admin/showrooms/${room.id}`} method="PATCH">
-              <LocaleFields prefix="name" label="Name" vi={name.vi} en={name.en} />
-              <LocaleFields prefix="address" label="Address" vi={address.vi} en={address.en} multiline />
-              <LocaleFields prefix="hours" label="Opening hours" vi={hours.vi} en={hours.en} />
+              <LocaleFields prefix="name" label="Tên" vi={name.vi} en={name.en} />
+              <LocaleFields prefix="address" label="Địa chỉ" vi={address.vi} en={address.en} multiline />
+              <LocaleFields prefix="hours" label="Giờ mở cửa" vi={hours.vi} en={hours.en} />
               <label>
-                City
+                Thành phố
                 <input name="city" type="text" defaultValue={room.city} />
               </label>
               <label>
-                Phone
+                Điện thoại
                 <input name="phone" type="text" defaultValue={room.phone ?? ""} />
               </label>
               <label>
-                Type tag (1S / 2S / 3S)
+                Loại (1S / 2S / 3S)
                 <input name="typeTag" type="text" defaultValue={room.typeTag ?? ""} placeholder="2S" />
               </label>
               <label>
-                Sort order
+                Thứ tự
                 <input name="sortOrder" type="number" defaultValue={room.sortOrder} />
               </label>
               <label>
                 <input name="published" type="checkbox" value="true" defaultChecked={room.published} />
-                Published
+                Đã xuất bản
               </label>
             </AdminForm>
-            <DeleteButton action={`/api/admin/showrooms/${room.id}`} confirmMessage="Delete this showroom?" />
+            <DeleteButton action={`/api/admin/showrooms/${room.id}`} confirmMessage="Xóa showroom này?" />
           </div>
         );
       })}
 
-      <h3>Add showroom</h3>
-      <AdminForm action="/api/admin/showrooms" successMessage="Showroom created.">
-        <LocaleFields prefix="name" label="Name" />
-        <LocaleFields prefix="address" label="Address" multiline />
-        <LocaleFields prefix="hours" label="Opening hours" />
+      <h3>Thêm showroom</h3>
+      <AdminForm action="/api/admin/showrooms" successMessage="Đã thêm showroom.">
+        <LocaleFields prefix="name" label="Tên" />
+        <LocaleFields prefix="address" label="Địa chỉ" multiline />
+        <LocaleFields prefix="hours" label="Giờ mở cửa" />
         <label>
-          City
+          Thành phố
           <input name="city" type="text" required />
         </label>
         <label>
-          Phone
+          Điện thoại
           <input name="phone" type="text" />
         </label>
         <label>
-          Type tag
+          Loại
           <input name="typeTag" type="text" placeholder="2S" />
         </label>
         <label>
-          Sort order
+          Thứ tự
           <input name="sortOrder" type="number" defaultValue={showrooms.length} />
         </label>
       </AdminForm>
 
-      <h2>Hotlines</h2>
+      <h2>Hotline</h2>
       {hotlines.map((h) => {
         const label = /** @type {{ vi?: string, en?: string }} */ (h.label);
         return (
           <div key={h.id} className={styles.card}>
             <AdminForm action={`/api/admin/hotlines/${h.id}`} method="PATCH">
-              <LocaleFields prefix="label" label="Label" vi={label.vi} en={label.en} />
+              <LocaleFields prefix="label" label="Nhãn" vi={label.vi} en={label.en} />
               <label>
-                Phone
+                Số điện thoại
                 <input name="phone" type="text" defaultValue={h.phone} required />
               </label>
               <label>
-                Sort order
+                Thứ tự
                 <input name="sortOrder" type="number" defaultValue={h.sortOrder} />
               </label>
               <label>
-                Showroom (optional)
+                Showroom (tuỳ chọn)
                 <select name="showroomId" defaultValue={h.showroomId ?? ""}>
                   <option value="">—</option>
                   {showrooms.map((r) => (
@@ -114,24 +114,24 @@ export default async function ShowroomsPage() {
                 </select>
               </label>
             </AdminForm>
-            <DeleteButton action={`/api/admin/hotlines/${h.id}`} confirmMessage="Delete this hotline?" />
+            <DeleteButton action={`/api/admin/hotlines/${h.id}`} confirmMessage="Xóa hotline này?" />
           </div>
         );
       })}
 
-      <h3>Add hotline</h3>
-      <AdminForm action="/api/admin/hotlines" successMessage="Hotline created.">
-        <LocaleFields prefix="label" label="Label" />
+      <h3>Thêm hotline</h3>
+      <AdminForm action="/api/admin/hotlines" successMessage="Đã thêm hotline.">
+        <LocaleFields prefix="label" label="Nhãn" />
         <label>
-          Phone
+          Số điện thoại
           <input name="phone" type="text" required />
         </label>
         <label>
-          Sort order
+          Thứ tự
           <input name="sortOrder" type="number" defaultValue={hotlines.length} />
         </label>
         <label>
-          Showroom (optional)
+          Showroom (tuỳ chọn)
           <select name="showroomId">
             <option value="">—</option>
             {showrooms.map((r) => (

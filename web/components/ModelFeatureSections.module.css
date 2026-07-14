@@ -4,6 +4,19 @@
   gap: 0;
 }
 
+.listEmbedded {
+  margin: 0 calc(-1 * var(--space-lg));
+}
+
+.listEmbedded .block {
+  border-top: none;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.listEmbedded .block:first-child {
+  border-top: 1px solid var(--color-border);
+}
+
 .block {
   display: grid;
   grid-template-columns: 1fr;

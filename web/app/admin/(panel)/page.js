@@ -20,32 +20,32 @@ export default async function AdminDashboard() {
 
   return (
     <>
-      <h1>Dashboard</h1>
+      <h1>Tổng quan</h1>
       <div className={styles.grid2}>
         {leadCount !== null ? (
           <div className={styles.card}>
-            <h2>New leads</h2>
+            <h2>Khách hàng mới</h2>
             <p style={{ fontSize: "2rem", margin: 0 }}>{leadCount}</p>
-            <Link href="/admin/leads">Open inbox →</Link>
+            <Link href="/admin/leads">Mở hộp thư →</Link>
           </div>
         ) : null}
         {modelCount !== null ? (
           <div className={styles.card}>
-            <h2>Published models</h2>
+            <h2>Xe đang hiển thị</h2>
             <p style={{ fontSize: "2rem", margin: 0 }}>{modelCount}</p>
-            <Link href="/admin/models">Manage vehicles →</Link>
+            <Link href="/admin/models">Quản lý xe →</Link>
           </div>
         ) : null}
         {newsCount !== null ? (
           <div className={styles.card}>
-            <h2>Published news</h2>
+            <h2>Tin đã xuất bản</h2>
             <p style={{ fontSize: "2rem", margin: 0 }}>{newsCount}</p>
-            <Link href="/admin/news">Manage news →</Link>
+            <Link href="/admin/news">Quản lý tin →</Link>
           </div>
         ) : null}
       </div>
       <p className={styles.muted}>
-        Public site:{" "}
+        Site công khai:{" "}
         <a href="/vi" target="_blank" rel="noreferrer">
           /vi
         </a>

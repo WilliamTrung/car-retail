@@ -1,0 +1,53 @@
+.rich {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--color-muted);
+  max-width: 48rem;
+}
+
+.rich :global(p) {
+  margin: 0 0 1em;
+}
+
+.rich :global(p:last-child) {
+  margin-bottom: 0;
+}
+
+.rich :global(h2),
+.rich :global(h3),
+.rich :global(h4) {
+  margin: 1.25em 0 0.5em;
+  color: var(--color-navy-dark);
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.rich :global(h2) {
+  font-size: 1.25rem;
+}
+
+.rich :global(h3) {
+  font-size: 1.1rem;
+}
+
+.rich :global(ul),
+.rich :global(ol) {
+  margin: 0 0 1em;
+  padding-left: 1.35rem;
+}
+
+.rich :global(li) {
+  margin-bottom: 0.35em;
+}
+
+.rich :global(a) {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.rich :global(blockquote) {
+  margin: 0 0 1em;
+  padding-left: 1rem;
+  border-left: 3px solid var(--color-border);
+  color: var(--color-text);
+}

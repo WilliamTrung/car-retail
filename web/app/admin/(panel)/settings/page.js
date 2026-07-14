@@ -4,7 +4,7 @@ import { canAccess } from "@/lib/admin/roles";
 import prisma from "@/lib/prisma";
 import AdminForm from "@/components/admin/AdminForm";
 import LocaleFields from "@/components/admin/LocaleFields";
-import MediaSelect from "@/components/admin/MediaSelect";
+import MediaPicker from "@/components/admin/MediaPicker";
 import styles from "../panel.module.css";
 
 export default async function SettingsPage() {
@@ -31,7 +31,7 @@ export default async function SettingsPage() {
   const seo = /** @type {{ vi?: { title?: string, description?: string, ogImageMediaId?: string }, en?: { title?: string, description?: string } }} */ (
     settings?.seoDefaults ?? {}
   );
-  const tradeIn = /** @type {{ vi?: { title?: string, body?: string }, en?: { title?: string, body?: string } }} */ (
+  const tradeIn = /** @type {{ vi?: { title?: string, body?: string }, en?: { title?: string, body?: string }, imageMediaId?: string }} */ (
     settings?.tradeInBlock ?? {}
   );
   const promo = /** @type {{ enabled?: boolean, endAt?: string, label?: { vi?: string, en?: string } }} */ (
@@ -52,22 +52,22 @@ export default async function SettingsPage() {
 
   return (
     <>
-      <h1>Site settings</h1>
+      <h1>Cài đặt site</h1>
       <p className={styles.muted}>
-        Dealer identity, legal info, CTAs, social links, and footer copy. Showroom branches and hotlines are managed on the Showrooms page.
+        Thông tin đại lý, pháp lý, CTA, mạng xã hội và nội dung chân trang. Showroom và hotline quản lý tại trang Showroom.
       </p>
       <AdminForm action="/api/admin/settings" method="PATCH">
-        <h2>Brand & legal</h2>
-        <LocaleFields prefix="dealerName" label="Dealer name" vi={dealerName.vi} en={dealerName.en} />
-        <LocaleFields prefix="legalEntity" label="Legal entity" vi={legalEntity.vi} en={legalEntity.en} />
-        <MediaSelect
+        <h2>Thương hiệu & pháp lý</h2>
+        <LocaleFields prefix="dealerName" label="Tên đại lý" vi={dealerName.vi} en={dealerName.en} />
+        <LocaleFields prefix="legalEntity" label="Pháp nhân" vi={legalEntity.vi} en={legalEntity.en} />
+        <MediaPicker
           name="logoMediaId"
           label="Logo"
           value={settings?.logoMediaId}
           assets={siteMedia}
           folder="SITE"
         />
-        <MediaSelect
+        <MediaPicker
           name="faviconMediaId"
           label="Favicon"
           value={settings?.faviconMediaId}
@@ -82,60 +82,60 @@ export default async function SettingsPage() {
           Email
           <input name="email" type="email" defaultValue={settings?.email ?? ""} />
         </label>
-        <LocaleFields prefix="copyright" label="Copyright" vi={copyright.vi} en={copyright.en} />
+        <LocaleFields prefix="copyright" label="Bản quyền" vi={copyright.vi} en={copyright.en} />
         <LocaleFields
           prefix="disclaimers"
-          label="Footer site description"
+          label="Mô tả chân trang"
           vi={disclaimers.vi}
           en={disclaimers.en}
           multiline
         />
-        <LocaleFields prefix="consentTemplate" label="Consent template" vi={consent.vi} en={consent.en} multiline />
+        <LocaleFields prefix="consentTemplate" label="Mẫu đồng ý" vi={consent.vi} en={consent.en} multiline />
 
-        <h2>About the site</h2>
+        <h2>Giới thiệu</h2>
         <LocaleFields
           prefix="brandStoryTitle"
-          label="Brand story title"
+          label="Tiêu đề giới thiệu"
           vi={brandStory.vi?.title}
           en={brandStory.en?.title}
         />
         <LocaleFields
           prefix="brandStoryBody"
-          label="Brand story body"
+          label="Nội dung giới thiệu"
           vi={brandStory.vi?.body}
           en={brandStory.en?.body}
           multiline
         />
         <LocaleFields
           prefix="privacyPolicyUrl"
-          label="Privacy policy URL"
+          label="URL chính sách bảo mật"
           vi={privacyPolicyUrl.vi}
           en={privacyPolicyUrl.en}
         />
 
-        <h2>Header CTAs</h2>
+        <h2>CTA header</h2>
         <LocaleFields
           prefix="ctaTestDriveLabel"
-          label="Test drive CTA label"
+          label="Nhãn lái thử"
           vi={ctaTestDrive.label?.vi}
           en={ctaTestDrive.label?.en}
         />
         <label>
-          Test drive route key
+          Route lái thử
           <input name="ctaTestDriveRouteKey" type="text" defaultValue={ctaTestDrive.routeKey ?? "/book-test-drive"} />
         </label>
         <LocaleFields
           prefix="ctaDepositLabel"
-          label="Deposit CTA label"
+          label="Nhãn đặt cọc"
           vi={ctaDeposit.label?.vi}
           en={ctaDeposit.label?.en}
         />
         <label>
-          Deposit route key
+          Route đặt cọc
           <input name="ctaDepositRouteKey" type="text" defaultValue={ctaDeposit.routeKey ?? "/deposit"} />
         </label>
 
-        <h2>Social links</h2>
+        <h2>Mạng xã hội</h2>
         <label>
           Facebook URL
           <input name="socialFacebook" type="url" defaultValue={socialByPlatform.facebook ?? ""} />
@@ -153,7 +153,7 @@ export default async function SettingsPage() {
           <input name="socialTiktok" type="url" defaultValue={socialByPlatform.tiktok ?? ""} />
         </label>
 
-        <h2>SEO defaults</h2>
+        <h2>SEO mặc định</h2>
         <label>
           Title VI
           <input name="seoTitleVi" type="text" defaultValue={seo.vi?.title ?? ""} />
@@ -170,35 +170,43 @@ export default async function SettingsPage() {
           Description EN
           <textarea name="seoDescEn" rows={2} defaultValue={seo.en?.description ?? ""} />
         </label>
-        <MediaSelect
+        <MediaPicker
           name="seoOgImageMediaId"
-          label="Default OG image"
+          label="Ảnh OG mặc định"
           value={seo.vi?.ogImageMediaId}
           assets={siteMedia}
+          folder="SITE"
         />
 
-        <h2>Homepage trade-in block</h2>
+        <h2>Khối thu cũ đổi mới (trang chủ)</h2>
         <LocaleFields
           prefix="tradeInTitle"
-          label="Title"
+          label="Tiêu đề"
           vi={tradeIn.vi?.title}
           en={tradeIn.en?.title}
         />
         <LocaleFields
           prefix="tradeInBody"
-          label="Body"
+          label="Nội dung"
           vi={tradeIn.vi?.body}
           en={tradeIn.en?.body}
           multiline
         />
+        <MediaPicker
+          name="tradeInImageMediaId"
+          label="Ảnh minh họa"
+          value={tradeIn.imageMediaId}
+          assets={siteMedia}
+          folder="SITE"
+        />
 
-        <h2>Promo countdown</h2>
+        <h2>Đếm ngược khuyến mãi</h2>
         <label>
           <input name="promoEnabled" type="checkbox" value="true" defaultChecked={promo.enabled} />
-          Enable countdown banner
+          Bật banner đếm ngược
         </label>
         <label>
-          End at
+          Kết thúc lúc
           <input
             name="promoEndAt"
             type="datetime-local"
@@ -207,14 +215,14 @@ export default async function SettingsPage() {
         </label>
         <LocaleFields
           prefix="promoLabel"
-          label="Banner label"
+          label="Nhãn banner"
           vi={promo.label?.vi}
           en={promo.label?.en}
         />
 
         <label>
           <input name="maintenanceMode" type="checkbox" value="true" defaultChecked={settings?.maintenanceMode} />
-          Maintenance mode
+          Chế độ bảo trì
         </label>
       </AdminForm>
     </>

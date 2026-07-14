@@ -19,18 +19,18 @@ export default async function LeadsPage() {
 
   return (
     <>
-      <h1>Leads inbox</h1>
+      <h1>Hộp thư khách hàng</h1>
       <p className={styles.actions}>
         <ExportLeadsButton />
       </p>
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Contact</th>
-            <th>Model</th>
-            <th>Status</th>
+            <th>Ngày</th>
+            <th>Loại</th>
+            <th>Liên hệ</th>
+            <th>Xe</th>
+            <th>Trạng thái</th>
             <th />
           </tr>
         </thead>

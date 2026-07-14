@@ -143,7 +143,9 @@ export default function Header({
               <div
                 className={`${styles.modelsNav} ${modelsOpen || modelsPinned ? styles.modelsNavOpen : ""}`}
                 onMouseEnter={() => setModelsOpen(true)}
-                onMouseLeave={() => setModelsOpen(false)}
+                onMouseLeave={() => {
+                  if (!modelsPinned) setModelsOpen(false);
+                }}
               >
                 <button
                   type="button"

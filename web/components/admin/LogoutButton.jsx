@@ -1,5 +1,7 @@
 "use client";
 
+import { a } from "@/lib/admin/strings";
+
 export default function LogoutButton() {
   return (
     <button
@@ -9,7 +11,7 @@ export default function LogoutButton() {
         window.location.href = "/admin/login";
       }}
     >
-      Log out
+      {a.logout}
     </button>
   );
 }

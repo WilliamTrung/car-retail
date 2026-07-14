@@ -103,11 +103,11 @@ export default function AttributeEditor({
       <p className={styles.hint}>Drag rows to set display order. Order is saved top to bottom.</p>
 
       {items.length === 0 ? (
-        <p className={styles.empty}>No attributes yet. Add the first record below.</p>
+        <p className={styles.empty}>Chưa có thông số. Thêm bản ghi đầu tiên bên dưới.</p>
       ) : (
         <div className={styles.list}>
           {items.map((row, index) => {
-            const label = specLabels[row.key] || row.key || "New attribute";
+            const label = specLabels[row.key] || row.key || "Thông số mới";
             const isDragging = dragIndex === index;
             const isOver = overIndex === index && dragIndex !== null && dragIndex !== index;
 
@@ -181,7 +181,7 @@ export default function AttributeEditor({
                 <button
                   type="button"
                   className={styles.removeBtn}
-                  aria-label={`Remove ${label}`}
+                  aria-label={`Xóa ${label}`}
                   onClick={() => removeRow(index)}
                 >
                   ×
@@ -201,7 +201,7 @@ export default function AttributeEditor({
       </datalist>
 
       <button type="button" className={styles.addBtn} onClick={addRow}>
-        + Add attribute
+        + Thêm thông số
       </button>
     </div>
   );
