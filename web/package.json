@@ -17,7 +17,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:mock": "node prisma/seed-mock.js",
     "db:seed:scraped": "node prisma/seed-bootstrap.js && node prisma/seed-scraped.js",
-    "db:seed:media": "tsx prisma/seed-media.js",
+    "db:seed:media": "node prisma/seed-media.js",
     "db:seed:media:reference": "tsx scripts/seed-media-reference.js",
     "db:reset": "tsx scripts/reset-all.js",
     "db:reseed": "tsx scripts/reset-all.js --purge && npm run db:seed:scraped && npm run db:seed:media -- --purge",

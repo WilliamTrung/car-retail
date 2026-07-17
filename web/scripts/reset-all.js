@@ -6,7 +6,7 @@
 import { PrismaClient } from "@prisma/client";
 import { loadDotenv } from "../prisma/load-dotenv.js";
 import { clearMediaFromDatabase } from "../prisma/seed-media-run.js";
-import { isR2Configured, purgeR2Bucket } from "../src/server/storage/r2.ts";
+import { isR2Configured, purgeR2Bucket } from "../prisma/seed-media-r2.js";
 
 loadDotenv();
 

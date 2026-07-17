@@ -58,9 +58,9 @@ All seed scripts and manifest data live **in the repo** — nothing is maintaine
 | Path | Purpose |
 |------|---------|
 | `web/prisma/seed.js` | Base catalog, CMS, admin user |
-| `web/prisma/seed-media-data.js` | Media manifest (stable IDs, r2Keys, links) |
+| `web/prisma/seed-media-data.js` | Media manifest (stable IDs, r2Keys, links) — targets the **scraped** dataset (`db:seed:scraped`) |
 | `web/prisma/seed-media-urls.js` | Generated public URLs (committed after local seed) |
-| `web/scripts/seed-media.js` | Purge R2 + re-upload from manifest |
+| `web/prisma/seed-media.js` | Media seed entry (plain node, self-contained — fetch → R2 upload → transactional DB swap; `--purge` deletes stale R2 objects last) |
 
 **VPS holds only:** `$HOME/repo/car-retail` (git clone) and `~/dev/shared/car-retail/secrets/` (runtime env). No orphan seed files outside the clone.
 
@@ -80,8 +80,24 @@ docker run --rm \
   --network db-net \
   -v "$HOME/repo/car-retail/web:/app" \
   -w /app node:22-alpine \
-  sh -c 'apk add --no-cache libc6-compat && npm ci --omit=dev && node scripts/seed-media.js'
+  sh -c 'apk add --no-cache libc6-compat && npm ci && npx prisma generate && node prisma/seed-media.js --purge'
 ```
+
+Or reuse the already-built migrate image — the media seed is self-contained under
+`prisma/` (no `src/`, `tsconfig.json`, or host mounts needed):
+
+```bash
+cd $HOME/repo/car-retail
+docker compose --env-file ~/dev/shared/car-retail/secrets/deploy.env \
+  run --rm --entrypoint sh migrate \
+  -c 'npx prisma generate && node prisma/seed-media.js --purge'
+```
+
+The seed is failure-safe: images are fetched and uploaded to R2 **before** the
+MediaAsset swap (single transaction), and `--purge` removes only stale R2
+objects **after** the swap commits — a mid-run crash leaves prior media intact.
+The manifest links target the scraped dataset; run `db:seed:scraped` first or
+unmatched links are skipped with warnings.
 
 Prefer running `db:seed:media` locally, committing `seed-media-data.js` + `seed-media-urls.js`, then VPS only needs `git pull` before the media seed step (R2 + DB update). Do not edit seed manifests only on the VPS.
 

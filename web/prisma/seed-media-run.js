@@ -2,10 +2,11 @@ import { readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import {
+  deleteFromR2,
   isR2Configured,
-  purgeR2Bucket,
+  listAllR2Keys,
   uploadToR2,
-} from "../src/server/storage/r2.ts";
+} from "./seed-media-r2.js";
 import { SEED_MEDIA_ASSETS, SEED_MEDIA_FALLBACKS } from "./seed-media-data.js";
 import { fetchSeedImage } from "./seed-media-fetch.js";
 import { renderSeedSvg } from "./seed-media-svg.js";
@@ -37,26 +38,32 @@ export async function clearMediaFromDatabase(prisma) {
   return prisma.mediaAsset.deleteMany({});
 }
 
-/** @param {import("@prisma/client").PrismaClient} prisma @param {{ table: string, entityId: string, field: string }} link @param {string} mediaId */
-async function linkMedia(prisma, link, mediaId) {
-  const data = { [link.field]: mediaId };
-  if (link.table === "vehicleModel") {
-    await prisma.vehicleModel.update({ where: { id: link.entityId }, data });
-    return;
+/**
+ * Resilient link: updateMany never throws P2025 — a missing target row
+ * (e.g. media manifest run against a dataset it wasn't generated for)
+ * yields count 0 and the caller skips + warns instead of crashing the run.
+ *
+ * @param {import("@prisma/client").PrismaClient} db — prisma or tx client
+ * @param {{ table: string, entityId: string, field: string }} link
+ * @param {string} mediaId
+ * @returns {Promise<boolean>} true if the target row existed and was linked
+ */
+export async function linkMedia(db, link, mediaId) {
+  const tables = {
+    vehicleModel: db.vehicleModel,
+    heroSlide: db.heroSlide,
+    newsPost: db.newsPost,
+    deliveryPhoto: db.deliveryPhoto,
+  };
+  const table = tables[link.table];
+  if (!table) {
+    throw new Error(`Unsupported media link table: ${link.table}`);
   }
-  if (link.table === "heroSlide") {
-    await prisma.heroSlide.update({ where: { id: link.entityId }, data });
-    return;
-  }
-  if (link.table === "newsPost") {
-    await prisma.newsPost.update({ where: { id: link.entityId }, data });
-    return;
-  }
-  if (link.table === "deliveryPhoto") {
-    await prisma.deliveryPhoto.update({ where: { id: link.entityId }, data });
-    return;
-  }
-  throw new Error(`Unsupported media link table: ${link.table}`);
+  const { count } = await table.updateMany({
+    where: { id: link.entityId },
+    data: { [link.field]: mediaId },
+  });
+  return count > 0;
 }
 
 /** @param {string} id @param {string} primary @param {string[]} fallbacks */
@@ -166,7 +173,21 @@ function writeSeedMediaArtifacts(results) {
 }
 
 /**
- * Purge (opt-in) R2 + DB media, fetch dealer photos, upload to R2, link entities.
+ * Media seed, ordered so a failure never leaves prod media emptier than it
+ * started:
+ *
+ *   1. fetch every payload (network / SVG fallback) — no writes anywhere
+ *   2. upload all payloads to R2 (stable keys overwrite in place; existing
+ *      objects are NOT deleted yet)
+ *   3. swap MediaAsset rows + CMS links in ONE transaction — a crash rolls
+ *      back to the prior media set
+ *   4. only after the swap commits, --purge deletes STALE R2 keys (objects
+ *      not part of this seed) — never the freshly uploaded ones
+ *
+ * Links whose target rows are absent (manifest was generated for the scraped
+ * dataset — `npm run db:seed:scraped`) are skipped with a warning instead of
+ * aborting with P2025.
+ *
  * @param {import("@prisma/client").PrismaClient} prisma
  * @param {{ purge?: boolean }} [opts] — purge defaults false; set via --purge / SEED_MEDIA_PURGE=1
  */
@@ -175,71 +196,126 @@ export async function runSeedMedia(prisma, opts = {}) {
 
   if (!isR2Configured()) {
     throw new Error(
-      "R2 not configured. Set STORAGE_S3_* (and full app env) in web/.env",
+      "R2 not configured. Set STORAGE_S3_ENDPOINT/BUCKET/ACCESS_KEY/SECRET_KEY/PUBLIC_URL",
+    );
+  }
+
+  console.log("Stage 1/4 — fetching source images (no writes yet)…");
+  const payloads = [];
+  for (const entry of SEED_MEDIA_ASSETS) {
+    const payload = await buildUploadPayload(entry);
+    payloads.push({ entry, ...payload });
+    console.log(
+      `  ${entry.id} ← ${payload.sourceUrl ? (entry.sourceSite ?? "fetch") : "svg"}`,
+    );
+  }
+
+  console.log("Stage 2/4 — uploading to R2 (existing objects kept)…");
+  for (const payload of payloads) {
+    payload.publicUrl = await uploadToR2(
+      payload.r2Key,
+      payload.buffer,
+      payload.contentType,
+    );
+    console.log(`  ${payload.entry.id} → ${payload.publicUrl}`);
+  }
+
+  console.log("Stage 3/4 — swapping MediaAsset rows + links (transaction)…");
+  const skippedLinks = [];
+  await prisma.$transaction(
+    async (tx) => {
+      const { count } = await clearMediaFromDatabase(tx);
+      console.log(`  replaced ${count} prior MediaAsset row(s)`);
+
+      for (const payload of payloads) {
+        const { entry } = payload;
+        await tx.mediaAsset.create({
+          data: {
+            id: entry.id,
+            r2Key: payload.r2Key,
+            publicUrl: payload.publicUrl,
+            folder: entry.folder,
+            mimeType: payload.contentType,
+            sizeBytes: payload.buffer.length,
+            altText: entry.altText,
+          },
+        });
+
+        if (entry.link) {
+          const linked = await linkMedia(tx, entry.link, entry.id);
+          if (!linked) skippedLinks.push(entry.link);
+        }
+      }
+
+      for (const [deliveryId, mediaId] of Object.entries(
+        DELIVERY_PHOTO_MEDIA_LINKS,
+      )) {
+        const linked = await linkMedia(
+          tx,
+          { table: "deliveryPhoto", entityId: deliveryId, field: "imageMediaId" },
+          mediaId,
+        );
+        if (!linked) {
+          skippedLinks.push({
+            table: "deliveryPhoto",
+            entityId: deliveryId,
+            field: "imageMediaId",
+          });
+        }
+      }
+    },
+    // uploads already happened; the transaction is DB-only but touches ~35 rows
+    { maxWait: 15_000, timeout: 120_000 },
+  );
+
+  for (const link of skippedLinks) {
+    console.warn(
+      `  warn: link skipped — no ${link.table} row with id "${link.entityId}"`,
+    );
+  }
+  const modelLinks = SEED_MEDIA_ASSETS.filter(
+    (e) => e.link?.table === "vehicleModel",
+  ).length;
+  const skippedModelLinks = skippedLinks.filter(
+    (l) => l.table === "vehicleModel",
+  ).length;
+  if (modelLinks > 0 && skippedModelLinks === modelLinks) {
+    console.warn(
+      "  warn: NO vehicle models matched this manifest — it targets the scraped dataset.\n" +
+        "  Run `npm run db:seed:scraped` first (or `npm run db:reseed`), then re-run db:seed:media.",
     );
   }
 
   if (purge) {
-    console.log("Purging R2 bucket (--purge / SEED_MEDIA_PURGE=1)…");
-    const deletedKeys = await purgeR2Bucket();
-    console.log(`  deleted ${deletedKeys} object(s) from R2`);
+    console.log(
+      "Stage 4/4 — purging STALE R2 objects (--purge / SEED_MEDIA_PURGE=1)…",
+    );
+    const keep = new Set(payloads.map((p) => p.r2Key));
+    const staleKeys = (await listAllR2Keys()).filter((key) => !keep.has(key));
+    for (const key of staleKeys) {
+      await deleteFromR2(key);
+    }
+    console.log(`  deleted ${staleKeys.length} stale object(s) from R2`);
   } else {
     console.log(
-      "Skipping R2 purge. Pass --purge or SEED_MEDIA_PURGE=1 to wipe the bucket.",
+      "Stage 4/4 — skipping R2 purge. Pass --purge or SEED_MEDIA_PURGE=1 to delete stale objects.",
     );
   }
 
-  console.log("Clearing media from database…");
-  const { count } = await clearMediaFromDatabase(prisma);
-  console.log(`  removed ${count} MediaAsset row(s)`);
+  const results = payloads.map((p) => ({
+    id: p.entry.id,
+    r2Key: p.r2Key,
+    publicUrl: p.publicUrl,
+    sourceUrl: p.sourceUrl ?? p.entry.sourceUrl,
+  }));
 
-  console.log("Fetching dealer photos and uploading to R2…");
-  const results = [];
-
-  for (const entry of SEED_MEDIA_ASSETS) {
-    const { buffer, contentType, r2Key, sourceUrl } =
-      await buildUploadPayload(entry);
-    const publicUrl = await uploadToR2(r2Key, buffer, contentType);
-
-    await prisma.mediaAsset.create({
-      data: {
-        id: entry.id,
-        r2Key,
-        publicUrl,
-        folder: entry.folder,
-        mimeType: contentType,
-        sizeBytes: buffer.length,
-        altText: entry.altText,
-      },
-    });
-
-    if (entry.link) {
-      await linkMedia(prisma, entry.link, entry.id);
-    }
-    results.push({
-      id: entry.id,
-      r2Key,
-      publicUrl,
-      sourceUrl: sourceUrl ?? entry.sourceUrl,
-    });
-    const from = sourceUrl ? (entry.sourceSite ?? "fetch") : "svg";
-    console.log(`  ${entry.id} ← ${from} → ${publicUrl}`);
+  try {
+    writeSeedMediaArtifacts(results);
+    console.log(`Wrote ${URLS_FILE} and updated seed-media-data.js`);
+  } catch (err) {
+    // DB + R2 already consistent — artifact write is best-effort (read-only fs in containers)
+    console.warn(`  warn: could not write seed artifacts — ${err.message}`);
   }
-
-  for (const [deliveryId, mediaId] of Object.entries(
-    DELIVERY_PHOTO_MEDIA_LINKS,
-  )) {
-    await prisma.deliveryPhoto.update({
-      where: { id: deliveryId },
-      data: { imageMediaId: mediaId },
-    });
-  }
-  console.log(
-    `  re-linked ${Object.keys(DELIVERY_PHOTO_MEDIA_LINKS).length} delivery photo(s)`,
-  );
-
-  writeSeedMediaArtifacts(results);
-  console.log(`Wrote ${URLS_FILE} and updated seed-media-data.js`);
 
   return results;
 }
