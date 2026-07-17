@@ -1,0 +1,24 @@
+.dialog {
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0;
+  max-width: min(480px, calc(100vw - var(--space-8)));
+  width: 100%;
+  box-shadow: var(--shadow-raised);
+  color: var(--color-text-900);
+}
+
+.dialog::backdrop {
+  background: rgba(12, 36, 57, 0.5);
+}
+
+.body {
+  padding: var(--space-6);
+}
+
+.title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-h4-size);
+  line-height: var(--text-h4-line);
+  font-weight: var(--text-h4-weight);
+}

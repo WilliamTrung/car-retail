@@ -1,0 +1,43 @@
+.trigger {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-accent-600);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-accent-600);
+  font: inherit;
+  font-size: var(--text-caption-size);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.trigger:hover {
+  background: var(--color-accent-soft);
+}
+
+.message {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-body-sm-size);
+  line-height: var(--text-body-sm-line);
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.danger {
+  background: var(--color-accent-600);
+  border-color: var(--color-accent-600);
+  color: var(--color-text-on-dark);
+}
+
+.danger:hover {
+  background: var(--color-accent-500);
+  border-color: var(--color-accent-500);
+}
+
+.danger:disabled {
+  opacity: 0.6;
+}

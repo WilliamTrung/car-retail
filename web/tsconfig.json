@@ -17,6 +17,8 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/components/ui/*": ["./src/components/ui/*"],
+      "@/components/admin": ["./src/components/admin/index.ts"],
+      "@/components/admin/*": ["./src/components/admin/*"],
       "@/components/layout/*": ["./src/components/layout/*"],
       "@/components/leads": ["./src/components/leads/index.ts"],
       "@/components/leads/*": ["./src/components/leads/*"],

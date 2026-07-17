@@ -129,11 +129,12 @@ export async function applyTemplateAction(
 // --- Variants ---
 
 export async function createVariantAction(
+  modelId: string,
   input: unknown,
 ): Promise<Result<VariantDto>> {
   const gate = await guardAdmin("models");
   if (!gate.ok) return gate;
-  return vehiclesService.createVariant(input);
+  return vehiclesService.createVariant({ ...(input as object), modelId });
 }
 
 export async function updateVariantAction(

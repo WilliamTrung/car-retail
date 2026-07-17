@@ -1,0 +1,27 @@
+.control {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-200);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text-900);
+  font: inherit;
+  font-size: var(--text-body-sm-size);
+  line-height: var(--text-body-sm-line);
+  cursor: pointer;
+}
+
+.control:focus {
+  outline: none;
+  border-color: var(--color-brand-500);
+  box-shadow: 0 0 0 3px var(--color-brand-soft);
+}
+
+.control[aria-invalid="true"] {
+  border-color: var(--color-accent-600);
+}
+
+.control:disabled {
+  background: var(--color-surface-100);
+  cursor: not-allowed;
+}

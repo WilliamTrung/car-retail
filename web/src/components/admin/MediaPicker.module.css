@@ -1,0 +1,79 @@
+.picker {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.current {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.current img {
+  width: var(--space-16);
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.upload {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.upload label {
+  display: grid;
+  gap: var(--space-1);
+  flex: 1;
+  font-size: var(--text-body-sm-size);
+}
+
+.message {
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-600);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.grid button {
+  min-height: var(--space-24);
+  padding: var(--space-1);
+  overflow: hidden;
+}
+
+.grid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.grid .selected {
+  border-color: var(--color-brand-500);
+  box-shadow: 0 0 0 2px var(--color-brand-soft);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .upload {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

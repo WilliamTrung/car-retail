@@ -1,6 +1,10 @@
-/*fallback CSS styling for raw inputs/selects/buttons scoped to the admin panel */
+/*
+ * Fallback CSS styling for raw inputs/selects/buttons scoped to the admin panel.
+ * All selectors are wrapped in :where() (zero specificity) so component
+ * CSS Modules (src/components/admin/*) always win over these fallbacks.
+ */
 
-.admin-body select {
+:where(.admin-body select) {
   padding: 0.5rem 1.75rem 0.5rem 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
@@ -18,13 +22,13 @@
   -webkit-appearance: none;
 }
 
-.admin-body select:focus {
+:where(.admin-body select:focus) {
   outline: none;
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgba(0, 86, 198, 0.1);
 }
 
-.admin-body button {
+:where(.admin-body button) {
   padding: 0.5rem 1rem;
   background: var(--color-surface);
   color: var(--color-text);
@@ -41,24 +45,24 @@
   gap: var(--space-xs);
 }
 
-.admin-body button:hover {
+:where(.admin-body button:hover) {
   background: #f8fafc;
   border-color: #cbd5e1;
 }
 
-.admin-body button:active {
+:where(.admin-body button:active) {
   transform: translateY(1px);
 }
 
-.admin-body button:disabled {
+:where(.admin-body button:disabled) {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
 
 /* Scoped Table form elements overrides (Leads Update / Delete Buttons) */
-.admin-body table td select,
-.admin-body table td input[type="text"] {
+:where(.admin-body table td select),
+:where(.admin-body table td input[type="text"]) {
   padding: 0.4rem 0.6rem;
   font-size: 0.8125rem;
   border: 1px solid var(--color-border);
@@ -70,8 +74,8 @@
   transition: var(--transition-fast);
 }
 
-.admin-body table td select:focus,
-.admin-body table td input[type="text"]:focus {
+:where(.admin-body table td select:focus),
+:where(.admin-body table td input[type="text"]:focus) {
   outline: none;
   border-color: var(--color-accent);
   background-color: #ffffff;
@@ -79,7 +83,7 @@
 }
 
 /* Style table buttons inline: e.g. status submit buttons and raw DeleteButtons */
-.admin-body table td button {
+:where(.admin-body table td button) {
   padding: 0.4rem 0.85rem;
   font-size: 0.78rem;
   font-weight: 700;
@@ -91,51 +95,51 @@
   width: fit-content;
 }
 
-.admin-body table td button:hover {
+:where(.admin-body table td button:hover) {
   background: #e2e8f0;
   border-color: #cbd5e1;
 }
 
 /* Make raw table buttons that acts as 'Delete' have warning alert red outlines */
-.admin-body table td button[type="button"] {
+:where(.admin-body table td button[type="button"]) {
   background: #fef2f2;
   color: #ef4444;
   border-color: rgba(239, 68, 68, 0.2);
 }
 
-.admin-body table td button[type="button"]:hover {
+:where(.admin-body table td button[type="button"]:hover) {
   background: #fee2e2;
   border-color: rgba(239, 68, 68, 0.45);
   color: #b91c1c;
 }
 
 /* Make status form submit buttons have primary layouts */
-.admin-body table td button[type="submit"] {
+:where(.admin-body table td button[type="submit"]) {
   background: var(--color-accent);
   color: #ffffff;
   border-color: var(--color-accent);
 }
 
-.admin-body table td button[type="submit"]:hover {
+:where(.admin-body table td button[type="submit"]:hover) {
   background: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
 }
 
 /* Adjust layout actions toolbar buttons inside panel.module.css */
-.admin-body div[class*="panel_actions"] button,
-.admin-body p[class*="panel_actions"] button,
-.admin-body div[class*="panel_actions"] a,
-.admin-body p[class*="panel_actions"] a {
+:where(.admin-body div[class*="panel_actions"] button),
+:where(.admin-body p[class*="panel_actions"] button),
+:where(.admin-body div[class*="panel_actions"] a),
+:where(.admin-body p[class*="panel_actions"] a) {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   color: var(--color-text);
   box-shadow: var(--shadow-sm);
 }
 
-.admin-body div[class*="panel_actions"] button:hover,
-.admin-body p[class*="panel_actions"] button:hover,
-.admin-body div[class*="panel_actions"] a:hover,
-.admin-body p[class*="panel_actions"] a:hover {
+:where(.admin-body div[class*="panel_actions"] button:hover),
+:where(.admin-body p[class*="panel_actions"] button:hover),
+:where(.admin-body div[class*="panel_actions"] a:hover),
+:where(.admin-body p[class*="panel_actions"] a:hover) {
   border-color: var(--color-accent);
   color: var(--color-accent);
   background: var(--color-accent-light);
