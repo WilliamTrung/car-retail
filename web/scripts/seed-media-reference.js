@@ -9,7 +9,10 @@
  * Requires STORAGE_S3_* in web/.env
  */
 import { PrismaClient } from "@prisma/client";
-import { isR2Configured, uploadToR2 } from "../lib/r2.js";
+import { loadDotenv } from "../prisma/load-dotenv.js";
+import { isR2Configured, uploadToR2 } from "../src/server/storage/r2.ts";
+
+loadDotenv();
 
 const prisma = new PrismaClient();
 

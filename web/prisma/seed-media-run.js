@@ -1,7 +1,11 @@
 import { readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
-import { isR2Configured, purgeR2Bucket, uploadToR2 } from "../lib/r2.js";
+import {
+  isR2Configured,
+  purgeR2Bucket,
+  uploadToR2,
+} from "../src/server/storage/r2.ts";
 import { SEED_MEDIA_ASSETS, SEED_MEDIA_FALLBACKS } from "./seed-media-data.js";
 import { fetchSeedImage } from "./seed-media-fetch.js";
 import { renderSeedSvg } from "./seed-media-svg.js";
@@ -25,7 +29,9 @@ export async function clearMediaFromDatabase(prisma) {
   await prisma.heroSlide.updateMany({ data: { imageMediaId: null } });
   await prisma.newsPost.updateMany({ data: { featuredMediaId: null } });
   await prisma.featureSection.updateMany({ data: { imageMediaId: null } });
-  await prisma.siteSettings.updateMany({ data: { logoMediaId: null, faviconMediaId: null } });
+  await prisma.siteSettings.updateMany({
+    data: { logoMediaId: null, faviconMediaId: null },
+  });
   await prisma.policyDocument.updateMany({ data: { pdfMediaId: null } });
   await prisma.deliveryPhoto.updateMany({ data: { imageMediaId: null } });
   return prisma.mediaAsset.deleteMany({});
@@ -69,26 +75,52 @@ async function fetchWithFallbacks(id, primary, fallbacks = []) {
   throw lastErr ?? new Error(`No source URL for ${id}`);
 }
 
+/** @param {{ id: string, folder: string, altText?: { vi?: string, en?: string }, svg?: object }} entry */
+function svgSpecForEntry(entry) {
+  if (entry.svg) return entry.svg;
+  const label =
+    entry.altText?.en || entry.altText?.vi || entry.id.replace(/^seed-media-/, "");
+  if (entry.folder === "HEROES") {
+    return { kind: "hero", label, hueSeed: entry.id };
+  }
+  if (entry.folder === "NEWS") {
+    return { kind: "news", label, hueSeed: entry.id };
+  }
+  const bodyType = /van|cargo/i.test(entry.id)
+    ? "van"
+    : /mpv|limo|minio/i.test(entry.id)
+      ? "mpv"
+      : /suv|vf-[789]|family/i.test(entry.id)
+        ? "suv"
+        : "compact";
+  return { kind: "vehicle", bodyType, label, hueSeed: entry.id };
+}
+
 /** @param {{ id: string, r2Key: string, sourceUrl?: string, sourceSite?: string, svg?: object, folder: string, altText: object }} entry */
 async function buildUploadPayload(entry) {
   if (entry.sourceUrl) {
     const fallbacks = SEED_MEDIA_FALLBACKS[entry.id] ?? [];
-    const { buffer, contentType, ext, sourceUrl } = await fetchWithFallbacks(
-      entry.id,
-      entry.sourceUrl,
-      fallbacks
-    );
-    const r2Key = entry.r2Key.includes(".") ? entry.r2Key : `${entry.r2Key}.${ext}`;
-    return { buffer, contentType, r2Key, sourceUrl };
+    try {
+      const { buffer, contentType, ext, sourceUrl } = await fetchWithFallbacks(
+        entry.id,
+        entry.sourceUrl,
+        fallbacks,
+      );
+      const r2Key = entry.r2Key.includes(".")
+        ? entry.r2Key
+        : `${entry.r2Key}.${ext}`;
+      return { buffer, contentType, r2Key, sourceUrl };
+    } catch (err) {
+      console.warn(
+        `  warn ${entry.id}: all fetches failed — using SVG placeholder (${err.message})`,
+      );
+    }
   }
 
-  if (!entry.svg) {
-    throw new Error(`${entry.id}: no sourceUrl or svg fallback`);
-  }
-
-  const svg = renderSeedSvg(entry.svg);
+  const svg = renderSeedSvg(svgSpecForEntry(entry));
   const buffer = Buffer.from(svg, "utf8");
-  const r2Key = entry.r2Key.endsWith(".svg") ? entry.r2Key : `${entry.r2Key}.svg`;
+  const baseKey = entry.r2Key.replace(/\.[^.]+$/, "");
+  const r2Key = `${baseKey}.svg`;
   return { buffer, contentType: "image/svg+xml", r2Key, sourceUrl: null };
 }
 
@@ -105,7 +137,7 @@ function writeSeedMediaArtifacts(results) {
   for (const row of results) {
     const sourcePart = row.sourceUrl ? `, sourceUrl: "${row.sourceUrl}"` : "";
     lines.push(
-      `  "${row.id}": { id: "${row.id}", r2Key: "${row.r2Key}", publicUrl: "${row.publicUrl}"${sourcePart} },`
+      `  "${row.id}": { id: "${row.id}", r2Key: "${row.r2Key}", publicUrl: "${row.publicUrl}"${sourcePart} },`,
     );
   }
 
@@ -114,30 +146,48 @@ function writeSeedMediaArtifacts(results) {
 
   let manifest = readFileSync(DATA_FILE, "utf8");
   for (const row of results) {
+    // Manifest uses JSON-ish "id": "…" keys (also tolerate unquoted id:)
     manifest = manifest.replace(
-      new RegExp(`(id: "${row.id}"[\\s\\S]*?publicUrl: )"[^"]*"`, "m"),
-      `$1"${row.publicUrl}"`
+      new RegExp(
+        `("id":\\s*"${row.id}"[\\s\\S]*?"publicUrl":\\s*)"[^"]*"`,
+        "m",
+      ),
+      `$1"${row.publicUrl}"`,
     );
     manifest = manifest.replace(
-      new RegExp(`(id: "${row.id}"[\\s\\S]*?r2Key: )"[^"]*"`, "m"),
-      `$1"${row.r2Key}"`
+      new RegExp(
+        `("id":\\s*"${row.id}"[\\s\\S]*?"r2Key":\\s*)"[^"]*"`,
+        "m",
+      ),
+      `$1"${row.r2Key}"`,
     );
   }
   writeFileSync(DATA_FILE, manifest, "utf8");
 }
 
 /**
- * Purge R2 + DB media, fetch dealer photos, upload to R2, link entities, write seed-media-urls.js
+ * Purge (opt-in) R2 + DB media, fetch dealer photos, upload to R2, link entities.
  * @param {import("@prisma/client").PrismaClient} prisma
+ * @param {{ purge?: boolean }} [opts] — purge defaults false; set via --purge / SEED_MEDIA_PURGE=1
  */
-export async function runSeedMedia(prisma) {
+export async function runSeedMedia(prisma, opts = {}) {
+  const purge = opts.purge === true;
+
   if (!isR2Configured()) {
-    throw new Error("R2 not configured. Set STORAGE_S3_* in web/.env");
+    throw new Error(
+      "R2 not configured. Set STORAGE_S3_* (and full app env) in web/.env",
+    );
   }
 
-  console.log("Purging R2 bucket…");
-  const deletedKeys = await purgeR2Bucket();
-  console.log(`  deleted ${deletedKeys} object(s) from R2`);
+  if (purge) {
+    console.log("Purging R2 bucket (--purge / SEED_MEDIA_PURGE=1)…");
+    const deletedKeys = await purgeR2Bucket();
+    console.log(`  deleted ${deletedKeys} object(s) from R2`);
+  } else {
+    console.log(
+      "Skipping R2 purge. Pass --purge or SEED_MEDIA_PURGE=1 to wipe the bucket.",
+    );
+  }
 
   console.log("Clearing media from database…");
   const { count } = await clearMediaFromDatabase(prisma);
@@ -147,7 +197,8 @@ export async function runSeedMedia(prisma) {
   const results = [];
 
   for (const entry of SEED_MEDIA_ASSETS) {
-    const { buffer, contentType, r2Key, sourceUrl } = await buildUploadPayload(entry);
+    const { buffer, contentType, r2Key, sourceUrl } =
+      await buildUploadPayload(entry);
     const publicUrl = await uploadToR2(r2Key, buffer, contentType);
 
     await prisma.mediaAsset.create({
@@ -162,19 +213,30 @@ export async function runSeedMedia(prisma) {
       },
     });
 
-    await linkMedia(prisma, entry.link, entry.id);
-    results.push({ id: entry.id, r2Key, publicUrl, sourceUrl: sourceUrl ?? entry.sourceUrl });
-    const from = entry.sourceSite ?? "svg";
+    if (entry.link) {
+      await linkMedia(prisma, entry.link, entry.id);
+    }
+    results.push({
+      id: entry.id,
+      r2Key,
+      publicUrl,
+      sourceUrl: sourceUrl ?? entry.sourceUrl,
+    });
+    const from = sourceUrl ? (entry.sourceSite ?? "fetch") : "svg";
     console.log(`  ${entry.id} ← ${from} → ${publicUrl}`);
   }
 
-  for (const [deliveryId, mediaId] of Object.entries(DELIVERY_PHOTO_MEDIA_LINKS)) {
+  for (const [deliveryId, mediaId] of Object.entries(
+    DELIVERY_PHOTO_MEDIA_LINKS,
+  )) {
     await prisma.deliveryPhoto.update({
       where: { id: deliveryId },
       data: { imageMediaId: mediaId },
     });
   }
-  console.log(`  re-linked ${Object.keys(DELIVERY_PHOTO_MEDIA_LINKS).length} delivery photo(s)`);
+  console.log(
+    `  re-linked ${Object.keys(DELIVERY_PHOTO_MEDIA_LINKS).length} delivery photo(s)`,
+  );
 
   writeSeedMediaArtifacts(results);
   console.log(`Wrote ${URLS_FILE} and updated seed-media-data.js`);

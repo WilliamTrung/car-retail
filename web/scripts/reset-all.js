@@ -1,13 +1,18 @@
 /**
  * Wipe catalog/CMS/media/leads; keep units, attribute keys, templates, admin.
- * Purges entire R2 bucket when configured.
- * Usage: node scripts/reset-all.js
+ * R2 bucket purge requires --purge or SEED_MEDIA_PURGE=1 (not silent).
+ * Usage: npx tsx scripts/reset-all.js --purge
  */
 import { PrismaClient } from "@prisma/client";
-import { isR2Configured, purgeR2Bucket } from "../lib/r2.js";
+import { loadDotenv } from "../prisma/load-dotenv.js";
 import { clearMediaFromDatabase } from "../prisma/seed-media-run.js";
+import { isR2Configured, purgeR2Bucket } from "../src/server/storage/r2.ts";
+
+loadDotenv();
 
 const prisma = new PrismaClient();
+const purge =
+  process.argv.includes("--purge") || process.env.SEED_MEDIA_PURGE === "1";
 
 async function wipeDatabase() {
   await prisma.lead.deleteMany({});
@@ -33,17 +38,26 @@ async function wipeDatabase() {
 async function main() {
   console.log("Resetting car-retail data…");
 
-  if (isR2Configured()) {
-    const count = await purgeR2Bucket();
-    console.log(`R2: purged ${count} object(s).`);
+  if (purge) {
+    if (!isR2Configured()) {
+      console.warn("R2 not configured — cannot purge bucket.");
+    } else {
+      console.log("Purging R2 bucket (--purge / SEED_MEDIA_PURGE=1)…");
+      const count = await purgeR2Bucket();
+      console.log(`R2: purged ${count} object(s).`);
+    }
   } else {
-    console.warn("R2 not configured — skipping bucket purge.");
+    console.log(
+      "Skipping R2 purge. Pass --purge or SEED_MEDIA_PURGE=1 to wipe the bucket.",
+    );
   }
 
   await wipeDatabase();
   console.log("Database: catalog, CMS, media, and leads removed.");
   console.log("Kept: units, attribute keys, templates, admin user.");
-  console.log("Next: npm run db:seed:scraped && npm run db:seed:media");
+  console.log(
+    "Next: npm run db:seed:scraped && npm run db:seed:media -- --purge",
+  );
 }
 
 main()
