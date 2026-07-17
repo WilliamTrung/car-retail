@@ -6,6 +6,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SlugAlternatesProvider } from "@/components/ui/SlugAlternates";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { FloatingContactCluster } from "@/components/layout/FloatingContactCluster";
 import { MobileActionBar } from "@/components/layout/MobileActionBar";
@@ -107,8 +108,10 @@ export default async function LocaleLayout({ children, params }: Props) {
     <html lang={locale} className={beVietnamPro.variable}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <SiteHeader chrome={chrome} />
-          <main>{children}</main>
+          <SlugAlternatesProvider>
+            <SiteHeader chrome={chrome} />
+            <main>{children}</main>
+          </SlugAlternatesProvider>
           <SiteFooter chrome={chrome} description={description} />
           <FloatingContactCluster
             hotline={chrome.hotline}

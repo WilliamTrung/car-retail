@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import sectionStyles from "@/components/PageSection.module.css";
+import { SlugAlternates } from "@/components/ui/SlugAlternates";
 import { pickLocale } from "@/lib/attributes";
 import { routing } from "@/lib/i18n/routing";
 import {
@@ -65,6 +66,12 @@ export default async function NewsDetailPage({ params }: Props) {
 
   return (
     <article className={sectionStyles.pageHeader}>
+      {/* News slugs are locale-specific — register both so LangSwitcher
+          links to the counterpart article instead of a 404. */}
+      <SlugAlternates
+        vi={pickLocale(post.slug, "vi")}
+        en={pickLocale(post.slug, "en")}
+      />
       <h1>{title}</h1>
       <div className={sectionStyles.prose}>
         {body.split("\n").map((line, i) => (
