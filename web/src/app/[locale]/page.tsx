@@ -172,7 +172,8 @@ export default async function HomePage({ params }: Props) {
           carousel: t("carouselLabel"),
           previous: t("carouselPrev"),
           next: t("carouselNext"),
-          goToSlide: t("carouselGoTo"),
+          // raw: component interpolates {n} per dot via .replace
+          goToSlide: t.raw("carouselGoTo"),
           pause: t("carouselPause"),
           play: t("carouselPlay"),
         }}
@@ -197,7 +198,8 @@ export default async function HomePage({ params }: Props) {
           viewDetails: tc("viewDetails"),
           testDrive: tc("testDriveConsult"),
           eco: tc("ecoChip"),
-          viewAll: t("viewAllModels"),
+          // raw: component interpolates {count} via .replace
+          viewAll: t.raw("viewAllModels"),
         }}
         viewAllHref={localizeHref("/")}
       />
