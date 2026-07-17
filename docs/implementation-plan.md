@@ -1,6 +1,6 @@
 # Implementation Plan — car-retail
 
-Phased build plan for v1. See [project-context.md](./project-context.md) and [techstack.md](./techstack.md).
+Phased plan for the **TypeScript rework**. Stack of record: [techstack.md](./techstack.md) and `.cursor/rules/nextjs-developer.mdc`. Ignore archived “no TypeScript / Redis / HMAC cookie” v1 language.
 
 ---
 
@@ -9,76 +9,66 @@ Phased build plan for v1. See [project-context.md](./project-context.md) and [te
 | # | Task | Output |
 |---|------|--------|
 | 0.1 | Project context (+ admin spec + asset checklist) | `docs/project-context.md` ✓ |
-| 0.2 | Tech stack doc | `docs/techstack.md` ✓ |
+| 0.2 | Tech stack (TS rework) | `docs/techstack.md` ✓ |
 | 0.3 | Implementation plan | `docs/implementation-plan.md` ✓ |
-| 0.4 | Cursor rules | `.cursor/rules/car-retail-nextjs.mdc` ✓ |
+| 0.4 | Cursor rules | `.cursor/rules/nextjs-developer.mdc` ✓ |
 
 ---
 
-## Phase 1 — Scaffold & infrastructure
+## Phase 1 — Scaffold & infrastructure ✓
 
 | # | Task | Details |
 |---|------|---------|
-| 1.1 | Init Next.js | App Router, JavaScript, CSS Modules, `web/app/[locale]/`, `web/app/admin/` |
-| 1.2 | Prisma + PostgreSQL | `web/prisma/schema.prisma`, `web/lib/prisma.js`, `DATABASE_URL` |
-| 1.3 | Env templates | `web/.env.example`, `deploy.env.example` — all external services |
-| 1.4 | Docker | `web/Dockerfile`, root `docker-compose.yml` (`app` + `migrate`), `web/.dockerignore` |
-| 1.5 | R2 client | `web/lib/r2.js` from `STORAGE_S3_*` env |
-| 1.6 | Cache helper | `web/lib/cache.js` — Map + TTL; no Redis |
-| 1.7 | i18n setup | next-intl, `messages/vi.json`, `messages/en.json`, pathnames map |
+| 1.1 | Next.js App Router + TypeScript | `web/src/app/[locale]/`, `web/src/app/admin/`, strict TS |
+| 1.2 | Prisma + PostgreSQL | `web/prisma/schema.prisma`, `src/server/db/prisma.ts` |
+| 1.3 | Env | Zod fail-fast `src/server/config/env.ts` · `web/.env.example` |
+| 1.4 | Docker | `web/Dockerfile` (standalone, Node 24) · root `docker-compose.yml` (`app` + `migrate`) |
+| 1.5 | R2 client | `src/server/storage/r2.ts` from `STORAGE_S3_*` |
+| 1.6 | Cache | Tag registry + `cachedRead` / `revalidateTags` only — no Redis / Map cache |
+| 1.7 | i18n | next-intl, `messages/vi.json` + `en.json`, localized pathnames |
 
-**Exit criteria:** `docker compose up --build` starts app; Prisma connects via env; R2 client initializes.
+**Exit criteria:** `docker compose` builds app; Prisma connects via env; R2 client initializes.
 
 ---
 
-## Phase 2 — Data model
+## Phase 2 — Data model ✓
 
-| # | Entity | Key fields | Status |
-|---|--------|------------|--------|
-| 2.1 | `site_settings`, `hotlines`, `menu_items` | `{ vi, en }` text | ✓ |
-| 2.2 | `units` | `{ key, value: { vi, en } }` | ✓ |
-| 2.3 | `attribute_keys` | seed catalog | ✓ |
-| 2.4 | `attribute_templates` | `items: [{ key, unit, defaultValue, showInStrip, sortOrder, groupKey }]` | ✓ |
-| 2.5 | `vehicle_lines`, `segments`, `vehicle_models`, `variants` | bilingual descriptions + slugs | ✓ |
-| 2.6 | `vehicle_attributes` | JSON `[{ key, value, unit }]` on model/variant | ✓ |
-| 2.7 | `feature_sections`, `model_faqs`, `hero_slides`, `service_blocks` | CMS content | ✓ |
-| 2.8 | `news_posts`, `pages`, `policy_documents`, `faq_items` | bilingual + slugs | ✓ |
-| 2.9 | `showrooms`, `leads`, `media_assets` | leads include `locale` | ✓ |
-| 2.10 | `admin_users`, `roles` | auth | ✓ |
+| # | Entity | Key fields |
+|---|--------|------------|
+| 2.1 | `site_settings`, `hotlines`, `menu_items` | `{ vi, en }` text |
+| 2.2 | `units` | `{ key, value: { vi, en } }` |
+| 2.3 | `attribute_keys` / `attribute_templates` | catalog + JSON items |
+| 2.4 | `vehicle_lines`, `segments`, `vehicle_models`, `variants` | bilingual + attributes JSON |
+| 2.5 | CMS content | feature sections, FAQs, hero, services, news, pages, policies |
+| 2.6 | `showrooms`, `leads`, `media_assets` | leads include `locale` |
+| 2.7 | Auth tables | `AdminUser`, Auth.js `Account` / `Session` / `VerificationToken` |
 
-**Migrations:** `web/prisma/migrations/20250710120000_init` — full schema (replaces AppMeta placeholder).
+**Migrations:** `web/prisma/migrations/20260715120000_init`
 
-**Seed:** `web/prisma/seed.js` — generic models (City EV Compact, Family SUV Electric, etc.); units; templates (`electric-suv-standard`, `electric-mpv-standard`, `commercial-van`).
+**Seed:** `web/prisma/seed.ts` — generic models; units; templates; admin from `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`.
 
-**Run locally:**
 ```bash
 cd web
-npx prisma migrate deploy   # or db:migrate for dev
+npm run db:deploy   # or db:migrate for dev
 npm run db:seed
 ```
 
 ---
 
-## Phase 3 — Admin panel (`/admin`) ✓ (MVP)
+## Phase 3 — Backend modules + Auth.js ✓
 
-| # | Module | Status |
-|---|--------|--------|
-| 3.1 | Auth | ✓ HMAC session cookie, login/logout, role guard |
-| 3.2 | Site settings | ✓ dealer/legal/MST/consent/maintenance |
-| 3.3 | Units catalog | ✓ list + create |
-| 3.4 | Attribute templates | ✓ list + create (JSON items) |
-| 3.5 | Vehicle catalog | ✓ list/create/edit models; variants read-only |
-| 3.6 | Media library | ✓ R2 upload, list (delete API ready) |
-| 3.7 | Homepage CMS | ✓ hero slides + service blocks |
-| 3.8 | News | ✓ CRUD |
-| 3.9 | Static pages | ✓ about/contact + FAQ + policies create |
-| 3.10 | Showrooms & hotlines | ✓ CRUD |
-| 3.11 | Leads inbox | ✓ list, status update, CSV export |
-| 3.12 | Translation UX | ✓ VN/EN fields + missing-en badge |
+Layered `transport → service → repository` under `src/server/modules/*`.
 
-**Deferred (v1.1):** variant bulk import, menu route validator, password reset, user admin.
+| # | Area | Status |
+|---|------|--------|
+| 3.1 | Auth.js v5 + RBAC | ✓ DB sessions, `requireAdmin`, roles |
+| 3.2 | Vehicles / attributes / templates | ✓ + `revalidateTag` on writes |
+| 3.3 | Leads | ✓ create, list, status, CSV; rate limit on POST |
+| 3.4 | Content / homepage / news / pages | ✓ |
+| 3.5 | Showrooms / settings / media (R2) | ✓ |
+| 3.6 | Public REST | ✓ health, models `[slug]`, leads |
 
-**Cache bust:** `revalidateTag` on CMS writes via `lib/admin/revalidate.js`.
+**Admin UI:** contract surface = Server Actions + DTOs. Minimal unstyled pages for login / create-model / leads smoke; full CMS UI is frontend-owned (CSS Modules).
 
 ---
 
@@ -86,48 +76,48 @@ npm run db:seed
 
 | # | Page | Status |
 |---|------|--------|
-| 4.1 | Layout shell | ✓ Header, footer, locale switcher |
-| 4.2 | Home | ✓ |
-| 4.3 | Model detail | ✓ |
-| 4.4 | Test drive | ✓ |
-| 4.5 | Deposit | ✓ |
-| 4.6 | News list + detail | ✓ |
-| 4.7 | About | ✓ |
-| 4.8 | Contact | ✓ |
-| 4.9 | Policies | ✓ |
-| 4.10 | FAQ | ✓ |
+| 4.1–4.10 | Layout, home, model, test drive, deposit, news, about, contact, policies, FAQ | ✓ TS pages under `src/app/[locale]/` |
 
 **API:** `GET /api/models/[slug]?locale=vi|en` → `{ units, attributes }`.
 
 ---
 
-## Phase 5 — SEO & polish ✓ (partial)
+## Phase 5 — SEO & polish ✓
 
 | # | Task | Status |
 |---|------|--------|
-| 5.1 | Per-locale meta title/description | ✓ layout + model pages |
-| 5.2 | `hreflang` + canonical URLs | ✓ metadata alternates + next-intl middleware |
-| 5.3 | Sitemap (`/vi/*`, `/en/*`) | ✓ `app/sitemap.js` + `robots.js` |
-| 5.4 | OG images from admin | ✓ `ogImageMediaId` in SEO defaults + model hero + news featured |
-| 5.5 | Legal assets review before deploy | manual sign-off (`docs/project-context.md` checklist) |
+| 5.1 | Per-locale meta | ✓ |
+| 5.2 | `hreflang` + canonical | ✓ |
+| 5.3 | Sitemap / robots | ✓ `src/app/sitemap.ts`, `robots.ts` |
+| 5.4 | OG images from media | ✓ |
+| 5.5 | Legal assets review | checklist in `project-context.md` |
 
 ---
 
-## Phase 6 — Deploy (VPS)
+## Phase 6 — Tests, Docker, docs, cleanup ✓
+
+| # | Task | Details |
+|---|------|---------|
+| 6.1 | Vitest | Service/repo critical paths (leads, vehicles, RBAC, env, rate-limit, password) |
+| 6.2 | Playwright | Auth login → create model action → public API; lead POST → admin list; rate-limit 429 |
+| 6.3 | Docker | Standalone TS image; `migrate` = `prisma migrate deploy` |
+| 6.4 | Docs / env | `techstack.md`, this plan, `.env.example` (`AUTH_SECRET`, `SEED_ADMIN_*`) |
+| 6.5 | Cleanup | Remove superseded JS (`_legacy_app`, `web/lib/**.js`, HMAC admin, smoke/scrape scripts) |
+
+---
+
+## Phase 7 — Deploy (VPS)
 
 | # | Step | Status |
 |---|------|--------|
-| 6.1 | VPS directory structure | documented in `docs/deploy-checklist.md` |
-| 6.2 | Env from examples | ✓ `web/.env.example`, `deploy.env.example` |
-| 6.3 | Clone + compose | ✓ `docker-compose.yml` (`app` + `migrate`) |
-| 6.4 | Deploy command | documented |
-| 6.5 | Verify health/routes/admin/R2 | checklist in `docs/deploy-checklist.md` |
-
-**Note:** Actual VPS deploy requires user secrets and networks — not run from dev agent.
+| 7.1 | VPS layout | `docs/deploy-checklist.md` |
+| 7.2 | Env from examples | `web/.env.example`, `deploy.env.example` |
+| 7.3 | Compose | `app` + `migrate` only |
+| 7.4 | Verify | health / routes / admin / R2 |
 
 ---
 
-## Route map (quick reference)
+## Route map
 
 | Page | vi | en |
 |------|----|----|
@@ -144,28 +134,18 @@ npm run db:seed
 
 ---
 
-## v1.1 backlog
-
-- Used-car inventory (`/vi/xe-cu` ↔ `/en/used-cars`)
-- Careers page
-- Service appointment booking
-- Reviews widget
-- National showroom map locator
-- Per-locale news slug auto-derivation improvements
-
----
-
 ## Dependency graph
 
 ```mermaid
 flowchart TD
   P0[Phase 0 Docs] --> P1[Phase 1 Scaffold]
   P1 --> P2[Phase 2 Data model]
-  P2 --> P3[Phase 3 Admin]
+  P2 --> P3[Phase 3 Backend + Auth]
   P2 --> P4[Phase 4 Public]
   P3 --> P4
   P4 --> P5[Phase 5 SEO]
-  P5 --> P6[Phase 6 Deploy]
+  P5 --> P6[Phase 6 Tests / Docker / cleanup]
+  P6 --> P7[Phase 7 Deploy]
 ```
 
 ---

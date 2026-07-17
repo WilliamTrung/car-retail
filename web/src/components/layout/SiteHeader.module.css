@@ -1,0 +1,217 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--header-h);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border-200);
+}
+
+.inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.menuBtn {
+  display: none;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-brand-900);
+  cursor: pointer;
+  order: 1;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.15em;
+  font-size: var(--text-h4-size);
+  line-height: var(--text-h4-line);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+  order: 2;
+}
+
+.logoPrimary {
+  color: var(--color-brand-900);
+}
+
+.logoAccent {
+  color: var(--color-accent-500);
+}
+
+.desktopNav {
+  display: none;
+  flex: 1;
+  justify-content: center;
+  order: 3;
+}
+
+.navList {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-nav-size);
+  line-height: var(--text-nav-line);
+  font-weight: var(--text-nav-weight);
+  color: var(--color-text-900);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navLink:hover {
+  color: var(--color-brand-700);
+  background: var(--color-brand-soft);
+}
+
+.navLink[aria-current="page"] {
+  color: var(--color-brand-700);
+  font-weight: 700;
+}
+
+.chevron {
+  transform: rotate(90deg);
+}
+
+.hasDropdown {
+  position: relative;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  padding: var(--space-2);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-200);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(4px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dropdown {
+    transition:
+      opacity 0.15s ease,
+      transform 0.15s ease,
+      visibility 0.15s;
+  }
+}
+
+.hasDropdown:hover .dropdown,
+.hasDropdown:focus-within .dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.dropdownLink {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-body-sm-size);
+  color: var(--color-text-900);
+  text-decoration: none;
+}
+
+.dropdownLink:hover {
+  background: var(--color-brand-soft);
+  color: var(--color-brand-700);
+}
+
+.desktopActions {
+  display: none;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+  order: 4;
+}
+
+.mobileActions {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  margin-left: auto;
+  order: 5;
+}
+
+.iconFab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-on-dark);
+  text-decoration: none;
+}
+
+.iconFab[data-variant="zalo"] {
+  background: var(--color-zalo);
+}
+
+.iconFab[data-variant="call"] {
+  background: var(--color-accent-600);
+}
+
+/* MobileNav host — out of flex flow */
+.inner > #site-mobile-nav {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  order: 6;
+}
+
+@media (min-width: 901px) {
+  .desktopNav,
+  .desktopActions {
+    display: flex;
+  }
+}
+
+@media (max-width: 900px) {
+  .menuBtn,
+  .mobileActions {
+    display: inline-flex;
+  }
+
+  .logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: var(--text-body-size);
+  }
+}

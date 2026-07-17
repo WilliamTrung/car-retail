@@ -1,0 +1,71 @@
+.cluster {
+  display: none;
+  position: fixed;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  z-index: 40;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.fab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-on-dark);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-raised);
+}
+
+.fab[data-variant="call"] {
+  background: var(--color-accent-600);
+}
+
+.fab[data-variant="zalo"] {
+  background: var(--color-zalo);
+}
+
+.top {
+  background: var(--color-surface-100);
+  color: var(--color-brand-900);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(8px);
+}
+
+.topVisible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.up {
+  transform: rotate(-90deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fab[data-variant="call"] {
+    animation: pulse 2s ease-out infinite;
+  }
+
+  .top {
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease,
+      visibility 0.2s;
+  }
+}
+
+@media (min-width: 901px) {
+  .cluster {
+    display: flex;
+  }
+}

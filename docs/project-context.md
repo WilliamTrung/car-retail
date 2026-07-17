@@ -1,225 +1,167 @@
 # Project Context — car-retail
 
-## Overview
-
-**car-retail** is a bilingual (Vietnamese / English) car dealership marketing website with an admin CMS. It is inspired by VinFast reference sites but uses original branding and admin-managed content.
-
-| Item | Value |
-|------|-------|
-| Repository | `E:\works\car-retail` |
-| Product | Car selling / dealership public site + admin back-office |
-| Scope v1 | **Cars only** — catalog, model detail, leads, supporting pages |
-| Default locale | `vi` (Vietnamese) |
-| Secondary locale | `en` (English) |
-
-## Reference sites (layout / UX only)
-
-| Site | URL | Role |
-|------|-----|------|
-| OEM | [vinfastauto.com/vn_vi](https://vinfastauto.com/vn_vi) | National brand: spec depth, variant pricing, policies, FAQ |
-| Dealer | [vinfastdongsaigon.vn](https://vinfastdongsaigon.vn/) | Local dealer: test-drive CTA, news, multi-showroom footer, hotlines |
-
-**Template decision:** dealer layout as primary; OEM patterns for model detail (spec strip, feature sections, FAQs).
-
-Do **not** copy VinFast HTML, CSS, images, or marketing copy. Use references for structure and UX patterns only.
-
-## Goals
-
-1. Public site for vehicle catalog, model pages, test-drive and deposit lead capture
-2. Admin CMS for all dynamic content (vehicles, news, settings, media, leads)
-3. Bilingual public experience with localized URLs and per-locale slugs
-4. Structured car attributes (key-value) with reusable admin templates
-
-## Out of scope (v1)
-
-- E-bikes, accessories, charging-station locator
-- User accounts, payment gateway, full e-commerce checkout
-- Used-car inventory, careers, service booking flows
-- Redis (use in-memory cache)
-
-## Public features (v1)
-
-### Home
-- Hero carousel, vehicle lineup cards (tagline + price-from)
-- Service blocks, trade-in promo, news teaser
-- Dealer-style footer (showrooms, hotlines, legal entity, MST)
-
-### Model detail
-- Variant pricing, spec strip, feature sections, gallery, FAQ
-- Test-drive and consult CTAs
-
-### Lead forms
-- **Test drive** (primary): model, date, time, contact, consent
-- **Deposit / consult** (secondary): model, variant, showroom, contact
-
-### Supporting pages
-- News (`/vi/tin-tuc` ↔ `/en/news`)
-- About, contact, policies, FAQ
-
-## Internationalization model
-
-Three data tiers:
-
-| Tier | What | Storage |
-|------|------|---------|
-| 1 — Attributes | `key`, `value`, `unit` only | PostgreSQL; labels in `messages/*.json`; units in DB array |
-| 2 — Descriptions | Marketing copy | `{ vi, en }` in DB |
-| 3 — Slugs | URL segments per locale | `{ vi, en }` in DB |
-
-English routes use English path segments (e.g. `/en/book-test-drive`, not `/en/dang-ky-lai-thu`).
-
-## Asset replacement checklist
-
-Review before first deploy. VinFast references are **UX only** — never ship their assets or copy.
-
-### Must replace (legal / trademark / brand-bound)
-
-| Asset | VinFast example | Action |
-|-------|-----------------|--------|
-| Logo | VinFast V wordmark | Upload dealer/OEM logo via admin |
-| Dealer brand name | "VinFast Đông Sài Gòn" | Site settings → display name `{ vi, en }` |
-| Legal entity | CÔNG TY CỔ PHẦN… | Site settings → legal name `{ vi, en }` |
-| Tax ID (MST) | 0316801817 | Site settings |
-| Hotlines | 0971 38 90 68, 1900 23 23 89 | Hotlines CRUD |
-| Email | info@vinfastdongsaigon.vn | Site settings |
-| Model names | VF 3, VF 8, Limo Green | Admin-defined; seed generic placeholders only |
-| Campaign slogans | "Mãnh liệt Tinh thần Việt Nam…" | Admin marketing copy |
-| Privacy / terms | shop.vinfastauto.com links | Admin-authored legal pages per locale |
-| Policy PDFs | VinFast corporate docs | Upload own PDFs to R2 |
-| Showroom names | "Đông Sài Gòn 1" | Showrooms CRUD |
-| Copyright footer | © Vinfastdongsaigon.vn | Site settings |
-| Hero / promo images | VinFast campaign art | R2 upload — own creative |
-| Car renders | VF press images | R2 upload per vehicle |
-| Ecosystem refs | Vingroup, VinPearl, Xanh SM | Remove or replace |
-| Promo footnotes | "(*) Mức giá ưu đãi…" | Admin disclaimer text |
-
-### Keep (generic UI — no replacement needed)
-
-- [ ] Favicon (generic auto icon, not VinFast-branded)
-- [ ] UI icons (Lucide/Heroicons — arrows, spec icons)
-- [ ] Form controls, layout grid, spacing patterns
-- [ ] Countdown timer component (generic)
-- [ ] Map pin icons (generic)
-
-### Admin-managed (dynamic — never hardcode)
-
-- [ ] Vehicle images, hero banners, gallery
-- [ ] Prices, taglines, specs (attribute values)
-- [ ] News posts, FAQ, policies
-- [ ] Showroom addresses, hotlines
-- [ ] Lead form copy and consent text
-
-### Pre-deploy sign-off
-
-- [ ] No `vinfast` / `VINFAST` in public HTML, meta, or images
-- [ ] No links to vinfastauto.com or shop.vinfastauto.com in legal/consent
-- [ ] Seed data uses generic model names only
-- [ ] All logos and car photos are admin-uploaded or placeholders
-- [ ] MST, legal entity, hotlines match real dealer data
+> **Purpose of this document:** declare the **business domain** this project targets so that
+> research, design, and engineering all share one grounded understanding of *who this is for,
+> what business it runs, and what the site must achieve*. The UI researcher uses the
+> **Business domain** section below (plus the reference sites) as the frame for competitive research.
 
 ---
 
-## Admin feature spec
+## 1. Business domain
 
-Route: `/admin` — role-based access. Content fields use **VN | EN** tabs unless noted.
+### 1.1 Industry & market
 
-### Auth & users
-- Login (email + password), session, password reset
-- Roles: **Super Admin** (all), **Editor** (content + vehicles), **Sales** (leads only)
+**car-retail** is the marketing + lead-generation website for an **authorized electric-vehicle (EV)
+dealership operating in Vietnam** — the retail tier of the domestic EV market pioneered by VinFast.
+The domain is **automotive retail (new cars only)**, EV-first, in a fast-growing emerging market where:
 
-### Site settings
-- Dealer name, legal entity, MST, email, copyright — `{ vi, en }`
-- Logo + favicon upload (R2)
-- Social links, privacy policy URL, consent template, SEO defaults, disclaimers
-- Maintenance mode toggle
+- The **manufacturer (OEM)** owns brand, spec, national pricing, and policy.
+- **Local authorized dealers** own the customer relationship: showroom experience, test drives,
+  deposits, delivery, after-sales service, and regional promotions.
+- Buyers are **mid-transition to EVs** — many are first-time EV owners who need education
+  (range, charging, battery lease/subscription, cost-of-ownership) before they commit.
 
-### Hotlines
-- CRUD: label `{ vi, en }`, phone number, sort order, optional showroom link
+This project builds a **dealer** site (not the OEM site). It uses original branding and
+**admin-managed** content; VinFast reference sites inform **UX and information architecture only**.
 
-### Navigation & menus
-- Header/footer items: label `{ vi, en }`, internal route key, order, visible
-- CTAs: test-drive + deposit — label `{ vi, en }` + route key
-- Links resolve to localized paths (`/vi/tin-tuc` ↔ `/en/news`)
+### 1.2 Business model — the dealer
 
-### Units catalog
-- CRUD `units`: `{ key, value: { vi, en } }` — referenced by `attributes[].unit`
-- API returns full `units` array with model responses
+The dealer is a **multi-showroom "3S" operation**: **S**ales · **S**ervice · **S**pare-parts.
+Revenue and the site's job center on **getting qualified buyers into a showroom or a deposit**:
 
-### Attribute templates
-- CRUD templates: `name { vi, en }`, `key`, `items[]`
-- Item fields: `key`, `unit`, `defaultValue`, `showInStrip`, `sortOrder`, `groupKey`
-- **Apply template** on model/variant (replace or merge)
-- **Save as template** from existing attributes
-- Seed: `electric-suv-standard`, `electric-mpv-standard`, `commercial-van`
+| Dealer function | How the site serves it |
+|---|---|
+| **Sales** | Vehicle catalog, model/variant education, price-from, test-drive & deposit capture |
+| **Service** | Showroom/branch directory, hotlines, service-oriented trust signals |
+| **Spare-parts / after-sales** | Trust & credibility content, contact channels |
+| **Marketing** | Campaigns, promotions/countdowns, news, trade-in offers |
 
-### Vehicle catalog
-- **Lines** (personal/commercial), **segments** — `name { vi, en }`
-- **Models** — `name`, `slug`, `tagline`, `description`, meta `{ vi, en }`; hero, gallery (R2)
-- **Variants** — `name { vi, en }`, price, flags (deposit, test-drive, published)
-- **Attributes** — `[{ key, value, unit }]` only; no locale on values
-- **Feature sections**, **model FAQs** — bilingual text + images
+The dealer runs **several branches** across a metro region (Ho Chi Minh City / Bình Dương corridor),
+each with its own address, hours, hotlines, and showroom "type tag" (1S/2S/3S).
 
-### Homepage CMS
-- Hero slides, service blocks, brand story, trade-in block, promo countdown
+### 1.3 Target customers (personas)
 
-### News / blog
-- `title`, `slug`, `excerpt`, `body`, meta — all `{ vi, en }`
-- Featured image (R2), publish date, featured flag
+1. **First-time EV buyer (primary)** — urban family or young professional, price-sensitive,
+   needs reassurance on range/charging/warranty and total cost. Wants to *book a test drive*.
+2. **Upgrade/second-car buyer** — comparing variants and promotions; ready to *place a deposit*.
+3. **Commercial / fleet inquirer** — small business considering EV vans/commercial line; wants a *consult*.
+4. **Existing owner** — returning for service/parts info and branch contact.
 
-### Static pages, policies, FAQ
-- Bilingual CRUD with per-locale slugs
-- Policy PDFs on R2
+### 1.4 Customer journey the site must support
 
-### Showrooms
-- Name, address, city, phone, hours `{ vi, en }`, type tag (1S/2S/3S), lat/lng
-
-### Leads inbox
-- Types: `test_drive`, `deposit`, `consult`
-- Fields include `locale`; status: new → contacted → closed
-- Filter, export CSV, optional email notify
-
-### Media library (R2)
-- Upload/delete; metadata in PostgreSQL (`r2Key`, `publicUrl`, `altText { vi, en }`)
-- Folders: `vehicles/`, `heroes/`, `news/`, `policies/`, `site/`
-
-### SEO & publishing
-- Per-locale meta, preview, sitemap for `/vi/*` and `/en/*`
-- Cache bust via `revalidateTag` on writes
-
-### Admin UX — i18n
-- VN | EN tabs on descriptions and slugs
-- Single-value editor for attributes (unit dropdown from `units`)
-- Flag incomplete English content
-
-### API contract (attributes)
-```json
-{
-  "units": [{ "key": "km", "value": { "vi": "km", "en": "km" } }],
-  "attributes": [{ "key": "range", "value": 562, "unit": "km" }]
-}
 ```
-No `label` or `display` on server — client joins `messages[locale].spec` + `units`.
+Awareness → Model research → Compare variants/price → Test drive (lead) →
+Deposit / consult (lead) → Showroom visit → Purchase → After-sales/service
+```
 
-## Roles (admin)
+The site owns the **top of funnel through lead capture**. Purchase and delivery happen offline at
+the showroom (no e-commerce checkout in v1). Every page should push toward one of three conversions:
+**test-drive booking**, **deposit/consult**, or **contacting a showroom/hotline**.
 
-| Role | Access |
-|------|--------|
-| Super Admin | All modules + users |
-| Editor | Content + vehicles |
-| Sales | Leads inbox only |
+### 1.5 Core business goals of the website
 
-## Success criteria (v1)
+1. **Generate qualified leads** — test-drive and deposit/consult forms are the primary KPI.
+2. **Educate & build confidence** in EV models (specs, range, features, FAQs, policies).
+3. **Project a trustworthy, local, multi-branch dealer identity** (showrooms, hotlines, legal entity, MST).
+4. **Run marketing campaigns** (promotions, countdowns, trade-in, news) the dealer edits without a developer.
+5. **Serve a bilingual audience** — Vietnamese-first, English secondary — with localized URLs.
 
-- [ ] Bilingual public site live on `/vi` and `/en`
-- [ ] Admin can CRUD vehicles, templates, units, news, settings, media
-- [ ] Leads captured for test-drive and deposit
-- [ ] All external services configured via `.env` only
-- [ ] Docker Compose runs `app` + `migrate` only
-- [ ] No VinFast trademark assets in production
+### 1.6 Domain entities (the language of this business)
+
+`Vehicle line` (personal / commercial) → `segment` → `model` → `variant` (price, deposit/test-drive
+flags) with structured **`attributes` (key · value · unit)**; `showroom` (branch); `hotline`; `lead`
+(test_drive / deposit / consult); marketing **content** (hero, promo, news, pages, policies, FAQ);
+`media asset`; `site settings` (dealer identity, legal entity, MST). These map directly to the data model.
+
+### 1.7 Market/localization specifics
+
+- **Vietnamese (`vi`) is the default locale**; English (`en`) is secondary with English URL slugs.
+- **Pricing in VND** (large integer, no decimals); "price from" framing on cards.
+- **Legal/trust requirements**: display legal entity name, **MST (tax code)**, hotlines, showroom
+  addresses — Vietnamese buyers expect these as credibility signals.
+- **Phone-first contact culture**: prominent hotlines, floating call/Zalo-style CTAs, click-to-call.
+
+---
+
+## 2. Reference sites (UX / IA only — never copy assets or copy)
+
+Real VinFast **dealer** sites in the same market. Used for **layout, information architecture, and
+conversion-pattern research** — do **not** copy HTML, CSS, images, or marketing copy.
+
+| Site | URL | Role for research |
+|---|---|---|
+| Dealer A | https://vinfast3sgiatothcm.com/ | 3S dealer HCMC — full sales+service IA, test-drive/deposit CTAs |
+| Dealer B | https://vinfastsaigoncenter.com/ | Saigon Center dealer — home layout, model catalog, promo patterns |
+| Dealer C | https://vinfastnamthaibinhduong.vn/ | Bình Dương dealer — multi-showroom footer, hotlines, regional trust |
+
+**Research focus (for the UI researcher):** hero/lineup layout, model-detail structure (spec strip,
+variants, features, FAQ), lead-form patterns (test drive / deposit), showroom & hotline presentation,
+promo/countdown treatment, footer/legal/MST block, mobile-first navigation, and Vietnamese-market
+conversion cues (floating contact, click-to-call, Zalo). Extract structure and palette/typography
+*patterns*, not brand assets.
+
+---
+
+## 3. Product scope (v1)
+
+**Cars only** — catalog, model detail, lead capture, and supporting dealer pages.
+
+- **Default locale** `vi`; **secondary** `en` (English path segments, e.g. `/en/book-test-drive`).
+- **Public:** home (hero, lineup, services, promo, news), model detail (variants, spec strip,
+  features, gallery, FAQ, CTAs), lead forms (test drive primary; deposit/consult secondary),
+  news, about, contact, policies, FAQ.
+- **Admin CMS:** all dynamic content (vehicles, attributes/templates, homepage, news, pages,
+  showrooms, hotlines, media, site settings, leads inbox).
+
+### Out of scope (v1)
+E-bikes/accessories, charging-station locator, user accounts, payment/checkout, used-car inventory,
+careers, online service booking.
+
+---
+
+## 4. Internationalization model
+
+| Tier | What | Storage |
+|---|---|---|
+| 1 — Attributes | `key`, `value`, `unit` only | DB; labels in `messages/*.json`; units in DB |
+| 2 — Descriptions | Marketing copy | `{ vi, en }` in DB |
+| 3 — Slugs | URL segments per locale | `{ vi, en }` in DB |
+
+English routes use English path segments (`/en/book-test-drive`, not `/en/dang-ky-lai-thu`).
+
+---
+
+## 5. Admin feature spec (summary)
+
+Route `/admin`, role-based (**Super Admin** / **Editor** / **Sales**). VN | EN tabs on bilingual fields.
+
+- **Auth & users** — login, session, roles.
+- **Site settings** — dealer name, legal entity, MST, email, copyright `{vi,en}`; logo/favicon;
+  socials, consent template, SEO defaults, disclaimers, maintenance toggle.
+- **Hotlines / Navigation** — CRUD with `{vi,en}` labels, order, showroom link, CTA route keys.
+- **Attributes** — units catalog, attribute keys, reusable templates (apply / save-as-template).
+- **Vehicle catalog** — lines, segments, models (name/slug/tagline/description/meta `{vi,en}`,
+  hero, gallery), variants (price, deposit/test-drive/published flags), attributes `[{key,value,unit}]`,
+  feature sections, model FAQs.
+- **Homepage CMS** — hero slides, service blocks, brand story, trade-in, promo countdown.
+- **News / pages / policies / FAQ** — bilingual CRUD with per-locale slugs; policy PDFs.
+- **Showrooms** — name/address/hours `{vi,en}`, city, type tag, lat/lng.
+- **Leads inbox** — types test_drive/deposit/consult; status new→contacted→closed; filter, CSV export.
+- **Media library** — R2 upload/delete, metadata; folders `vehicles/heroes/news/policies/site`.
+- **SEO & publishing** — per-locale meta, sitemap for `/vi/*` & `/en/*`, cache-bust on writes.
+
+---
+
+## 6. Brand/asset replacement (pre-deploy discipline)
+
+VinFast references are **UX only**. Before deploy: no `vinfast`/`VINFAST` strings in public HTML,
+meta, or assets; no links to vinfastauto.com in legal/consent; all logos, car photos, model names,
+slogans, hotlines, MST, legal entity, and showroom data are **admin-uploaded or generic placeholders**.
+Full checklist tracked in `docs/deploy-checklist.md`.
+
+---
 
 ## Related docs
-
-- [techstack.md](./techstack.md) — technology choices
+- [techstack.md](./techstack.md) — technology choices (greenfield TypeScript rework)
 - [implementation-plan.md](./implementation-plan.md) — build phases and tasks
-
-Admin feature spec and asset replacement checklist are **sections in this file** (not separate docs).
+- [reference-site-layouts.md](./reference-site-layouts.md) — extracted layout notes from reference research

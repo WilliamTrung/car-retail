@@ -29,3 +29,8 @@ deploy.env.example
 # misc
 coverage
 .DS_Store
+.t0008-deletions.txt
+tests
+scripts/scrape-reference
+scripts/ui-smoke-output
+_legacy_app

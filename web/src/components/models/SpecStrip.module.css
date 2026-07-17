@@ -1,0 +1,18 @@
+.band {
+  background: var(--color-brand-900);
+  padding: var(--space-8) var(--container-pad);
+}
+
+.grid {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-4) var(--space-6);
+}
+
+.cell {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--color-text-on-dark) 22%, transparent);
+  border-radius: var(--radius-sm);
+}

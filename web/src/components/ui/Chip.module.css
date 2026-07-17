@@ -1,0 +1,39 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  font-weight: var(--text-caption-weight);
+  padding: var(--space-1) var(--space-3);
+  white-space: nowrap;
+}
+
+.eco {
+  background: color-mix(in srgb, var(--color-eco-500) 16%, var(--color-bg));
+  color: var(--color-eco-500);
+}
+
+.spec {
+  background: var(--color-surface-100);
+  color: var(--color-text-900);
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.tag {
+  background: var(--color-surface-50);
+  color: var(--color-text-muted);
+}
+
+.promo {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-600);
+}
+
+.darkTag {
+  background: color-mix(in srgb, var(--color-text-on-dark) 14%, transparent);
+  color: var(--color-text-on-dark);
+}

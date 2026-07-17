@@ -1,0 +1,59 @@
+.root {
+  background: var(--color-bg);
+  padding: var(--space-16) var(--container-pad);
+}
+
+.inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.scroller {
+  margin-top: var(--space-8);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.track {
+  display: flex;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0 0 var(--space-2);
+  list-style: none;
+}
+
+.slide {
+  flex: 0 0 min(80%, 14rem);
+  scroll-snap-align: start;
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .scroller {
+    overflow: visible;
+  }
+
+  .track {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  .slide {
+    flex: none;
+  }
+}

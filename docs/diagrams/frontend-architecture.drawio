@@ -1,0 +1,143 @@
+<mxfile host="app.diagrams.net" modified="2026-07-16T12:00:00.000Z" agent="lead-frontend-architect" version="24.7.5">
+  <diagram id="fe-arch-car-retail" name="Frontend architecture">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="t" value="car-retail public web v2 — component &amp; data-flow (Penpot design → Next.js 15 App Router, TS strict, CSS Modules + tokens)" style="text;html=1;fontSize=16;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="40" y="10" width="1100" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cData" value="Data (server only)" style="swimlane;html=1;startSize=28;fillColor=#EAF1F8;strokeColor=#123A5E;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="260" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="dFacade" value="lib/queries/public.ts&#10;(read facade → services)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#123A5E;" vertex="1" parent="cData">
+          <mxGeometry x="30" y="50" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="dDto" value="server/modules/*/*.schema.ts&#10;Zod DTO types (contract)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#123A5E;" vertex="1" parent="cData">
+          <mxGeometry x="30" y="130" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="dI18n" value="messages/vi|en.json + units map&#10;(spec.* labels, unit display)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#123A5E;" vertex="1" parent="cData">
+          <mxGeometry x="30" y="210" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="dLeads" value="POST /api/leads&#10;(Zod + rate-limit)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#FFF1EC;strokeColor=#C4370F;" vertex="1" parent="cData">
+          <mxGeometry x="30" y="300" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cVm" value="View models (pure mappers)" style="swimlane;html=1;startSize=28;fillColor=#F4F6F9;strokeColor=#5B6672;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="60" width="240" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="vmCard" value="ModelCardVM / ModelDetailVM" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#5B6672;" vertex="1" parent="cVm">
+          <mxGeometry x="20" y="50" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="vmChrome" value="SiteChromeVM" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#5B6672;" vertex="1" parent="cVm">
+          <mxGeometry x="20" y="120" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="vmShowroom" value="ShowroomVM / HeroSlideVM / PromoVM / NewsTeaserVM" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#5B6672;" vertex="1" parent="cVm">
+          <mxGeometry x="20" y="190" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="vmLead" value="LeadFormValues&#10;(assignable to CreateLeadInput)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#FFF1EC;strokeColor=#C4370F;" vertex="1" parent="cVm">
+          <mxGeometry x="20" y="280" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cShell" value="Route shell — app/[locale]/layout.tsx" style="swimlane;html=1;startSize=28;fillColor=#EAEEF4;strokeColor=#0C2439;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="620" y="60" width="240" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="shHeader" value="SiteHeader (sticky, nav, VI/EN, Zalo, hotline)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#0C2439;" vertex="1" parent="cShell">
+          <mxGeometry x="20" y="50" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="shFooter" value="SiteFooter (trust, legal + MST, 3-branch directory)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#0C2439;" vertex="1" parent="cShell">
+          <mxGeometry x="20" y="130" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="shFloat" value="FloatingContactCluster ⚡client (call pulse · Zalo · top)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#FFF7F3;strokeColor=#C4370F;dashed=1;" vertex="1" parent="cShell">
+          <mxGeometry x="20" y="210" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="shBar" value="MobileActionBar ⚡client (Gọi · Zalo · Lái thử, ≤900px)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#FFF7F3;strokeColor=#C4370F;dashed=1;" vertex="1" parent="cShell">
+          <mxGeometry x="20" y="290" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cPages" value="Pages (Server Components)" style="swimlane;html=1;startSize=28;fillColor=#EAF1F8;strokeColor=#123A5E;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="60" width="300" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="pHome" value="Home — HeroCarousel · BenefitStrip · ModelGridSection · CtaBand · PromoSection · DeliveryGallery · NewsTeaser · LeadForm(consult)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#123A5E;align=left;spacingLeft=8;" vertex="1" parent="cPages">
+          <mxGeometry x="20" y="50" width="260" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="pModel" value="Model Detail — GalleryHero · VariantSelector · promo · CTA cluster · FeatureSections · SpecStrip · RelatedModels" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#123A5E;align=left;spacingLeft=8;" vertex="1" parent="cPages">
+          <mxGeometry x="20" y="145" width="260" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="pTd" value="Test Drive — trust panel · LeadForm(test_drive) · success state" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#123A5E;align=left;spacingLeft=8;" vertex="1" parent="cPages">
+          <mxGeometry x="20" y="230" width="260" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="pShow" value="Showrooms — filter tabs · ShowroomCard grid · CTA band" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#123A5E;align=left;spacingLeft=8;" vertex="1" parent="cPages">
+          <mxGeometry x="20" y="300" width="260" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cIsles" value="Client islands (only client JS)" style="swimlane;html=1;startSize=28;fillColor=#FFF1EC;strokeColor=#C4370F;fontStyle=1;rounded=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="60" width="300" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="iCarousel" value="HeroCarousel (slide 1 SSR = LCP)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#C4370F;" vertex="1" parent="cIsles">
+          <mxGeometry x="20" y="50" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="iCountdown" value="CountdownTimer (tabular-nums, expiry fallback)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#C4370F;" vertex="1" parent="cIsles">
+          <mxGeometry x="20" y="100" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="iLead" value="LeadForm (consult / test_drive / deposit)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#C4370F;" vertex="1" parent="cIsles">
+          <mxGeometry x="20" y="150" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="iGallery" value="GalleryHero + VariantSelector" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#C4370F;" vertex="1" parent="cIsles">
+          <mxGeometry x="20" y="200" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="iTabs" value="ShowroomDirectory tabs (CSS filter, no refetch)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#C4370F;" vertex="1" parent="cIsles">
+          <mxGeometry x="20" y="250" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="iNav" value="LangSwitcher · MobileNav" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#C4370F;" vertex="1" parent="cIsles">
+          <mxGeometry x="20" y="300" width="260" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cUi" value="Shared UI — tokens.css consumers (atoms / molecules)" style="swimlane;html=1;startSize=28;fillColor=#F4F6F9;strokeColor=#5B6672;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="620" y="510" width="920" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="uAtoms" value="Button · Chip · PriceText · SectionTitle · SmartImage · FormField · ConsentCheckbox · Icon" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#5B6672;" vertex="1" parent="cUi">
+          <mxGeometry x="20" y="45" width="430" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uMol" value="ModelCard · NewsCard · DeliveryCard · BenefitItem · SpecCell · VariantCard · ShowroomCard · FaqItem" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#5B6672;" vertex="1" parent="cUi">
+          <mxGeometry x="470" y="45" width="430" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tok" value="styles/tokens.css — 17 colors · radius · 8px spacing · elevation · Be Vietnam Pro 13-style scale (next/font)" style="rounded=1;html=1;whiteSpace=wrap;fillColor=#0C2439;strokeColor=none;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="545" width="540" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeColor=#123A5E;" edge="1" parent="1" source="cData" target="cVm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="props (typed)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeColor=#123A5E;labelBackgroundColor=#ffffff;fontSize=11;" edge="1" parent="1" source="cVm" target="cShell">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="props (typed)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeColor=#123A5E;labelBackgroundColor=#ffffff;fontSize=11;" edge="1" parent="1" source="cVm" target="cPages">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="590" y="40" /><mxPoint x="1050" y="40" /></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" value="hydrate leaf islands" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeColor=#C4370F;dashed=1;labelBackgroundColor=#ffffff;fontSize=11;" edge="1" parent="1" source="cPages" target="cIsles">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="fetch on submit (only client mutation)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeColor=#C4370F;dashed=1;labelBackgroundColor=#ffffff;fontSize=11;" edge="1" parent="1" source="iLead" target="dLeads">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="1370" y="700" /><mxPoint x="160" y="700" /></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" value="compose" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeColor=#5B6672;labelBackgroundColor=#ffffff;fontSize=11;" edge="1" parent="1" source="cPages" target="cUi">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="CSS vars only" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeColor=#5B6672;labelBackgroundColor=#ffffff;fontSize=11;" edge="1" parent="1" source="tok" target="cUi">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="spec.* labels + units" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeColor=#123A5E;labelBackgroundColor=#ffffff;fontSize=11;" edge="1" parent="1" source="dI18n" target="cVm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

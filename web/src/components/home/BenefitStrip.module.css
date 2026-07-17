@@ -1,0 +1,30 @@
+.root {
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border-200);
+  padding: var(--space-6) var(--container-pad);
+}
+
+.inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: 1fr;
+}
+
+.item {
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .inner {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-8);
+  }
+}

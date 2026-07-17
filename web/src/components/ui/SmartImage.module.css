@@ -1,0 +1,29 @@
+.frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-surface-100);
+  border-radius: var(--radius-md);
+}
+
+.img {
+  object-fit: cover;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-100);
+  padding: var(--space-4);
+}
+
+.placeholderCaption {
+  color: var(--color-text-muted);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  font-weight: var(--text-caption-weight);
+  text-align: center;
+}

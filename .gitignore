@@ -1,5 +1,7 @@
 # Cursor / agent (local IDE & temp working files)
 .cursor/
+.claude/
+.agent-tasks/
 agent-transcripts/
 .agents/
 .tmp-*
@@ -24,6 +26,7 @@ dist/
 
 # Testing
 coverage/
+web/tests/e2e/artifacts/
 
 # Environment secrets (keep *.example templates)
 .env
@@ -54,6 +57,9 @@ Thumbs.db
 web/prisma/*.db
 web/prisma/*.db-journal
 
+# check-task watcher runtime sidecars (events log / PID / stdout-stderr)
+.agent-tasks/.check_task.*
+
 # Scrape output (screenshots local only; manifest committed)
 web/scripts/scrape-reference/output/screenshots/
 web/scripts/ui-smoke-output/
@@ -61,3 +67,9 @@ web/scripts/ui-smoke-output/
 .cache/
 .turbo/
 .vercel/
+
+# local docker override
+web/.env.docker
+
+# Playwright test results
+web/test-results/

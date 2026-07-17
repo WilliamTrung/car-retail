@@ -311,6 +311,102 @@ export const SEED_MEDIA_ASSETS = [
     }
   },
   {
+    "id": "seed-media-city-ev-g1",
+    "r2Key": "vehicles/gallery/seed-media-city-ev-g1.png",
+    "sourceUrl": "https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
+    "sourceSite": "vinfastauto",
+    "publicUrl": "",
+    "folder": "VEHICLES",
+    "altText": {
+      "vi": "Ảnh gallery City EV",
+      "en": "City EV gallery photo"
+    }
+  },
+  {
+    "id": "seed-media-city-ev-g2",
+    "r2Key": "vehicles/gallery/seed-media-city-ev-g2.png",
+    "sourceUrl": "https://static-cms-prod.vinfastauto.com/header-vf3-hover_0.png",
+    "sourceSite": "vinfastauto",
+    "publicUrl": "",
+    "folder": "VEHICLES",
+    "altText": {
+      "vi": "Ảnh gallery City EV",
+      "en": "City EV gallery photo"
+    }
+  },
+  {
+    "id": "seed-media-family-suv-g1",
+    "r2Key": "vehicles/gallery/seed-media-family-suv-g1.png",
+    "sourceUrl": "https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
+    "sourceSite": "vinfastauto",
+    "publicUrl": "",
+    "folder": "VEHICLES",
+    "altText": {
+      "vi": "Ảnh gallery Family SUV",
+      "en": "Family SUV gallery photo"
+    }
+  },
+  {
+    "id": "seed-media-family-suv-g2",
+    "r2Key": "vehicles/gallery/seed-media-family-suv-g2.png",
+    "sourceUrl": "https://static-cms-prod.vinfastauto.com/header-vf3-hover_0.png",
+    "sourceSite": "vinfastauto",
+    "publicUrl": "",
+    "folder": "VEHICLES",
+    "altText": {
+      "vi": "Ảnh gallery Family SUV",
+      "en": "Family SUV gallery photo"
+    }
+  },
+  {
+    "id": "seed-media-urban-mpv-g1",
+    "r2Key": "vehicles/gallery/seed-media-urban-mpv-g1.png",
+    "sourceUrl": "https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
+    "sourceSite": "vinfastauto",
+    "publicUrl": "",
+    "folder": "VEHICLES",
+    "altText": {
+      "vi": "Ảnh gallery Urban MPV",
+      "en": "Urban MPV gallery photo"
+    }
+  },
+  {
+    "id": "seed-media-urban-mpv-g2",
+    "r2Key": "vehicles/gallery/seed-media-urban-mpv-g2.png",
+    "sourceUrl": "https://static-cms-prod.vinfastauto.com/header-vf3-hover_0.png",
+    "sourceSite": "vinfastauto",
+    "publicUrl": "",
+    "folder": "VEHICLES",
+    "altText": {
+      "vi": "Ảnh gallery Urban MPV",
+      "en": "Urban MPV gallery photo"
+    }
+  },
+  {
+    "id": "seed-media-cargo-van-g1",
+    "r2Key": "vehicles/gallery/seed-media-cargo-van-g1.png",
+    "sourceUrl": "https://vinfastdongsaigon.vn/wp-content/uploads/2025/05/banner-ec-van-1024x576.png",
+    "sourceSite": "vinfastdongsaigon",
+    "publicUrl": "",
+    "folder": "VEHICLES",
+    "altText": {
+      "vi": "Ảnh gallery Cargo Van",
+      "en": "Cargo Van gallery photo"
+    }
+  },
+  {
+    "id": "seed-media-cargo-van-g2",
+    "r2Key": "vehicles/gallery/seed-media-cargo-van-g2.png",
+    "sourceUrl": "https://vinfastdongsaigon.vn/wp-content/uploads/2025/05/banner-ec-van-1024x576.png",
+    "sourceSite": "vinfastdongsaigon",
+    "publicUrl": "",
+    "folder": "VEHICLES",
+    "altText": {
+      "vi": "Ảnh gallery Cargo Van",
+      "en": "Cargo Van gallery photo"
+    }
+  },
+  {
     "id": "seed-media-news-1",
     "r2Key": "news/home.png",
     "sourceUrl": "https://vinfastdongsaigon.vn/wp-content/uploads/2025/09/555940871_1120387186949477_63562-677x1024.png",

@@ -1,0 +1,18 @@
+.root {
+  background: var(--color-bg);
+  padding: var(--space-16) 0 var(--space-24);
+}
+
+.inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}

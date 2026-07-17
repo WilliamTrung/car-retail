@@ -1,0 +1,21 @@
+.price {
+  color: var(--color-accent-500);
+  font-variant-numeric: tabular-nums;
+}
+
+.lg {
+  font-size: var(--text-price-lg-size);
+  line-height: var(--text-price-lg-line);
+  font-weight: var(--text-price-lg-weight);
+}
+
+.base {
+  font-size: var(--text-price-size);
+  line-height: var(--text-price-line);
+  font-weight: var(--text-price-weight);
+}
+
+.fallback {
+  color: var(--color-text-muted);
+  font-weight: var(--text-body-weight);
+}

@@ -10,6 +10,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const URLS_FILE = join(__dirname, "seed-media-urls.js");
 const DATA_FILE = join(__dirname, "seed-media-data.js");
 
+/** Delivery gallery rows → hero media used as delivery card images */
+const DELIVERY_PHOTO_MEDIA_LINKS = {
+  "seed-delivery-1": "seed-media-vf-3-hero",
+  "seed-delivery-2": "seed-media-vf-5-hero",
+  "seed-delivery-3": "seed-media-vf-6-hero",
+  "seed-delivery-4": "seed-media-vf-7-hero",
+  "seed-delivery-5": "seed-media-vf-8-hero",
+};
+
 /** @param {import("@prisma/client").PrismaClient} prisma */
 export async function clearMediaFromDatabase(prisma) {
   await prisma.vehicleModel.updateMany({ data: { heroMediaId: null } });
@@ -18,6 +27,7 @@ export async function clearMediaFromDatabase(prisma) {
   await prisma.featureSection.updateMany({ data: { imageMediaId: null } });
   await prisma.siteSettings.updateMany({ data: { logoMediaId: null, faviconMediaId: null } });
   await prisma.policyDocument.updateMany({ data: { pdfMediaId: null } });
+  await prisma.deliveryPhoto.updateMany({ data: { imageMediaId: null } });
   return prisma.mediaAsset.deleteMany({});
 }
 
@@ -34,6 +44,10 @@ async function linkMedia(prisma, link, mediaId) {
   }
   if (link.table === "newsPost") {
     await prisma.newsPost.update({ where: { id: link.entityId }, data });
+    return;
+  }
+  if (link.table === "deliveryPhoto") {
+    await prisma.deliveryPhoto.update({ where: { id: link.entityId }, data });
     return;
   }
   throw new Error(`Unsupported media link table: ${link.table}`);
@@ -153,6 +167,14 @@ export async function runSeedMedia(prisma) {
     const from = entry.sourceSite ?? "svg";
     console.log(`  ${entry.id} ← ${from} → ${publicUrl}`);
   }
+
+  for (const [deliveryId, mediaId] of Object.entries(DELIVERY_PHOTO_MEDIA_LINKS)) {
+    await prisma.deliveryPhoto.update({
+      where: { id: deliveryId },
+      data: { imageMediaId: mediaId },
+    });
+  }
+  console.log(`  re-linked ${Object.keys(DELIVERY_PHOTO_MEDIA_LINKS).length} delivery photo(s)`);
 
   writeSeedMediaArtifacts(results);
   console.log(`Wrote ${URLS_FILE} and updated seed-media-data.js`);
