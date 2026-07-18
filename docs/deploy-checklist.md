@@ -117,6 +117,20 @@ unmatched links are skipped with warnings.
 
 Prefer running `db:seed:media` locally, committing `seed-media-data.js` + `seed-media-urls.js`, then VPS only needs `git pull` before the media seed step (R2 + DB update). Do not edit seed manifests only on the VPS.
 
+### Reseed visibility (SSG)
+
+Homepage, model, and news routes are **SSG-prerendered at `next build`** from the live DB. After a reseed, `docker restart` or a plain `docker compose up -d --build` still serves **stale SSG pages** — Docker layer cache reuses the previous image build (and its baked HTML).
+
+To make reseeded content visible, rebuild the app image with no cache, then recreate the container:
+
+```bash
+# after reseed
+docker compose --env-file ~/dev/shared/car-retail/secrets/deploy.env build --no-cache app
+docker compose --env-file ~/dev/shared/car-retail/secrets/deploy.env up -d
+```
+
+(Tradeoff if you want reseed without a no-cache rebuild: mark those routes `force-dynamic` or use a short `revalidate` — route changes are out of scope here.)
+
 ## 4.2 Reference scrape + full reseed (dev)
 
 Scrape dealer/OEM sites with Playwright, generate catalog seed, wipe DB + R2, reload:
