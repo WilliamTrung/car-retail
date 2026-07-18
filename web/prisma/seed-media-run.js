@@ -8,7 +8,7 @@ import {
   uploadToR2,
 } from "./seed-media-r2.js";
 import { SEED_MEDIA_ASSETS, SEED_MEDIA_FALLBACKS } from "./seed-media-data.js";
-import { fetchSeedImage } from "./seed-media-fetch.js";
+import { fetchSeedImage, readLocalSeedImage } from "./seed-media-fetch.js";
 import { renderSeedSvg } from "./seed-media-svg.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -111,8 +111,34 @@ function svgSpecForEntry(entry) {
   return { kind: "vehicle", bodyType, label, hueSeed: entry.id };
 }
 
-/** @param {{ id: string, r2Key: string, sourceUrl?: string, sourceSite?: string, svg?: object, folder: string, altText: object }} entry */
+/**
+ * Prefer committed local raster → optional network URL → SVG last resort.
+ * @param {{ id: string, r2Key: string, localFile?: string, sourceUrl?: string, sourceSite?: string, svg?: object, folder: string, altText: object }} entry
+ */
 async function buildUploadPayload(entry) {
+  if (entry.localFile) {
+    try {
+      const { buffer, contentType, ext } = readLocalSeedImage(
+        entry.localFile,
+        __dirname,
+      );
+      const r2Key = entry.r2Key.includes(".")
+        ? entry.r2Key
+        : `${entry.r2Key}.${ext}`;
+      return {
+        buffer,
+        contentType,
+        r2Key,
+        sourceUrl: `file:${entry.localFile}`,
+        origin: "local",
+      };
+    } catch (err) {
+      console.warn(
+        `  warn ${entry.id}: local file failed — ${err.message}`,
+      );
+    }
+  }
+
   if (entry.sourceUrl) {
     const fallbacks = SEED_MEDIA_FALLBACKS[entry.id] ?? [];
     try {
@@ -124,7 +150,7 @@ async function buildUploadPayload(entry) {
       const r2Key = entry.r2Key.includes(".")
         ? entry.r2Key
         : `${entry.r2Key}.${ext}`;
-      return { buffer, contentType, r2Key, sourceUrl };
+      return { buffer, contentType, r2Key, sourceUrl, origin: "fetch" };
     } catch (err) {
       console.warn(
         `  warn ${entry.id}: all fetches failed — using SVG placeholder (${err.message})`,
@@ -136,7 +162,13 @@ async function buildUploadPayload(entry) {
   const buffer = Buffer.from(svg, "utf8");
   const baseKey = entry.r2Key.replace(/\.[^.]+$/, "");
   const r2Key = `${baseKey}.svg`;
-  return { buffer, contentType: "image/svg+xml", r2Key, sourceUrl: null };
+  return {
+    buffer,
+    contentType: "image/svg+xml",
+    r2Key,
+    sourceUrl: null,
+    origin: "svg",
+  };
 }
 
 /** @param {Array<{ id: string, r2Key: string, publicUrl: string, sourceUrl?: string }>} results */
@@ -207,14 +239,18 @@ export async function runSeedMedia(prisma, opts = {}) {
     );
   }
 
-  console.log("Stage 1/4 — fetching source images (no writes yet)…");
+  console.log("Stage 1/4 — loading source images (no writes yet)…");
   const payloads = [];
   for (const entry of SEED_MEDIA_ASSETS) {
     const payload = await buildUploadPayload(entry);
     payloads.push({ entry, ...payload });
-    console.log(
-      `  ${entry.id} ← ${payload.sourceUrl ? (entry.sourceSite ?? "fetch") : "svg"}`,
-    );
+    const origin =
+      payload.origin === "local"
+        ? "local"
+        : payload.origin === "fetch"
+          ? entry.sourceSite ?? "fetch"
+          : "svg";
+    console.log(`  ${entry.id} ← ${origin}`);
   }
 
   console.log("Stage 2/4 — uploading to R2 (existing objects kept)…");

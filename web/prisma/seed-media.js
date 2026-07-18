@@ -12,8 +12,9 @@
  * Run inside the migrate image (copies prisma/ only — no mounts needed):
  *   npx prisma generate && node prisma/seed-media.js --purge
  *
- * Ordering is failure-safe: fetch → upload → transactional DB swap → stale
- * purge last. A mid-run crash leaves the prior media set intact.
+ * Ordering is failure-safe: local file (preferred) / fetch → upload →
+ * transactional DB swap → stale purge last. SVG is last-resort only.
+ * A mid-run crash leaves the prior media set intact.
  *
  * Without --purge (or SEED_MEDIA_PURGE=1), stale R2 objects are NOT deleted —
  * assets are re-uploaded over the same keys and MediaAsset rows are replaced.
