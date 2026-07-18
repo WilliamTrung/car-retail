@@ -18,9 +18,9 @@
  * Without --purge (or SEED_MEDIA_PURGE=1), stale R2 objects are NOT deleted —
  * assets are re-uploaded over the same keys and MediaAsset rows are replaced.
  *
- * NOTE: the manifest (seed-media-data.js) targets the SCRAPED dataset
- * (`npm run db:seed:scraped` / `npm run db:reseed`). Against another dataset
- * (e.g. generic prisma/seed.ts) unmatched CMS links are skipped with warnings.
+ * NOTE: the manifest (seed-media-data.js) targets the GENERIC catalog from
+ * prisma/seed.ts (`npm run db:seed`). Unmatched CMS links are skipped with
+ * warnings (failure-safe) instead of aborting.
  */
 import { PrismaClient } from "@prisma/client";
 import { loadDotenv } from "./load-dotenv.js";

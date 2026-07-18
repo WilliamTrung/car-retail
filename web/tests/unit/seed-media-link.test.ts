@@ -10,6 +10,7 @@ function fakeDb(count: number) {
     heroSlide: { updateMany },
     newsPost: { updateMany },
     deliveryPhoto: { updateMany },
+    featureSection: { updateMany },
   } as unknown as Db;
   return { db, updateMany };
 }
@@ -19,24 +20,24 @@ describe("seed-media linkMedia", () => {
     const { db, updateMany } = fakeDb(1);
     const linked = await linkMedia(
       db,
-      { table: "vehicleModel", entityId: "seed-model-vf-3", field: "heroMediaId" },
-      "seed-media-vf-3-hero",
+      { table: "vehicleModel", entityId: "seed-model-city-ev", field: "heroMediaId" },
+      "seed-media-city-ev-hero",
     );
     expect(linked).toBe(true);
     expect(updateMany).toHaveBeenCalledWith({
-      where: { id: "seed-model-vf-3" },
-      data: { heroMediaId: "seed-media-vf-3-hero" },
+      where: { id: "seed-model-city-ev" },
+      data: { heroMediaId: "seed-media-city-ev-hero" },
     });
   });
 
   it("skips (no throw) when the target row is missing — the prod P2025 case", async () => {
-    // generic seed.ts dataset has no seed-model-ec-van → updateMany count 0
+    // unknown model id → updateMany count 0
     const { db } = fakeDb(0);
     await expect(
       linkMedia(
         db,
-        { table: "vehicleModel", entityId: "seed-model-ec-van", field: "heroMediaId" },
-        "seed-media-ec-van-hero",
+        { table: "vehicleModel", entityId: "seed-model-missing", field: "heroMediaId" },
+        "seed-media-missing-hero",
       ),
     ).resolves.toBe(false);
   });

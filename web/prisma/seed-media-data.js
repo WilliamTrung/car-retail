@@ -1,503 +1,221 @@
-/** AUTO-GENERATED — dev reference media manifest */
+/** Generic Volta catalog media manifest — SVG placeholders only (no third-party sources) */
 function bi(vi, en) {
   return { vi, en: en || vi };
 }
 
+/**
+ * @param {object} opts
+ * @param {string} opts.id
+ * @param {string} opts.r2Key
+ * @param {string} opts.folder
+ * @param {{ vi: string, en: string }} opts.altText
+ * @param {object} [opts.svg]
+ * @param {{ table: string, entityId: string, field: string }} [opts.link]
+ * @param {string} [opts.publicUrl]
+ */
+function asset({ id, r2Key, folder, altText, svg, link, publicUrl = "" }) {
+  return {
+    id,
+    r2Key,
+    publicUrl,
+    folder,
+    altText,
+    ...(svg ? { svg } : {}),
+    ...(link ? { link } : {}),
+  };
+}
+
 export const SEED_MEDIA_ASSETS = [
-  {
-    "id": "seed-media-ec-van-hero",
-    "r2Key": "vehicles/ec-van-hero.svg",
-    "sourceUrl": "https://voltadongsaigon.vn/wp-content/uploads/2025/05/banner-ec-van-1024x576.png",
-    "sourceSite": "voltadongsaigon",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/ec-van-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh EC Van",
-      "en": "EC Van image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-ec-van",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-herio-green-hero",
-    "r2Key": "vehicles/herio-green-hero.svg",
-    "sourceUrl": "https://static-cms-prod.voltaauto.com/header-vf3-hover_0.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/herio-green-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh Herio Green",
-      "en": "Herio Green image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-herio-green",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-limo-green-hero",
-    "r2Key": "vehicles/limo-green-hero.svg",
-    "sourceUrl": "https://voltadongsaigon.vn/wp-content/uploads/2025/04/LimoGreen-768x453.png",
-    "sourceSite": "voltadongsaigon",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/limo-green-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh Limo Green",
-      "en": "Limo Green image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-limo-green",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-minio-green-hero",
-    "r2Key": "vehicles/minio-green-hero.svg",
-    "sourceUrl": "https://static-cms-prod.voltaauto.com/header-vf3-hover_0.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/minio-green-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh Minio Green",
-      "en": "Minio Green image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-minio-green",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-mpv-7-hero",
-    "r2Key": "vehicles/mpv-7-hero.svg",
-    "sourceUrl": "https://static-cms-prod.voltaauto.com/header-vf3-hover_0.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/mpv-7-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh VF MPV 7",
-      "en": "VF MPV 7 image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-mpv-7",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-nerio-green-hero",
-    "r2Key": "vehicles/nerio-green-hero.svg",
-    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/nerio-green-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh Nerio Green",
-      "en": "Nerio Green image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-nerio-green",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-vf-3-hero",
-    "r2Key": "vehicles/vf-3-hero.svg",
-    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/vf-3-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh VF 3",
-      "en": "VF 3 image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-vf-3",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-vf-5-hero",
-    "r2Key": "vehicles/vf-5-hero.svg",
-    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/vf-5-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh VF 5",
-      "en": "VF 5 image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-vf-5",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-vf-6-hero",
-    "r2Key": "vehicles/vf-6-hero.svg",
-    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/vf-6-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh VF 6",
-      "en": "VF 6 image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-vf-6",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-vf-7-hero",
-    "r2Key": "vehicles/vf-7-hero.svg",
-    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/vf-7-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh VF 7",
-      "en": "VF 7 image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-vf-7",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-vf-8-hero",
-    "r2Key": "vehicles/vf-8-hero.svg",
-    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/vf-8-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh VF 8",
-      "en": "VF 8 image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-vf-8",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-vf-9-hero",
-    "r2Key": "vehicles/vf-9-hero.svg",
-    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/vf-9-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh VF 9",
-      "en": "VF 9 image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-vf-9",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-vf-e34-hero",
-    "r2Key": "vehicles/vf-e34-hero.svg",
-    "sourceUrl": "https://voltadongsaigon.vn/wp-content/uploads/2022/11/volta-vf-e34-img-banner-top.webp",
-    "sourceSite": "voltadongsaigon",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/vf-e34-hero.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh VF e34",
-      "en": "VF e34 image"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-vf-e34",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-hero-1",
-    "r2Key": "heroes/seed-hero-1.svg",
-    "sourceUrl": "https://voltadongsaigon.vn/wp-content/uploads/2022/11/VF5_1711360061.png",
-    "sourceSite": "voltadongsaigon",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/heroes/seed-hero-1.svg",
-    "folder": "HEROES",
-    "altText": {
-      "vi": "Khuyến mãi",
-      "en": "Promotion"
-    },
-    "link": {
-      "table": "heroSlide",
-      "entityId": "seed-hero-1",
-      "field": "imageMediaId"
-    }
-  },
-  {
-    "id": "seed-media-hero-2",
-    "r2Key": "heroes/seed-hero-2.svg",
-    "sourceUrl": "https://voltadongsaigon.vn/wp-content/uploads/2022/11/VF6_1711360087.png",
-    "sourceSite": "voltadongsaigon",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/heroes/seed-hero-2.svg",
-    "folder": "HEROES",
-    "altText": {
-      "vi": "Khuyến mãi",
-      "en": "Promotion"
-    },
-    "link": {
-      "table": "heroSlide",
-      "entityId": "seed-hero-2",
-      "field": "imageMediaId"
-    }
-  },
-  {
-    "id": "seed-media-hero-3",
-    "r2Key": "heroes/seed-hero-3.svg",
-    "sourceUrl": "https://voltadongsaigon.vn/wp-content/uploads/2022/11/VFe34_1711360121.png",
-    "sourceSite": "voltadongsaigon",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/heroes/seed-hero-3.svg",
-    "folder": "HEROES",
-    "altText": {
-      "vi": "Khuyến mãi",
-      "en": "Promotion"
-    },
-    "link": {
-      "table": "heroSlide",
-      "entityId": "seed-hero-3",
-      "field": "imageMediaId"
-    }
-  },
-  {
-    "id": "seed-media-hero-4",
-    "r2Key": "heroes/seed-hero-4.svg",
-    "sourceUrl": "https://volta3sgiatothcm.com/wp-content/uploads/2026/04/slider-voltahcm-18-4-26-3.jpg",
-    "sourceSite": "volta3sgiatothcm",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/heroes/seed-hero-4.svg",
-    "folder": "HEROES",
-    "altText": {
-      "vi": "Khuyến mãi",
-      "en": "Promotion"
-    },
-    "link": {
-      "table": "heroSlide",
-      "entityId": "seed-hero-4",
-      "field": "imageMediaId"
-    }
-  },
-  {
-    "id": "seed-media-hero-5",
-    "r2Key": "heroes/seed-hero-5.svg",
-    "sourceUrl": "https://volta3sgiatothcm.com/wp-content/uploads/2026/04/slider-voltahcm-18-4-26-4.jpg",
-    "sourceSite": "volta3sgiatothcm",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/heroes/seed-hero-5.svg",
-    "folder": "HEROES",
-    "altText": {
-      "vi": "Khuyến mãi",
-      "en": "Promotion"
-    },
-    "link": {
-      "table": "heroSlide",
-      "entityId": "seed-hero-5",
-      "field": "imageMediaId"
-    }
-  },
-  {
-    "id": "seed-media-city-ev-g1",
-    "r2Key": "vehicles/gallery/seed-media-city-ev-g1.svg",
-    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-city-ev-g1.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh gallery City EV",
-      "en": "City EV gallery photo"
-    },
-    "link": {
-      "table": "vehicleModel",
-      "entityId": "seed-model-city-ev",
-      "field": "heroMediaId"
-    }
-  },
-  {
-    "id": "seed-media-city-ev-g2",
-    "r2Key": "vehicles/gallery/seed-media-city-ev-g2.svg",
-    "sourceUrl": "https://static-cms-prod.voltaauto.com/header-vf3-hover_0.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-city-ev-g2.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh gallery City EV góc 2",
-      "en": "City EV gallery photo angle 2"
-    }
-  },
-  {
-    "id": "seed-media-city-ev-g3",
-    "r2Key": "vehicles/gallery/seed-media-city-ev-g3.svg",
-    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-city-ev-g3.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh gallery City EV góc 3",
-      "en": "City EV gallery photo angle 3"
-    }
-  },
-  {
-    "id": "seed-media-city-ev-g4",
-    "r2Key": "vehicles/gallery/seed-media-city-ev-g4.svg",
-    "sourceUrl": "https://static-cms-prod.voltaauto.com/header-vf3-hover_0.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-city-ev-g4.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh gallery City EV góc 4",
-      "en": "City EV gallery photo angle 4"
-    }
-  },
-  {
-    "id": "seed-media-city-ev-g5",
-    "r2Key": "vehicles/gallery/seed-media-city-ev-g5.svg",
-    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-city-ev-g5.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh gallery City EV góc 5",
-      "en": "City EV gallery photo angle 5"
-    }
-  },
-  {
-    "id": "seed-media-family-suv-g1",
-    "r2Key": "vehicles/gallery/seed-media-family-suv-g1.svg",
-    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-family-suv-g1.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh gallery Family SUV",
-      "en": "Family SUV gallery photo"
-    }
-  },
-  {
-    "id": "seed-media-family-suv-g2",
-    "r2Key": "vehicles/gallery/seed-media-family-suv-g2.svg",
-    "sourceUrl": "https://static-cms-prod.voltaauto.com/header-vf3-hover_0.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-family-suv-g2.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh gallery Family SUV",
-      "en": "Family SUV gallery photo"
-    }
-  },
-  {
-    "id": "seed-media-urban-mpv-g1",
-    "r2Key": "vehicles/gallery/seed-media-urban-mpv-g1.svg",
-    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-urban-mpv-g1.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh gallery Urban MPV",
-      "en": "Urban MPV gallery photo"
-    }
-  },
-  {
-    "id": "seed-media-urban-mpv-g2",
-    "r2Key": "vehicles/gallery/seed-media-urban-mpv-g2.svg",
-    "sourceUrl": "https://static-cms-prod.voltaauto.com/header-vf3-hover_0.png",
-    "sourceSite": "voltaauto",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-urban-mpv-g2.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh gallery Urban MPV",
-      "en": "Urban MPV gallery photo"
-    }
-  },
-  {
-    "id": "seed-media-cargo-van-g1",
-    "r2Key": "vehicles/gallery/seed-media-cargo-van-g1.svg",
-    "sourceUrl": "https://voltadongsaigon.vn/wp-content/uploads/2025/05/banner-ec-van-1024x576.png",
-    "sourceSite": "voltadongsaigon",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-cargo-van-g1.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh gallery Cargo Van",
-      "en": "Cargo Van gallery photo"
-    }
-  },
-  {
-    "id": "seed-media-cargo-van-g2",
-    "r2Key": "vehicles/gallery/seed-media-cargo-van-g2.svg",
-    "sourceUrl": "https://voltadongsaigon.vn/wp-content/uploads/2025/05/banner-ec-van-1024x576.png",
-    "sourceSite": "voltadongsaigon",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-cargo-van-g2.svg",
-    "folder": "VEHICLES",
-    "altText": {
-      "vi": "Ảnh gallery Cargo Van",
-      "en": "Cargo Van gallery photo"
-    }
-  },
-  {
-    "id": "seed-media-news-1",
-    "r2Key": "news/home.svg",
-    "sourceUrl": "https://voltadongsaigon.vn/wp-content/uploads/2025/09/555940871_1120387186949477_63562-677x1024.png",
-    "sourceSite": "voltadongsaigon",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/news/home.svg",
-    "folder": "NEWS",
-    "altText": {
-      "vi": "Home",
-      "en": "Home"
-    },
-    "link": {
-      "table": "newsPost",
-      "entityId": "seed-news-1",
-      "field": "featuredMediaId"
-    }
-  },
-  {
-    "id": "seed-media-news-2",
-    "r2Key": "news/ban-giao-volta-limo-green-trao-niem-tin-ong-hanh-xanh.svg",
-    "sourceUrl": "https://voltadongsaigon.vn/wp-content/uploads/2025/09/555940871_1120387186949477_63562-677x1024.png",
-    "sourceSite": "voltadongsaigon",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/news/ban-giao-volta-limo-green-trao-niem-tin-ong-hanh-xanh.svg",
-    "folder": "NEWS",
-    "altText": {
-      "vi": "Bàn Giao Volta Limo Green – Trao Niềm Tin, Đồng Hành Xanh",
-      "en": "Bàn Giao Volta Limo Green – Trao Niềm Tin, Đồng Hành Xanh"
-    },
-    "link": {
-      "table": "newsPost",
-      "entityId": "seed-news-2",
-      "field": "featuredMediaId"
-    }
-  },
-  {
-    "id": "seed-media-news-3",
-    "r2Key": "news/volta-vf-3-lai-thu-tai-ngai-giao-cung-volta-ong-sai-gon.svg",
-    "sourceUrl": "https://voltadongsaigon.vn/wp-content/uploads/2025/09/555528951_1119823573672505_75309-1024x683.png",
-    "sourceSite": "voltadongsaigon",
-    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/news/volta-vf-3-lai-thu-tai-ngai-giao-cung-volta-ong-sai-gon.svg",
-    "folder": "NEWS",
-    "altText": {
-      "vi": "Volta VF 3 – Lái thử tại Ngãi Giao Cùng Volta Đông Sài Gòn",
-      "en": "Volta VF 3 – Lái thử tại Ngãi Giao Cùng Volta Đông Sài Gòn"
-    },
-    "link": {
-      "table": "newsPost",
-      "entityId": "seed-news-3",
-      "field": "featuredMediaId"
-    }
-  }
+  // ── Model heroes / gallery (IDs match prisma/seed.ts gallery + heroMediaId) ──
+  asset({
+    id: "seed-media-city-ev-g1",
+    r2Key: "models/city-ev/hero.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh City EV Compact", "City EV Compact image"),
+    svg: { kind: "vehicle", bodyType: "compact", label: "City EV Compact", hueSeed: "seed-media-city-ev-g1" },
+    link: { table: "vehicleModel", entityId: "seed-model-city-ev", field: "heroMediaId" },
+  }),
+  asset({
+    id: "seed-media-city-ev-g2",
+    r2Key: "models/city-ev/gallery-2.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh gallery City EV góc 2", "City EV gallery photo angle 2"),
+    svg: { kind: "vehicle", bodyType: "compact", label: "City EV · 2", hueSeed: "seed-media-city-ev-g2" },
+  }),
+  asset({
+    id: "seed-media-city-ev-g3",
+    r2Key: "models/city-ev/gallery-3.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh gallery City EV góc 3", "City EV gallery photo angle 3"),
+    svg: { kind: "vehicle", bodyType: "compact", label: "City EV · 3", hueSeed: "seed-media-city-ev-g3" },
+  }),
+  asset({
+    id: "seed-media-city-ev-g4",
+    r2Key: "models/city-ev/gallery-4.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh gallery City EV góc 4", "City EV gallery photo angle 4"),
+    svg: { kind: "vehicle", bodyType: "compact", label: "City EV · 4", hueSeed: "seed-media-city-ev-g4" },
+  }),
+  asset({
+    id: "seed-media-city-ev-g5",
+    r2Key: "models/city-ev/gallery-5.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh gallery City EV góc 5", "City EV gallery photo angle 5"),
+    svg: { kind: "vehicle", bodyType: "compact", label: "City EV · 5", hueSeed: "seed-media-city-ev-g5" },
+  }),
+
+  asset({
+    id: "seed-media-family-suv-g1",
+    r2Key: "models/family-suv/hero.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh Family SUV Electric", "Family SUV Electric image"),
+    svg: { kind: "vehicle", bodyType: "suv", label: "Family SUV Electric", hueSeed: "seed-media-family-suv-g1" },
+    link: { table: "vehicleModel", entityId: "seed-model-family-suv", field: "heroMediaId" },
+  }),
+  asset({
+    id: "seed-media-family-suv-g2",
+    r2Key: "models/family-suv/gallery-2.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh gallery Family SUV", "Family SUV gallery photo"),
+    svg: { kind: "vehicle", bodyType: "suv", label: "Family SUV · 2", hueSeed: "seed-media-family-suv-g2" },
+  }),
+
+  asset({
+    id: "seed-media-urban-mpv-g1",
+    r2Key: "models/urban-mpv/hero.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh Urban MPV Plus", "Urban MPV Plus image"),
+    svg: { kind: "vehicle", bodyType: "mpv", label: "Urban MPV Plus", hueSeed: "seed-media-urban-mpv-g1" },
+    link: { table: "vehicleModel", entityId: "seed-model-urban-mpv", field: "heroMediaId" },
+  }),
+  asset({
+    id: "seed-media-urban-mpv-g2",
+    r2Key: "models/urban-mpv/gallery-2.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh gallery Urban MPV", "Urban MPV gallery photo"),
+    svg: { kind: "vehicle", bodyType: "mpv", label: "Urban MPV · 2", hueSeed: "seed-media-urban-mpv-g2" },
+  }),
+
+  asset({
+    id: "seed-media-cargo-van-g1",
+    r2Key: "models/cargo-van/hero.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh Cargo Van E", "Cargo Van E image"),
+    svg: { kind: "vehicle", bodyType: "van", label: "Cargo Van E", hueSeed: "seed-media-cargo-van-g1" },
+    link: { table: "vehicleModel", entityId: "seed-model-cargo-van", field: "heroMediaId" },
+  }),
+  asset({
+    id: "seed-media-cargo-van-g2",
+    r2Key: "models/cargo-van/gallery-2.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh gallery Cargo Van", "Cargo Van gallery photo"),
+    svg: { kind: "vehicle", bodyType: "van", label: "Cargo Van · 2", hueSeed: "seed-media-cargo-van-g2" },
+  }),
+
+  asset({
+    id: "seed-media-metro-g1",
+    r2Key: "models/metro/hero.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh Metro EV", "Metro EV image"),
+    svg: { kind: "vehicle", bodyType: "compact", label: "Metro EV", hueSeed: "seed-media-metro-g1" },
+    link: { table: "vehicleModel", entityId: "seed-model-metro", field: "heroMediaId" },
+  }),
+  asset({
+    id: "seed-media-metro-g2",
+    r2Key: "models/metro/gallery-2.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh gallery Metro EV", "Metro EV gallery photo"),
+    svg: { kind: "vehicle", bodyType: "compact", label: "Metro EV · 2", hueSeed: "seed-media-metro-g2" },
+  }),
+
+  asset({
+    id: "seed-media-limo-g1",
+    r2Key: "models/limo/hero.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh Limo Green", "Limo Green image"),
+    svg: { kind: "vehicle", bodyType: "mpv", label: "Limo Green", hueSeed: "seed-media-limo-g1" },
+    link: { table: "vehicleModel", entityId: "seed-model-limo", field: "heroMediaId" },
+  }),
+  asset({
+    id: "seed-media-limo-g2",
+    r2Key: "models/limo/gallery-2.svg",
+    folder: "VEHICLES",
+    altText: bi("Ảnh gallery Limo", "Limo gallery photo"),
+    svg: { kind: "vehicle", bodyType: "mpv", label: "Limo · 2", hueSeed: "seed-media-limo-g2" },
+  }),
+
+  // ── Homepage hero (seed-hero-1 only in seed.ts) ──
+  asset({
+    id: "seed-media-hero-1",
+    r2Key: "heroes/seed-hero-1.svg",
+    folder: "HEROES",
+    altText: bi("Ảnh banner trang chủ", "Homepage hero banner"),
+    svg: { kind: "hero", label: "Discover electric", hueSeed: "seed-media-hero-1" },
+    link: { table: "heroSlide", entityId: "seed-hero-1", field: "imageMediaId" },
+  }),
+
+  // ── News featured images ──
+  asset({
+    id: "seed-media-news-1",
+    r2Key: "news/news-1.svg",
+    folder: "NEWS",
+    altText: bi("Ra mắt dòng xe điện mới", "New electric lineup launch"),
+    svg: { kind: "news", label: "New electric lineup", hueSeed: "seed-media-news-1" },
+    link: { table: "newsPost", entityId: "seed-news-1", field: "featuredMediaId" },
+  }),
+  asset({
+    id: "seed-media-news-2",
+    r2Key: "news/news-2.svg",
+    folder: "NEWS",
+    altText: bi("Ưu đãi mùa hè 2026", "Summer offer 2026"),
+    svg: { kind: "news", label: "Summer offer 2026", hueSeed: "seed-media-news-2" },
+    link: { table: "newsPost", entityId: "seed-news-2", field: "featuredMediaId" },
+  }),
+  asset({
+    id: "seed-media-news-3",
+    r2Key: "news/news-3.svg",
+    folder: "NEWS",
+    altText: bi("Bàn giao xe dịch vụ cho đối tác", "Fleet delivery milestone"),
+    svg: { kind: "news", label: "Fleet delivery", hueSeed: "seed-media-news-3" },
+    link: { table: "newsPost", entityId: "seed-news-3", field: "featuredMediaId" },
+  }),
+
+  // ── Delivery gallery (linked via DELIVERY_PHOTO_MEDIA_LINKS in seed-media-run.js) ──
+  asset({
+    id: "seed-media-delivery-1",
+    r2Key: "delivery/delivery-1.svg",
+    folder: "SITE",
+    altText: bi("Ảnh bàn giao City EV", "City EV delivery photo"),
+    svg: { kind: "vehicle", bodyType: "compact", label: "Delivery · City EV", hueSeed: "seed-media-delivery-1" },
+  }),
+  asset({
+    id: "seed-media-delivery-2",
+    r2Key: "delivery/delivery-2.svg",
+    folder: "SITE",
+    altText: bi("Ảnh bàn giao Family SUV", "Family SUV delivery photo"),
+    svg: { kind: "vehicle", bodyType: "suv", label: "Delivery · Family SUV", hueSeed: "seed-media-delivery-2" },
+  }),
+  asset({
+    id: "seed-media-delivery-3",
+    r2Key: "delivery/delivery-3.svg",
+    folder: "SITE",
+    altText: bi("Ảnh bàn giao Urban MPV", "Urban MPV delivery photo"),
+    svg: { kind: "vehicle", bodyType: "mpv", label: "Delivery · Urban MPV", hueSeed: "seed-media-delivery-3" },
+  }),
+  asset({
+    id: "seed-media-delivery-4",
+    r2Key: "delivery/delivery-4.svg",
+    folder: "SITE",
+    altText: bi("Ảnh bàn giao Family SUV", "Family SUV delivery photo"),
+    svg: { kind: "vehicle", bodyType: "suv", label: "Delivery · Family SUV", hueSeed: "seed-media-delivery-4" },
+  }),
+  asset({
+    id: "seed-media-delivery-5",
+    r2Key: "delivery/delivery-5.svg",
+    folder: "SITE",
+    altText: bi("Ảnh bàn giao Cargo Van", "Cargo Van delivery photo"),
+    svg: { kind: "vehicle", bodyType: "van", label: "Delivery · Cargo Van", hueSeed: "seed-media-delivery-5" },
+  }),
 ];
 
 export const SEED_MEDIA_FALLBACKS = {};

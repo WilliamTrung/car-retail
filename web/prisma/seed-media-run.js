@@ -15,13 +15,20 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const URLS_FILE = join(__dirname, "seed-media-urls.js");
 const DATA_FILE = join(__dirname, "seed-media-data.js");
 
-/** Delivery gallery rows → hero media used as delivery card images */
+/** Delivery gallery rows → media IDs in seed-media-data.js */
 const DELIVERY_PHOTO_MEDIA_LINKS = {
-  "seed-delivery-1": "seed-media-vf-3-hero",
-  "seed-delivery-2": "seed-media-vf-5-hero",
-  "seed-delivery-3": "seed-media-vf-6-hero",
-  "seed-delivery-4": "seed-media-vf-7-hero",
-  "seed-delivery-5": "seed-media-vf-8-hero",
+  "seed-delivery-1": "seed-media-delivery-1",
+  "seed-delivery-2": "seed-media-delivery-2",
+  "seed-delivery-3": "seed-media-delivery-3",
+  "seed-delivery-4": "seed-media-delivery-4",
+  "seed-delivery-5": "seed-media-delivery-5",
+};
+
+/** Feature sections → gallery media (re-link after clearMedia nulls FKs) */
+const FEATURE_SECTION_MEDIA_LINKS = {
+  "seed-feature-city-turning": "seed-media-city-ev-g1",
+  "seed-feature-city-infotainment": "seed-media-city-ev-g2",
+  "seed-feature-city-safety": "seed-media-city-ev-g3",
 };
 
 /** @param {import("@prisma/client").PrismaClient} prisma */
@@ -54,6 +61,7 @@ export async function linkMedia(db, link, mediaId) {
     heroSlide: db.heroSlide,
     newsPost: db.newsPost,
     deliveryPhoto: db.deliveryPhoto,
+    featureSection: db.featureSection,
   };
   const table = tables[link.table];
   if (!table) {
@@ -97,7 +105,7 @@ function svgSpecForEntry(entry) {
     ? "van"
     : /mpv|limo|minio/i.test(entry.id)
       ? "mpv"
-      : /suv|vf-[789]|family/i.test(entry.id)
+      : /suv|family/i.test(entry.id)
         ? "suv"
         : "compact";
   return { kind: "vehicle", bodyType, label, hueSeed: entry.id };
@@ -153,17 +161,17 @@ function writeSeedMediaArtifacts(results) {
 
   let manifest = readFileSync(DATA_FILE, "utf8");
   for (const row of results) {
-    // Manifest uses JSON-ish "id": "…" keys (also tolerate unquoted id:)
+    // Manifest may use JSON-ish "id": "…" or unquoted id: "…" keys
     manifest = manifest.replace(
       new RegExp(
-        `("id":\\s*"${row.id}"[\\s\\S]*?"publicUrl":\\s*)"[^"]*"`,
+        `((?:"id"|id):\\s*"${row.id}"[\\s\\S]*?(?:"publicUrl"|publicUrl):\\s*)"[^"]*"`,
         "m",
       ),
       `$1"${row.publicUrl}"`,
     );
     manifest = manifest.replace(
       new RegExp(
-        `("id":\\s*"${row.id}"[\\s\\S]*?"r2Key":\\s*)"[^"]*"`,
+        `((?:"id"|id):\\s*"${row.id}"[\\s\\S]*?(?:"r2Key"|r2Key):\\s*)"[^"]*"`,
         "m",
       ),
       `$1"${row.r2Key}"`,
@@ -184,9 +192,8 @@ function writeSeedMediaArtifacts(results) {
  *   4. only after the swap commits, --purge deletes STALE R2 keys (objects
  *      not part of this seed) — never the freshly uploaded ones
  *
- * Links whose target rows are absent (manifest was generated for the scraped
- * dataset — `npm run db:seed:scraped`) are skipped with a warning instead of
- * aborting with P2025.
+ * Links whose target rows are absent (manifest / DB dataset mismatch) are
+ * skipped with a warning instead of aborting with P2025.
  *
  * @param {import("@prisma/client").PrismaClient} prisma
  * @param {{ purge?: boolean }} [opts] — purge defaults false; set via --purge / SEED_MEDIA_PURGE=1
@@ -263,6 +270,27 @@ export async function runSeedMedia(prisma, opts = {}) {
           });
         }
       }
+
+      for (const [featureId, mediaId] of Object.entries(
+        FEATURE_SECTION_MEDIA_LINKS,
+      )) {
+        const linked = await linkMedia(
+          tx,
+          {
+            table: "featureSection",
+            entityId: featureId,
+            field: "imageMediaId",
+          },
+          mediaId,
+        );
+        if (!linked) {
+          skippedLinks.push({
+            table: "featureSection",
+            entityId: featureId,
+            field: "imageMediaId",
+          });
+        }
+      }
     },
     // uploads already happened; the transaction is DB-only but touches ~35 rows
     { maxWait: 15_000, timeout: 120_000 },
@@ -281,8 +309,8 @@ export async function runSeedMedia(prisma, opts = {}) {
   ).length;
   if (modelLinks > 0 && skippedModelLinks === modelLinks) {
     console.warn(
-      "  warn: NO vehicle models matched this manifest — it targets the scraped dataset.\n" +
-        "  Run `npm run db:seed:scraped` first (or `npm run db:reseed`), then re-run db:seed:media.",
+      "  warn: NO vehicle models matched this manifest — run `npm run db:seed` first\n" +
+        "  (generic catalog), then re-run db:seed:media.",
     );
   }
 

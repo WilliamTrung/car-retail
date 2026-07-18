@@ -881,11 +881,11 @@ async function main() {
 
   // Delivery gallery — imageMediaId refs match prisma/seed-media-data.js (linked on db:seed:media)
   const deliveryMediaIds = [
-    "seed-media-vf-3-hero",
-    "seed-media-vf-5-hero",
-    "seed-media-vf-6-hero",
-    "seed-media-vf-7-hero",
-    "seed-media-vf-8-hero",
+    "seed-media-delivery-1",
+    "seed-media-delivery-2",
+    "seed-media-delivery-3",
+    "seed-media-delivery-4",
+    "seed-media-delivery-5",
   ] as const;
   for (const mediaId of deliveryMediaIds) {
     const publicUrl = `https://placehold.co/400x300.png?text=${encodeURIComponent(mediaId)}`;

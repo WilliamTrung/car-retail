@@ -21,6 +21,7 @@
     "db:seed:media:reference": "tsx scripts/seed-media-reference.js",
     "db:reset": "tsx scripts/reset-all.js",
     "db:reseed": "tsx scripts/reset-all.js --purge && npm run db:seed:scraped && npm run db:seed:media -- --purge",
+    "predeploy:check": "node scripts/predeploy-check.mjs",
     "start:standalone": "node scripts/start-standalone.mjs"
   },
   "prisma": {
