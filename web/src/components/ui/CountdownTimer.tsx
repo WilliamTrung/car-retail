@@ -23,6 +23,8 @@ type CountdownTimerProps = {
 
 type Parts = { days: number; hours: number; minutes: number; seconds: number };
 
+const PLACEHOLDER: Parts = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+
 function partsFrom(endsAtMs: number, nowMs: number): Parts | null {
   const diff = endsAtMs - nowMs;
   if (diff <= 0) return null;
@@ -39,11 +41,10 @@ function pad2(n: number): string {
   return String(n).padStart(2, "0");
 }
 
-function initialParts(endsAt: string | null | undefined): Parts | null {
+function parseEndsAt(endsAt: string | null | undefined): number | null {
   if (!endsAt) return null;
-  const endsAtMs = Date.parse(endsAt);
-  if (Number.isNaN(endsAtMs)) return null;
-  return partsFrom(endsAtMs, Date.now());
+  const ms = Date.parse(endsAt);
+  return Number.isNaN(ms) ? null : ms;
 }
 
 export function CountdownTimer({
@@ -53,23 +54,17 @@ export function CountdownTimer({
   onExpire,
   className,
 }: CountdownTimerProps) {
-  const [parts, setParts] = useState<Parts | null>(() => initialParts(endsAt));
-  const [expired, setExpired] = useState(() => {
-    if (!endsAt) return true;
-    const ms = Date.parse(endsAt);
-    return Number.isNaN(ms) || ms <= Date.now();
-  });
+  const endsAtMs = parseEndsAt(endsAt);
+  // Deterministic init — no Date.now() on first paint (avoids React #418).
+  const [parts, setParts] = useState<Parts | null>(null);
+  const [expired, setExpired] = useState(() => endsAtMs === null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!endsAt) {
+    if (endsAtMs === null) {
       setExpired(true);
       setParts(null);
-      return;
-    }
-    const endsAtMs = Date.parse(endsAt);
-    if (Number.isNaN(endsAtMs)) {
-      setExpired(true);
-      setParts(null);
+      setMounted(true);
       return;
     }
 
@@ -86,6 +81,7 @@ export function CountdownTimer({
       return true;
     };
 
+    setMounted(true);
     if (!tick()) return;
 
     const id = window.setInterval(() => {
@@ -93,17 +89,19 @@ export function CountdownTimer({
     }, 1000);
 
     return () => window.clearInterval(id);
-  }, [endsAt, onExpire]);
+  }, [endsAtMs, onExpire]);
 
-  if (!endsAt || expired || !parts) {
+  if (endsAtMs === null || (mounted && (expired || !parts))) {
     return fallback ? <>{fallback}</> : null;
   }
 
+  // Pre-mount: same 4-cell layout with 00 placeholders (no CLS).
+  const display = parts ?? PLACEHOLDER;
   const cells = [
-    { value: pad2(parts.days), label: labels?.days ?? "Ngày" },
-    { value: pad2(parts.hours), label: labels?.hours ?? "Giờ" },
-    { value: pad2(parts.minutes), label: labels?.minutes ?? "Phút" },
-    { value: pad2(parts.seconds), label: labels?.seconds ?? "Giây" },
+    { value: pad2(display.days), label: labels?.days ?? "Ngày" },
+    { value: pad2(display.hours), label: labels?.hours ?? "Giờ" },
+    { value: pad2(display.minutes), label: labels?.minutes ?? "Phút" },
+    { value: pad2(display.seconds), label: labels?.seconds ?? "Giây" },
   ];
 
   return (
