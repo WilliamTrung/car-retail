@@ -1,4 +1,4 @@
-/** Generic Volta catalog media manifest — SVG placeholders only (no third-party sources) */
+/** Generic catalog media manifest — SVG placeholders only (no third-party sources) */
 function bi(vi, en) {
   return { vi, en: en || vi };
 }
