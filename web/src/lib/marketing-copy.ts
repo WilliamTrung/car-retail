@@ -11,7 +11,8 @@ export function isNoiseCopy(text: string | null | undefined): boolean {
   const t = cleanParagraph(text);
   if (!t) return true;
   if (NOISE_FRAGMENT.test(t)) return true;
-  if (/^VinFast\s+[\w\s]+\.\s*(Mô tả|THÔNG)/i.test(t)) return true;
+  // Brand-agnostic: scraper noise starts "<Brand> <model words>. Mô tả/THÔNG…"
+  if (/^[\w]+\s+[\w\s]+\.\s*(Mô tả|THÔNG)/i.test(t)) return true;
   if (/^Mô tả\.?\s*Mô tả\.?$/i.test(t)) return true;
   if (/để biết thêm thông tin về sản phẩm và giá cả/i.test(t)) return true;
   if (/liên hệ trực tiếp/i.test(t) && t.length < 120) return true;

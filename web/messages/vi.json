@@ -101,7 +101,18 @@
     "categoryLabel": "Danh mục",
     "galleryLabel": "Thư viện ảnh",
     "thumbsLabel": "Ảnh thu nhỏ",
-    "swatchesLabel": "Màu xe"
+    "swatchesLabel": "Màu xe",
+    "promoLabel": "Ưu đãi hiện tại",
+    "promoBullet1": "Giảm đến 10% giá niêm yết trong tháng",
+    "promoBullet2": "Hỗ trợ 100% lệ phí trước bạ (theo chương trình)",
+    "promoBullet3": "Tặng gói sạc tại nhà khi đặt cọc",
+    "promoDateRange": "Áp dụng trong thời gian khuyến mãi hiện tại",
+    "featureTurningTitle": "Bán kính quay đầu tối ưu đô thị",
+    "featureTurningBody": "Kích thước gọn và vòng quay hẹp giúp quay đầu, đỗ xe trong hẻm hẹp dễ dàng giữa phố đông.",
+    "featureInfotainmentTitle": "Giải trí & trợ lý giọng nói",
+    "featureInfotainmentBody": "Màn hình trung tâm rõ nét kèm điều khiển giọng nói — dẫn đường, media và điều hòa trong tầm tay mà không xao nhãng.",
+    "featureSafetyTitle": "An toàn đáng tin cậy",
+    "featureSafetyBody": "Nhiều túi khí và hỗ trợ lái thiết yếu bảo vệ mọi chuyến đi — từ đưa đón đến cuối tuần xa nhà."
   },
   "forms": {
     "name": "Họ và tên",

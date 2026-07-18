@@ -72,7 +72,7 @@
 }
 
 .dateNote {
-  margin: 0;
+  margin: var(--space-4) 0 0;
   font-size: var(--text-body-sm-size);
   line-height: var(--text-body-sm-line);
   color: var(--color-text-muted);
@@ -86,8 +86,10 @@
   background: var(--color-bg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
+  justify-content: center;
 }
 
 .timer {
   width: 100%;
+  margin-top: var(--space-6);
 }

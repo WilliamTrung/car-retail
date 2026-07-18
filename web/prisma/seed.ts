@@ -21,6 +21,15 @@ const familySuvSwatches = [
   { name: bi("Đỏ Ruby", "Ruby Red"), hex: "#8B1E2F" },
 ];
 
+const cityEvPromo = {
+  bullets: [
+    bi("Giảm đến 10% giá niêm yết trong tháng", "Up to 10% off list price this month"),
+    bi("Hỗ trợ 100% lệ phí trước bạ (theo chương trình)", "100% registration fee support (program terms apply)"),
+    bi("Tặng gói sạc tại nhà khi đặt cọc", "Free home charging package when you deposit"),
+  ],
+  dateRange: bi("Áp dụng trong thời gian khuyến mãi hiện tại", "Offer valid during the current promotion window"),
+};
+
 const familySuvPromo = {
   bullets: [
     bi("Tặng gói sạc tại nhà", "Free home charging package"),
@@ -186,6 +195,12 @@ async function main() {
       "Tôi đồng ý với chính sách bảo mật và cho phép liên hệ tư vấn.",
       "I agree to the privacy policy and consent to be contacted.",
     ),
+    // Home promo band countdown (T-0046) — future end so timer renders & ticks
+    promoCountdown: {
+      enabled: true,
+      endAt: "2026-12-31T17:00:00.000Z",
+      label: bi("Mùa hè rực rỡ — ưu đãi đến 10%", "Summer offer — up to 10% off"),
+    },
   };
 
   await prisma.siteSettings.upsert({
@@ -194,20 +209,26 @@ async function main() {
     create: { id: "singleton", ...siteSettingsData },
   });
 
-  // Showrooms
+  // Showrooms — 3-branch network (Thủ Đức, Quận 7, Bình Dương)
+  const showroom1Data = {
+    id: "seed-showroom-1",
+    name: bi("Volta Auto Thủ Đức", "Volta Auto Thu Duc"),
+    address: bi(
+      "123 Võ Nguyên Giáp, Thủ Đức, TP. Hồ Chí Minh",
+      "123 Vo Nguyen Giap, Thu Duc, Ho Chi Minh City",
+    ),
+    city: "Ho Chi Minh City",
+    phone: "1900123456",
+    hours: bi("T2–CN: 8:00–20:00", "Mon–Sun: 8:00 AM–8:00 PM"),
+    typeTag: "3S",
+    sortOrder: 1,
+    published: true,
+  };
+  const { id: showroom1Id, ...showroom1Fields } = showroom1Data;
   const showroom = await prisma.showroom.upsert({
-    where: { id: "seed-showroom-1" },
-    update: {},
-    create: {
-      id: "seed-showroom-1",
-      name: bi("Showroom Trung tâm", "Central Showroom"),
-      address: bi("123 Đường Mẫu, Quận 1", "123 Sample Street, District 1"),
-      city: "Ho Chi Minh City",
-      phone: "1900123456",
-      hours: bi("T2–CN: 8:00–20:00", "Mon–Sun: 8:00 AM–8:00 PM"),
-      typeTag: "2S",
-      sortOrder: 1,
-    },
+    where: { id: showroom1Id },
+    update: showroom1Fields,
+    create: showroom1Data,
   });
 
   await prisma.hotline.upsert({
@@ -233,31 +254,105 @@ async function main() {
     },
   });
 
+  const showroom2Data = {
+    id: "seed-showroom-2",
+    name: bi("Volta Auto Quận 7", "Volta Auto District 7"),
+    address: bi(
+      "456 Nguyễn Văn Linh, Quận 7, TP. Hồ Chí Minh",
+      "456 Nguyen Van Linh, District 7, Ho Chi Minh City",
+    ),
+    city: "Ho Chi Minh City",
+    phone: "1900654321",
+    hours: bi("T2–CN: 8:30–19:00", "Mon–Sun: 8:30 AM–7:00 PM"),
+    typeTag: "3S",
+    sortOrder: 2,
+    published: true,
+  };
+  const { id: showroom2Id, ...showroom2Fields } = showroom2Data;
   await prisma.showroom.upsert({
-    where: { id: "seed-showroom-2" },
-    update: {},
-    create: {
-      id: "seed-showroom-2",
-      name: bi("Showroom Quận 7", "District 7 Showroom"),
-      address: bi("456 Đường Nam, Quận 7", "456 South Road, District 7"),
-      city: "Ho Chi Minh City",
-      phone: "1900654321",
-      hours: bi("T2–CN: 8:30–19:00", "Mon–Sun: 8:30 AM–7:00 PM"),
-      typeTag: "3S",
-      sortOrder: 2,
-    },
+    where: { id: showroom2Id },
+    update: showroom2Fields,
+    create: showroom2Data,
   });
 
-  // Menu items
+  const showroom3Data = {
+    id: "seed-showroom-3",
+    name: bi("Volta Auto Bình Dương", "Volta Auto Binh Duong"),
+    address: bi(
+      "789 Đại lộ Bình Dương, Thủ Dầu Một, Bình Dương",
+      "789 Binh Duong Boulevard, Thu Dau Mot, Binh Duong",
+    ),
+    city: "Binh Duong",
+    phone: "1900789012",
+    hours: bi("T2–CN: 8:00–19:00", "Mon–Sun: 8:00 AM–7:00 PM"),
+    typeTag: "2S",
+    sortOrder: 3,
+    published: true,
+  };
+  const { id: showroom3Id, ...showroom3Fields } = showroom3Data;
+  await prisma.showroom.upsert({
+    where: { id: showroom3Id },
+    update: showroom3Fields,
+    create: showroom3Data,
+  });
+
+  // Menu items — 7-item primary header + footer quick links (incl. Showrooms)
   const menuItems: Array<{
     id: string;
     label: { vi: string; en: string };
     routeKey: string;
     placement: MenuPlacement;
     sortOrder: number;
+    visible?: boolean;
   }> = [
-    { id: "seed-menu-news", label: bi("Tin tức", "News"), routeKey: "/news", placement: "HEADER", sortOrder: 2 },
-    { id: "seed-menu-about", label: bi("Về chúng tôi", "About"), routeKey: "/about", placement: "HEADER", sortOrder: 3 },
+    // HEADER: Home, Products, Promotions, Test Drive, Showroom, News, Contact
+    { id: "seed-menu-home", label: bi("Trang chủ", "Home"), routeKey: "/", placement: "HEADER", sortOrder: 1 },
+    {
+      id: "seed-menu-products",
+      label: bi("Sản phẩm", "Products"),
+      routeKey: "/models",
+      placement: "HEADER",
+      sortOrder: 2,
+    },
+    {
+      id: "seed-menu-promotions",
+      label: bi("Khuyến mãi", "Promotions"),
+      routeKey: "/news",
+      placement: "HEADER",
+      sortOrder: 3,
+    },
+    {
+      id: "seed-menu-test-drive",
+      label: bi("Lái thử", "Test Drive"),
+      routeKey: "/book-test-drive",
+      placement: "HEADER",
+      sortOrder: 4,
+    },
+    {
+      id: "seed-menu-showroom",
+      label: bi("Showroom", "Showroom"),
+      routeKey: "/showrooms",
+      placement: "HEADER",
+      sortOrder: 5,
+    },
+    { id: "seed-menu-news", label: bi("Tin tức", "News"), routeKey: "/news", placement: "HEADER", sortOrder: 6 },
+    {
+      id: "seed-menu-contact-header",
+      label: bi("Liên hệ", "Contact"),
+      routeKey: "/contact",
+      placement: "HEADER",
+      sortOrder: 7,
+    },
+    // Hide legacy About header entry (was G1 incomplete nav)
+    {
+      id: "seed-menu-about",
+      label: bi("Về chúng tôi", "About"),
+      routeKey: "/about",
+      placement: "HEADER",
+      sortOrder: 99,
+      visible: false,
+    },
+    // FOOTER quick links
     { id: "seed-menu-footer-about", label: bi("Giới thiệu", "About Us"), routeKey: "/about", placement: "FOOTER", sortOrder: 1 },
     {
       id: "seed-menu-footer-test-drive",
@@ -274,20 +369,27 @@ async function main() {
       sortOrder: 3,
     },
     {
+      id: "seed-menu-footer-showrooms",
+      label: bi("Showroom", "Showrooms"),
+      routeKey: "/showrooms",
+      placement: "FOOTER",
+      sortOrder: 4,
+    },
+    {
       id: "seed-menu-footer-news",
       label: bi("Tin tức khuyến mãi", "News & Campaigns"),
       routeKey: "/news",
       placement: "FOOTER",
-      sortOrder: 4,
+      sortOrder: 5,
     },
     {
       id: "seed-menu-footer-policies",
       label: bi("Chính sách đại lý", "Policies"),
       routeKey: "/policies",
       placement: "FOOTER",
-      sortOrder: 5,
+      sortOrder: 6,
     },
-    { id: "seed-menu-contact", label: bi("Liên hệ", "Contact"), routeKey: "/contact", placement: "FOOTER", sortOrder: 6 },
+    { id: "seed-menu-contact", label: bi("Liên hệ", "Contact"), routeKey: "/contact", placement: "FOOTER", sortOrder: 7 },
   ];
   for (const item of menuItems) {
     await prisma.menuItem.upsert({
@@ -328,16 +430,37 @@ async function main() {
     create: { lineId: commercialLine.id, key: "van", name: bi("Van", "Van"), sortOrder: 1 },
   });
 
-  const cityEvGallery = ["seed-media-city-ev-g1", "seed-media-city-ev-g2"] as const;
+  const fleetSegment = await prisma.vehicleSegment.upsert({
+    where: { lineId_key: { lineId: commercialLine.id, key: "fleet" } },
+    update: {},
+    create: {
+      lineId: commercialLine.id,
+      key: "fleet",
+      name: bi("Xe dịch vụ", "Service fleet"),
+      sortOrder: 2,
+    },
+  });
+
+  const cityEvGallery = [
+    "seed-media-city-ev-g1",
+    "seed-media-city-ev-g2",
+    "seed-media-city-ev-g3",
+    "seed-media-city-ev-g4",
+    "seed-media-city-ev-g5",
+  ] as const;
   const familySuvGallery = ["seed-media-family-suv-g1", "seed-media-family-suv-g2"] as const;
   const urbanMpvGallery = ["seed-media-urban-mpv-g1", "seed-media-urban-mpv-g2"] as const;
   const cargoVanGallery = ["seed-media-cargo-van-g1", "seed-media-cargo-van-g2"] as const;
+  const metroGallery = ["seed-media-metro-g1", "seed-media-metro-g2"] as const;
+  const limoGallery = ["seed-media-limo-g1", "seed-media-limo-g2"] as const;
 
   const modelGalleryDefs = [
     { ids: cityEvGallery, altVi: "Ảnh gallery City EV", altEn: "City EV gallery photo" },
     { ids: familySuvGallery, altVi: "Ảnh gallery Family SUV", altEn: "Family SUV gallery photo" },
     { ids: urbanMpvGallery, altVi: "Ảnh gallery Urban MPV", altEn: "Urban MPV gallery photo" },
     { ids: cargoVanGallery, altVi: "Ảnh gallery Cargo Van", altEn: "Cargo Van gallery photo" },
+    { ids: metroGallery, altVi: "Ảnh gallery Metro EV", altEn: "Metro EV gallery photo" },
+    { ids: limoGallery, altVi: "Ảnh gallery Limo", altEn: "Limo gallery photo" },
   ] as const;
   for (const { ids, altVi, altEn } of modelGalleryDefs) {
     for (const mediaId of ids) {
@@ -358,7 +481,12 @@ async function main() {
 
   const cityEv = await prisma.vehicleModel.upsert({
     where: { id: "seed-model-city-ev" },
-    update: { colorSwatches: cityEvSwatches, gallery: [...cityEvGallery] },
+    update: {
+      colorSwatches: cityEvSwatches,
+      gallery: [...cityEvGallery],
+      promo: cityEvPromo,
+      heroMediaId: cityEvGallery[0],
+    },
     create: {
       id: "seed-model-city-ev",
       segmentId: suvSegment.id,
@@ -371,6 +499,8 @@ async function main() {
       ),
       colorSwatches: cityEvSwatches,
       gallery: [...cityEvGallery],
+      promo: cityEvPromo,
+      heroMediaId: cityEvGallery[0],
       attributes: [
         { key: "range", value: 320, unit: "km" },
         { key: "power", value: 100, unit: "kW" },
@@ -452,6 +582,56 @@ async function main() {
     },
   });
 
+  const metroEv = await prisma.vehicleModel.upsert({
+    where: { id: "seed-model-metro" },
+    update: { colorSwatches: cityEvSwatches, gallery: [...metroGallery], segmentId: fleetSegment.id },
+    create: {
+      id: "seed-model-metro",
+      segmentId: fleetSegment.id,
+      name: bi("Metro EV", "Metro EV"),
+      slug: bi("metro-ev", "metro-ev"),
+      tagline: bi("Xe dịch vụ nội đô", "Urban service EV"),
+      description: bi(
+        "Sedan điện nhỏ gọn cho dịch vụ vận tải hành khách nội đô.",
+        "Compact electric sedan for urban passenger service.",
+      ),
+      colorSwatches: cityEvSwatches,
+      gallery: [...metroGallery],
+      attributes: [
+        { key: "range", value: 210, unit: "km" },
+        { key: "power", value: 30, unit: "kW" },
+        { key: "seats", value: 4, unit: "seats" },
+      ],
+      published: true,
+      sortOrder: 2,
+    },
+  });
+
+  const limoGreen = await prisma.vehicleModel.upsert({
+    where: { id: "seed-model-limo" },
+    update: { colorSwatches: urbanMpvSwatches, gallery: [...limoGallery], segmentId: fleetSegment.id },
+    create: {
+      id: "seed-model-limo",
+      segmentId: fleetSegment.id,
+      name: bi("Limo Green", "Limo Green"),
+      slug: bi("limo-green", "limo-green"),
+      tagline: bi("MPV dịch vụ 7 chỗ", "7-seat service MPV"),
+      description: bi(
+        "MPV điện 7 chỗ tối ưu cho dịch vụ đưa đón và kinh doanh vận tải.",
+        "7-seat electric MPV optimized for shuttle and commercial passenger service.",
+      ),
+      colorSwatches: urbanMpvSwatches,
+      gallery: [...limoGallery],
+      attributes: [
+        { key: "range", value: 450, unit: "km" },
+        { key: "power", value: 150, unit: "kW" },
+        { key: "seats", value: 7, unit: "seats" },
+      ],
+      published: true,
+      sortOrder: 3,
+    },
+  });
+
   // Variants
   await prisma.vehicleVariant.upsert({
     where: { id: "seed-variant-city-standard" },
@@ -507,6 +687,32 @@ async function main() {
     },
   });
 
+  await prisma.vehicleVariant.upsert({
+    where: { id: "seed-variant-metro-base" },
+    update: {},
+    create: {
+      id: "seed-variant-metro-base",
+      modelId: metroEv.id,
+      name: bi("Bản Tiêu chuẩn", "Standard"),
+      price: 269000000,
+      published: true,
+      sortOrder: 1,
+    },
+  });
+
+  await prisma.vehicleVariant.upsert({
+    where: { id: "seed-variant-limo-base" },
+    update: {},
+    create: {
+      id: "seed-variant-limo-base",
+      modelId: limoGreen.id,
+      name: bi("Bản Tiêu chuẩn", "Standard"),
+      price: 749000000,
+      published: true,
+      sortOrder: 1,
+    },
+  });
+
   // Model FAQs & feature sections
   await prisma.modelFaq.upsert({
     where: { id: "seed-faq-family-1" },
@@ -531,6 +737,62 @@ async function main() {
       sortOrder: 1,
     },
   });
+
+  const cityEvFeatures = [
+    {
+      id: "seed-feature-city-turning",
+      title: bi(
+        "Bán kính quay đầu tối ưu đô thị",
+        "City-ready turning radius",
+      ),
+      body: bi(
+        "Kích thước gọn và vòng quay hẹp giúp quay đầu, đỗ xe trong hẻm hẹp dễ dàng giữa phố đông.",
+        "A compact footprint and tight turning circle make U-turns and narrow alley parking effortless in dense urban traffic.",
+      ),
+      imageMediaId: cityEvGallery[0],
+      sortOrder: 1,
+    },
+    {
+      id: "seed-feature-city-infotainment",
+      title: bi("Giải trí & trợ lý giọng nói", "Infotainment & voice assistant"),
+      body: bi(
+        "Màn hình trung tâm rõ nét kèm điều khiển giọng nói — dẫn đường, media và điều hòa trong tầm tay mà không xao nhãng.",
+        "A clear center display with voice control keeps navigation, media, and climate within easy reach without taking your eyes off the road.",
+      ),
+      imageMediaId: cityEvGallery[1],
+      sortOrder: 2,
+    },
+    {
+      id: "seed-feature-city-safety",
+      title: bi("An toàn đáng tin cậy", "Safety you can feel"),
+      body: bi(
+        "Nhiều túi khí và hỗ trợ lái thiết yếu bảo vệ mọi chuyến đi — từ đưa đón đến cuối tuần xa nhà.",
+        "Multiple airbags and driver-assist essentials help protect every trip — from the school run to weekend getaways.",
+      ),
+      imageMediaId: cityEvGallery[2],
+      sortOrder: 3,
+    },
+  ] as const;
+
+  for (const feature of cityEvFeatures) {
+    await prisma.featureSection.upsert({
+      where: { id: feature.id },
+      update: {
+        title: feature.title,
+        body: feature.body,
+        imageMediaId: feature.imageMediaId,
+        sortOrder: feature.sortOrder,
+      },
+      create: {
+        id: feature.id,
+        modelId: cityEv.id,
+        title: feature.title,
+        body: feature.body,
+        imageMediaId: feature.imageMediaId,
+        sortOrder: feature.sortOrder,
+      },
+    });
+  }
 
   // Homepage CMS — hero image matches seed-media-data.js link (seed-media-hero-1)
   await prisma.mediaAsset.upsert({
@@ -563,26 +825,59 @@ async function main() {
     },
   });
 
+  // Home benefit strip (T-0044) — 4 cards matching design
   const serviceBlocks = [
     {
-      id: "seed-service-test-drive",
-      title: bi("Lái thử", "Test drive"),
-      description: bi("Trải nghiệm xe tại showroom.", "Experience vehicles at our showroom."),
-      iconKey: "steering-wheel",
-      linkRouteKey: "/book-test-drive",
+      id: "seed-service-offers",
+      title: bi("Ưu đãi mỗi tháng", "Monthly offers"),
+      description: bi(
+        "Chương trình khuyến mãi cập nhật hàng tháng tại showroom.",
+        "Fresh monthly promotions at every showroom.",
+      ),
+      iconKey: "tag",
       sortOrder: 1,
+      published: true,
     },
     {
-      id: "seed-service-trade-in",
-      title: bi("Thu cũ đổi mới", "Trade-in"),
-      description: bi("Định giá nhanh, hỗ trợ thủ tục.", "Fast appraisal and paperwork support."),
-      iconKey: "refresh",
+      id: "seed-service-installment",
+      title: bi("Trả góp đến 90%", "Installment up to 90%"),
+      description: bi(
+        "Hỗ trợ vay ngân hàng, thủ tục nhanh chóng.",
+        "Bank financing support with fast paperwork.",
+      ),
+      iconKey: "percent",
       sortOrder: 2,
+      published: true,
+    },
+    {
+      id: "seed-service-test-drive",
+      title: bi("Lái thử miễn phí", "Free test drive"),
+      description: bi(
+        "Đăng ký trải nghiệm xe tại showroom hoặc tại nhà.",
+        "Book a free drive at the showroom or at home.",
+      ),
+      iconKey: "steering-wheel",
+      linkRouteKey: "/book-test-drive",
+      sortOrder: 3,
+      published: true,
+    },
+    {
+      id: "seed-service-3s",
+      title: bi("Dịch vụ 3S", "3S service"),
+      description: bi(
+        "Bán hàng, bảo dưỡng và phụ tùng chính hãng.",
+        "Sales, service, and genuine spare parts.",
+      ),
+      iconKey: "wrench",
+      sortOrder: 4,
+      published: true,
     },
   ];
   for (const block of serviceBlocks) {
     await prisma.serviceBlock.upsert({ where: { id: block.id }, update: block, create: block });
   }
+  // Drop legacy trade-in card so the strip stays at 4
+  await prisma.serviceBlock.deleteMany({ where: { id: "seed-service-trade-in" } });
 
   // Delivery gallery — imageMediaId refs match prisma/seed-media-data.js (linked on db:seed:media)
   const deliveryMediaIds = [
@@ -708,24 +1003,72 @@ async function main() {
     },
   });
 
-  // News
-  await prisma.newsPost.upsert({
-    where: { id: "seed-news-1" },
-    update: {},
-    create: {
+  // News teaser (T-0047) — 3 published featured posts for home grid
+  const newsPosts = [
+    {
       id: "seed-news-1",
       slug: bi("ra-mat-xe-dien-moi", "new-electric-lineup"),
       title: bi("Ra mắt dòng xe điện mới", "New electric lineup launch"),
-      excerpt: bi("Khám phá các mẫu xe điện mới tại showroom.", "Explore new electric models at our showroom."),
+      excerpt: bi(
+        "Khám phá các mẫu xe điện mới tại showroom.",
+        "Explore new electric models at our showroom.",
+      ),
       body: bi(
         "Chúng tôi trân trọng giới thiệu dòng xe điện mới với quãng đường dài hơn và công nghệ an toàn nâng cao.",
         "We are pleased to introduce a new electric lineup with extended range and enhanced safety technology.",
       ),
       published: true,
       featured: true,
-      publishedAt: new Date(),
+      publishedAt: new Date("2026-07-10T08:00:00.000Z"),
     },
-  });
+    {
+      id: "seed-news-2",
+      slug: bi("uu-dai-mua-he-2026", "summer-offer-2026"),
+      title: bi("Ưu đãi mùa hè 2026", "Summer offer 2026"),
+      excerpt: bi(
+        "Giảm đến 10% và hỗ trợ lệ phí trước bạ trong tháng khuyến mãi.",
+        "Up to 10% off plus registration-fee support during the promo window.",
+      ),
+      body: bi(
+        "Chương trình mùa hè áp dụng cho nhiều mẫu xe điện, kèm gói sạc và bảo hiểm ưu đãi khi đặt cọc.",
+        "The summer program covers multiple EVs, with charging packages and preferential insurance on deposit.",
+      ),
+      published: true,
+      featured: true,
+      publishedAt: new Date("2026-07-05T08:00:00.000Z"),
+    },
+    {
+      id: "seed-news-3",
+      slug: bi("ban-giao-xe-dich-vu", "fleet-delivery-milestone"),
+      title: bi("Bàn giao xe dịch vụ cho đối tác", "Fleet delivery milestone"),
+      excerpt: bi(
+        "Hơn 50 xe dịch vụ được bàn giao trong quý này.",
+        "Over 50 service vehicles delivered this quarter.",
+      ),
+      body: bi(
+        "Đại lý tiếp tục đồng hành cùng đối tác vận tải với Metro EV, Cargo Van E và Limo Green.",
+        "The dealership continues partnering with operators on Metro EV, Cargo Van E, and Limo Green.",
+      ),
+      published: true,
+      featured: true,
+      publishedAt: new Date("2026-06-28T08:00:00.000Z"),
+    },
+  ];
+  for (const post of newsPosts) {
+    await prisma.newsPost.upsert({
+      where: { id: post.id },
+      update: {
+        slug: post.slug,
+        title: post.title,
+        excerpt: post.excerpt,
+        body: post.body,
+        published: post.published,
+        featured: post.featured,
+        publishedAt: post.publishedAt,
+      },
+      create: post,
+    });
+  }
 
   // Policy
   await prisma.policyDocument.upsert({

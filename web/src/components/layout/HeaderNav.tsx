@@ -36,14 +36,16 @@ export function HeaderNav({ nav, allProductsLabel }: Props) {
     <ul className={styles.navList}>
       {nav.map((item) => {
         const products = isProductsNav(item);
-        const active = isActiveHref(pathname, item.href);
+        // Products has no /models index — land on home model grid; keep dropdown.
+        const href = (products ? "/" : item.href) as "/";
+        const active = isActiveHref(pathname, href);
         return (
           <li
             key={`${item.href}-${item.label}`}
             className={products ? styles.hasDropdown : undefined}
           >
             <Link
-              href={item.href as "/"}
+              href={href}
               className={styles.navLink}
               aria-current={active ? "page" : undefined}
             >
@@ -55,7 +57,7 @@ export function HeaderNav({ nav, allProductsLabel }: Props) {
             {products ? (
               <div className={styles.dropdown} role="menu">
                 <Link
-                  href={item.href as "/"}
+                  href={href}
                   className={styles.dropdownLink}
                   role="menuitem"
                 >

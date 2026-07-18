@@ -147,18 +147,22 @@ function isEvModel(model: ModelCardSource): boolean {
 }
 
 function segmentOf(model: ModelCardSource): "personal" | "commercial" {
+  // Prefer vehicle line — segment keys like "fleet"/"mpv" sit under commercial.
+  const lineKey = (model.segment?.line?.key ?? "").toLowerCase();
   const key = (
     model.segmentKey ||
     model.segment?.key ||
-    model.segment?.line?.key ||
+    lineKey ||
     ""
   ).toLowerCase();
+  const haystack = `${lineKey} ${key}`;
   if (
-    key.includes("commercial") ||
-    key.includes("service") ||
-    key.includes("dich-vu") ||
-    key.includes("thuong-mai") ||
-    key.includes("van")
+    haystack.includes("commercial") ||
+    haystack.includes("service") ||
+    haystack.includes("dich-vu") ||
+    haystack.includes("thuong-mai") ||
+    haystack.includes("van") ||
+    haystack.includes("fleet")
   ) {
     return "commercial";
   }
@@ -274,10 +278,15 @@ export function toModelDetailVM(
   const m = model ?? {};
   const card = toModelCardVM(m, units, t, locale, localizeHref);
   const galleryMedia = m.galleryMedia ?? [];
-  const thumbs = galleryMedia
+  const galleryUrls = galleryMedia
     .map((g) => g.publicUrl)
     .filter((u): u is string => Boolean(u));
-  const mainUrl = m.heroMedia?.publicUrl ?? thumbs[0] ?? null;
+  const mainUrl = m.heroMedia?.publicUrl ?? galleryUrls[0] ?? null;
+  // Hero + gallery (deduped) so the thumbnail strip is never empty when media exists
+  const thumbs: string[] = [];
+  for (const url of [mainUrl, ...galleryUrls]) {
+    if (url && !thumbs.includes(url)) thumbs.push(url);
+  }
 
   const variantsRaw = [...(m.variants ?? [])].sort(
     (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
@@ -459,6 +468,8 @@ function routeKeyToHref(routeKey: string): string {
   const map: Record<string, string> = {
     home: "/",
     models: "/models",
+    products: "/models",
+    promotions: "/news",
     news: "/news",
     about: "/about",
     contact: "/contact",

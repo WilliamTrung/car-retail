@@ -36,12 +36,6 @@ export function PromoSection({ promo, countdownLabels }: PromoSectionProps) {
               ))}
             </ul>
           ) : null}
-          {promo.dateRangeNote ? (
-            <p className={styles.dateNote}>{promo.dateRangeNote}</p>
-          ) : null}
-        </div>
-
-        <div className={styles.panel}>
           {promo.endsAt ? (
             <CountdownTimer
               endsAt={promo.endsAt}
@@ -49,6 +43,12 @@ export function PromoSection({ promo, countdownLabels }: PromoSectionProps) {
               className={styles.timer}
             />
           ) : null}
+          {promo.dateRangeNote ? (
+            <p className={styles.dateNote}>{promo.dateRangeNote}</p>
+          ) : null}
+        </div>
+
+        <div className={styles.panel}>
           <Button variant="primary" size="lg" href={promo.ctaHref}>
             {promo.ctaLabel}
           </Button>

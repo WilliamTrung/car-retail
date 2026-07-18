@@ -32,17 +32,17 @@ export function BenefitStrip({ items }: BenefitStripProps) {
 
   return (
     <section className={styles.root} aria-label="Benefits">
-      <div className={styles.inner}>
+      <ul className={styles.inner}>
         {items.map((item) => (
-          <BenefitItem
-            key={item.id}
-            icon={<BenefitIcon iconKey={item.iconKey} />}
-            title={item.title}
-            text={item.text}
-            className={styles.item}
-          />
+          <li key={item.id} className={styles.item}>
+            <BenefitItem
+              icon={<BenefitIcon iconKey={item.iconKey} />}
+              title={item.title}
+              text={item.text}
+            />
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

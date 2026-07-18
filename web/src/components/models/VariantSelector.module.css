@@ -44,7 +44,9 @@
 
 .promo {
   padding: var(--space-4) var(--space-6);
-  background: var(--color-accent-soft);
+  /* QA D2 / design token accent/soft */
+  background: #fff1ec;
+  background: var(--color-accent-soft, #fff1ec);
   border: 1px solid color-mix(in srgb, var(--color-accent-500) 35%, transparent);
   border-radius: var(--radius-md);
 }

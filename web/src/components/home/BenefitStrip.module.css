@@ -10,6 +10,8 @@
   display: grid;
   gap: var(--space-6);
   grid-template-columns: 1fr;
+  list-style: none;
+  padding: 0;
 }
 
 .item {

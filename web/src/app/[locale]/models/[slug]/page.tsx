@@ -118,6 +118,62 @@ export default async function ModelPage({ params }: Props) {
     localizeHref,
   );
 
+  // T-0050: ensure selectable thumbnail strip even when CMS gallery is empty
+  const galleryThumbs =
+    vm.gallery.thumbs.length > 0
+      ? vm.gallery.thumbs
+      : [1, 2, 3, 4, 5].map(
+          (n) =>
+            `https://placehold.co/800x600/png?text=${encodeURIComponent(`${vm.name}-${n}`)}`,
+        );
+  const gallery = {
+    mainUrl: vm.gallery.mainUrl ?? galleryThumbs[0] ?? null,
+    thumbs: galleryThumbs.slice(0, 5),
+    alt: vm.gallery.alt,
+  };
+
+  // T-0051: promo callout between price and variants (i18n fallback if CMS empty)
+  const promo =
+    vm.promo && vm.promo.bullets.length > 0
+      ? vm.promo
+      : {
+          bullets: [
+            tModel("promoBullet1"),
+            tModel("promoBullet2"),
+            tModel("promoBullet3"),
+          ],
+          dateRange: tModel("promoDateRange"),
+        };
+
+  // T-0052: storytelling blocks in addition to spec strip
+  const featureSectionsBase =
+    vm.featureSections.length > 0
+      ? vm.featureSections
+      : [
+          {
+            title: tModel("featureTurningTitle"),
+            body: tModel("featureTurningBody"),
+            imageUrl: null as string | null,
+            imageLeft: false,
+          },
+          {
+            title: tModel("featureInfotainmentTitle"),
+            body: tModel("featureInfotainmentBody"),
+            imageUrl: null as string | null,
+            imageLeft: true,
+          },
+          {
+            title: tModel("featureSafetyTitle"),
+            body: tModel("featureSafetyBody"),
+            imageUrl: null as string | null,
+            imageLeft: false,
+          },
+        ];
+  const featureSections = featureSectionsBase.map((fs, i) => ({
+    ...fs,
+    imageUrl: fs.imageUrl ?? gallery.thumbs[i] ?? gallery.thumbs[0] ?? null,
+  }));
+
   const primaryPhone = hotlines[0]?.phone ?? "";
   const callHref = primaryPhone ? toTelHref(primaryPhone) : null;
   const zaloFromSettings =
@@ -158,7 +214,7 @@ export default async function ModelPage({ params }: Props) {
       <section className={styles.hero}>
         <div className={styles.heroGrid}>
           <GalleryHero
-            gallery={vm.gallery}
+            gallery={gallery}
             colorSwatches={vm.colorSwatches}
             priority
             labels={{
@@ -169,7 +225,7 @@ export default async function ModelPage({ params }: Props) {
             }}
           />
           <VariantSelector
-            model={vm}
+            model={{ ...vm, promo }}
             paths={{
               testDrive: testDrivePath,
               deposit: depositPath,
@@ -183,6 +239,7 @@ export default async function ModelPage({ params }: Props) {
               zalo: tChrome("chatZalo"),
               contactPrice: tCommon("contactPrice"),
               variantsLabel: tModel("variantsTitle"),
+              promoLabel: tModel("promoLabel"),
               eco: tCommon("ecoChip"),
             }}
           />
@@ -190,7 +247,7 @@ export default async function ModelPage({ params }: Props) {
       </section>
 
       <FeatureSections
-        sections={vm.featureSections}
+        sections={featureSections}
         placeholderCaption={tCommon("imagePlaceholder", { name: vm.name })}
       />
 

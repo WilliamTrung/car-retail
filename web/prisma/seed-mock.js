@@ -483,32 +483,41 @@ const heroSlides = [
 
 const serviceBlocks = [
   {
-    id: "mock-service-test-drive",
-    title: bi("Đăng ký lái thử", "Book a test drive"),
-    description: bi("Trải nghiệm mọi mẫu xe tại 4 showroom.", "Experience any model at our 4 showrooms."),
-    iconKey: "steering-wheel",
-    linkRouteKey: "/book-test-drive",
+    id: "mock-service-offers",
+    title: bi("Ưu đãi mỗi tháng", "Monthly offers"),
+    description: bi(
+      "Chương trình khuyến mãi cập nhật hàng tháng tại showroom.",
+      "Fresh monthly promotions at every showroom."
+    ),
+    iconKey: "tag",
     sortOrder: 1,
   },
   {
-    id: "mock-service-maintenance",
-    title: bi("Bảo hành & bảo dưỡng", "Warranty & maintenance"),
-    description: bi("Bảo hành vượt trội tới 10 năm, đặt lịch dịch vụ trực tuyến.", "Class-leading 10-year warranty and online service booking."),
-    iconKey: "wrench",
+    id: "mock-service-installment",
+    title: bi("Trả góp đến 90%", "Installment up to 90%"),
+    description: bi(
+      "Hỗ trợ vay ngân hàng, thủ tục nhanh chóng.",
+      "Bank financing support with fast paperwork."
+    ),
+    iconKey: "percent",
     sortOrder: 2,
   },
   {
-    id: "mock-service-trade-in",
-    title: bi("Thu cũ đổi mới", "Trade-in"),
-    description: bi("Mua xe cũ giá tốt, đổi xe mới siêu tiết kiệm.", "Fair used-car buyback, big savings on your next car."),
-    iconKey: "refresh",
+    id: "mock-service-test-drive",
+    title: bi("Lái thử miễn phí", "Free test drive"),
+    description: bi("Trải nghiệm mọi mẫu xe tại showroom.", "Experience any model at our showrooms."),
+    iconKey: "steering-wheel",
+    linkRouteKey: "/book-test-drive",
     sortOrder: 3,
   },
   {
-    id: "mock-service-charging",
-    title: bi("Pin và trạm sạc", "Battery & charging"),
-    description: bi("Giải pháp sạc tại nhà và trạm sạc công cộng phủ rộng.", "Home chargers plus a wide public charging network."),
-    iconKey: "battery-charging",
+    id: "mock-service-3s",
+    title: bi("Dịch vụ 3S", "3S service"),
+    description: bi(
+      "Bán hàng, bảo dưỡng và phụ tùng chính hãng.",
+      "Sales, service, and genuine spare parts."
+    ),
+    iconKey: "wrench",
     sortOrder: 4,
   },
 ];
@@ -539,7 +548,7 @@ const newsPosts = [
       "The Velo M7 is now open for deposits in a single Standard trim with 450 km NEDC range, 150 kW of power and a roomy 7-seat cabin."
     ),
     published: true,
-    featured: false,
+    featured: true,
     daysAgo: 7,
   },
   {
@@ -552,7 +561,7 @@ const newsPosts = [
       "All new EVs come with a 10-year / 200,000 km warranty covering both vehicle and high-voltage battery — the strongest commitment in the segment under standard use."
     ),
     published: true,
-    featured: false,
+    featured: true,
     daysAgo: 14,
   },
 ];

@@ -101,7 +101,18 @@
     "categoryLabel": "Category",
     "galleryLabel": "Image gallery",
     "thumbsLabel": "Thumbnails",
-    "swatchesLabel": "Colors"
+    "swatchesLabel": "Colors",
+    "promoLabel": "Current offers",
+    "promoBullet1": "Up to 10% off list price this month",
+    "promoBullet2": "100% registration fee support (program terms apply)",
+    "promoBullet3": "Free home charging package when you deposit",
+    "promoDateRange": "Offer valid during the current promotion window",
+    "featureTurningTitle": "City-ready turning radius",
+    "featureTurningBody": "A compact footprint and tight turning circle make U-turns and narrow alley parking effortless in dense urban traffic.",
+    "featureInfotainmentTitle": "Infotainment & voice assistant",
+    "featureInfotainmentBody": "A clear center display with voice control keeps navigation, media, and climate within easy reach without taking your eyes off the road.",
+    "featureSafetyTitle": "Safety you can feel",
+    "featureSafetyBody": "Multiple airbags and driver-assist essentials help protect every trip — from the school run to weekend getaways."
   },
   "forms": {
     "name": "Full name",

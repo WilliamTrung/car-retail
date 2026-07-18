@@ -15,6 +15,7 @@ type CtaLabels = {
   zalo: string;
   contactPrice: string;
   variantsLabel: string;
+  promoLabel?: string;
   eco?: string;
 };
 
@@ -79,6 +80,22 @@ export function VariantSelector({ model, paths, labels }: VariantSelectorProps) 
         />
       </div>
 
+      {model.promo && model.promo.bullets.length > 0 ? (
+        <aside
+          className={styles.promo}
+          aria-label={labels.promoLabel ?? "Promo"}
+        >
+          <ul className={styles.promoList}>
+            {model.promo.bullets.map((b) => (
+              <li key={b}>{b}</li>
+            ))}
+          </ul>
+          {model.promo.dateRange ? (
+            <p className={styles.promoDate}>{model.promo.dateRange}</p>
+          ) : null}
+        </aside>
+      ) : null}
+
       <div
         className={styles.variants}
         role="radiogroup"
@@ -94,19 +111,6 @@ export function VariantSelector({ model, paths, labels }: VariantSelectorProps) 
           />
         ))}
       </div>
-
-      {model.promo && model.promo.bullets.length > 0 ? (
-        <aside className={styles.promo} aria-label="Promo">
-          <ul className={styles.promoList}>
-            {model.promo.bullets.map((b) => (
-              <li key={b}>{b}</li>
-            ))}
-          </ul>
-          {model.promo.dateRange ? (
-            <p className={styles.promoDate}>{model.promo.dateRange}</p>
-          ) : null}
-        </aside>
-      ) : null}
 
       <div className={styles.ctas}>
         <Button

@@ -135,20 +135,26 @@ async function main() {
     create: { id: "singleton", ...siteSettingsData },
   });
 
-  // Showrooms
+  // Showrooms — 3-branch network (Thủ Đức, Quận 7, Bình Dương)
+  const showroom1Data = {
+    id: "seed-showroom-1",
+    name: bi("Volta Auto Thủ Đức", "Volta Auto Thu Duc"),
+    address: bi(
+      "123 Võ Nguyên Giáp, Thủ Đức, TP. Hồ Chí Minh",
+      "123 Vo Nguyen Giap, Thu Duc, Ho Chi Minh City",
+    ),
+    city: "Ho Chi Minh City",
+    phone: "1900123456",
+    hours: bi("T2–CN: 8:00–20:00", "Mon–Sun: 8:00 AM–8:00 PM"),
+    typeTag: "3S",
+    sortOrder: 1,
+    published: true,
+  };
+  const { id: showroom1Id, ...showroom1Fields } = showroom1Data;
   const showroom = await prisma.showroom.upsert({
-    where: { id: "seed-showroom-1" },
-    update: {},
-    create: {
-      id: "seed-showroom-1",
-      name: bi("Showroom Trung tâm", "Central Showroom"),
-      address: bi("123 Đường Mẫu, Quận 1", "123 Sample Street, District 1"),
-      city: "Ho Chi Minh City",
-      phone: "1900123456",
-      hours: bi("T2–CN: 8:00–20:00", "Mon–Sun: 8:00 AM–8:00 PM"),
-      typeTag: "2S",
-      sortOrder: 1,
-    },
+    where: { id: showroom1Id },
+    update: showroom1Fields,
+    create: showroom1Data,
   });
 
   await prisma.hotline.upsert({
@@ -174,31 +180,65 @@ async function main() {
     },
   });
 
+  const showroom2Data = {
+    id: "seed-showroom-2",
+    name: bi("Volta Auto Quận 7", "Volta Auto District 7"),
+    address: bi(
+      "456 Nguyễn Văn Linh, Quận 7, TP. Hồ Chí Minh",
+      "456 Nguyen Van Linh, District 7, Ho Chi Minh City",
+    ),
+    city: "Ho Chi Minh City",
+    phone: "1900654321",
+    hours: bi("T2–CN: 8:30–19:00", "Mon–Sun: 8:30 AM–7:00 PM"),
+    typeTag: "3S",
+    sortOrder: 2,
+    published: true,
+  };
+  const { id: showroom2Id, ...showroom2Fields } = showroom2Data;
   await prisma.showroom.upsert({
-    where: { id: "seed-showroom-2" },
-    update: {},
-    create: {
-      id: "seed-showroom-2",
-      name: bi("Showroom Quận 7", "District 7 Showroom"),
-      address: bi("456 Đường Nam, Quận 7", "456 South Road, District 7"),
-      city: "Ho Chi Minh City",
-      phone: "1900654321",
-      hours: bi("T2–CN: 8:30–19:00", "Mon–Sun: 8:30 AM–7:00 PM"),
-      typeTag: "3S",
-      sortOrder: 2,
-    },
+    where: { id: showroom2Id },
+    update: showroom2Fields,
+    create: showroom2Data,
   });
 
-  // Menu items
+  const showroom3Data = {
+    id: "seed-showroom-3",
+    name: bi("Volta Auto Bình Dương", "Volta Auto Binh Duong"),
+    address: bi(
+      "789 Đại lộ Bình Dương, Thủ Dầu Một, Bình Dương",
+      "789 Binh Duong Boulevard, Thu Dau Mot, Binh Duong",
+    ),
+    city: "Binh Duong",
+    phone: "1900789012",
+    hours: bi("T2–CN: 8:00–19:00", "Mon–Sun: 8:00 AM–7:00 PM"),
+    typeTag: "2S",
+    sortOrder: 3,
+    published: true,
+  };
+  const { id: showroom3Id, ...showroom3Fields } = showroom3Data;
+  await prisma.showroom.upsert({
+    where: { id: showroom3Id },
+    update: showroom3Fields,
+    create: showroom3Data,
+  });
+
+  // Menu items — 7-item primary header + footer quick links (incl. Showrooms)
   const menuItems = [
-    { id: "seed-menu-news", label: bi("Tin tức", "News"), routeKey: "/news", placement: "HEADER", sortOrder: 2 },
-    { id: "seed-menu-about", label: bi("Về chúng tôi", "About"), routeKey: "/about", placement: "HEADER", sortOrder: 3 },
+    { id: "seed-menu-home", label: bi("Trang chủ", "Home"), routeKey: "/", placement: "HEADER", sortOrder: 1 },
+    { id: "seed-menu-products", label: bi("Sản phẩm", "Products"), routeKey: "/models", placement: "HEADER", sortOrder: 2 },
+    { id: "seed-menu-promotions", label: bi("Khuyến mãi", "Promotions"), routeKey: "/news", placement: "HEADER", sortOrder: 3 },
+    { id: "seed-menu-test-drive", label: bi("Lái thử", "Test Drive"), routeKey: "/book-test-drive", placement: "HEADER", sortOrder: 4 },
+    { id: "seed-menu-showroom", label: bi("Showroom", "Showroom"), routeKey: "/showrooms", placement: "HEADER", sortOrder: 5 },
+    { id: "seed-menu-news", label: bi("Tin tức", "News"), routeKey: "/news", placement: "HEADER", sortOrder: 6 },
+    { id: "seed-menu-contact-header", label: bi("Liên hệ", "Contact"), routeKey: "/contact", placement: "HEADER", sortOrder: 7 },
+    { id: "seed-menu-about", label: bi("Về chúng tôi", "About"), routeKey: "/about", placement: "HEADER", sortOrder: 99, visible: false },
     { id: "seed-menu-footer-about", label: bi("Giới thiệu", "About Us"), routeKey: "/about", placement: "FOOTER", sortOrder: 1 },
     { id: "seed-menu-footer-test-drive", label: bi("Đăng ký lái thử", "Book Test Drive"), routeKey: "/book-test-drive", placement: "FOOTER", sortOrder: 2 },
     { id: "seed-menu-footer-deposit", label: bi("Báo giá & Đặt cọc", "Quote & Deposit"), routeKey: "/deposit", placement: "FOOTER", sortOrder: 3 },
-    { id: "seed-menu-footer-news", label: bi("Tin tức khuyến mãi", "News & Campaigns"), routeKey: "/news", placement: "FOOTER", sortOrder: 4 },
-    { id: "seed-menu-footer-policies", label: bi("Chính sách đại lý", "Policies"), routeKey: "/policies", placement: "FOOTER", sortOrder: 5 },
-    { id: "seed-menu-contact", label: bi("Liên hệ", "Contact"), routeKey: "/contact", placement: "FOOTER", sortOrder: 6 },
+    { id: "seed-menu-footer-showrooms", label: bi("Showroom", "Showrooms"), routeKey: "/showrooms", placement: "FOOTER", sortOrder: 4 },
+    { id: "seed-menu-footer-news", label: bi("Tin tức khuyến mãi", "News & Campaigns"), routeKey: "/news", placement: "FOOTER", sortOrder: 5 },
+    { id: "seed-menu-footer-policies", label: bi("Chính sách đại lý", "Policies"), routeKey: "/policies", placement: "FOOTER", sortOrder: 6 },
+    { id: "seed-menu-contact", label: bi("Liên hệ", "Contact"), routeKey: "/contact", placement: "FOOTER", sortOrder: 7 },
   ];
   for (const item of menuItems) {
     await prisma.menuItem.upsert({

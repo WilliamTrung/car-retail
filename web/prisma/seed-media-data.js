@@ -320,6 +320,11 @@ export const SEED_MEDIA_ASSETS = [
     "altText": {
       "vi": "Ảnh gallery City EV",
       "en": "City EV gallery photo"
+    },
+    "link": {
+      "table": "vehicleModel",
+      "entityId": "seed-model-city-ev",
+      "field": "heroMediaId"
     }
   },
   {
@@ -330,8 +335,44 @@ export const SEED_MEDIA_ASSETS = [
     "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-city-ev-g2.svg",
     "folder": "VEHICLES",
     "altText": {
-      "vi": "Ảnh gallery City EV",
-      "en": "City EV gallery photo"
+      "vi": "Ảnh gallery City EV góc 2",
+      "en": "City EV gallery photo angle 2"
+    }
+  },
+  {
+    "id": "seed-media-city-ev-g3",
+    "r2Key": "vehicles/gallery/seed-media-city-ev-g3.svg",
+    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
+    "sourceSite": "voltaauto",
+    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-city-ev-g3.svg",
+    "folder": "VEHICLES",
+    "altText": {
+      "vi": "Ảnh gallery City EV góc 3",
+      "en": "City EV gallery photo angle 3"
+    }
+  },
+  {
+    "id": "seed-media-city-ev-g4",
+    "r2Key": "vehicles/gallery/seed-media-city-ev-g4.svg",
+    "sourceUrl": "https://static-cms-prod.voltaauto.com/header-vf3-hover_0.png",
+    "sourceSite": "voltaauto",
+    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-city-ev-g4.svg",
+    "folder": "VEHICLES",
+    "altText": {
+      "vi": "Ảnh gallery City EV góc 4",
+      "en": "City EV gallery photo angle 4"
+    }
+  },
+  {
+    "id": "seed-media-city-ev-g5",
+    "r2Key": "vehicles/gallery/seed-media-city-ev-g5.svg",
+    "sourceUrl": "https://shop.voltaauto.com/on/demandware.static/-/Sites-app_volta_vn-Library/default/dwaa27a00c/images/mega-menu/car/VF3_hover.png",
+    "sourceSite": "voltaauto",
+    "publicUrl": "https://pub-8f401798955245bdb2d56ae79de9647a.r2.dev/vehicles/gallery/seed-media-city-ev-g5.svg",
+    "folder": "VEHICLES",
+    "altText": {
+      "vi": "Ảnh gallery City EV góc 5",
+      "en": "City EV gallery photo angle 5"
     }
   },
   {
