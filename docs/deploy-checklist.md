@@ -57,14 +57,25 @@ All seed scripts and manifest data live **in the repo** — nothing is maintaine
 
 | Path | Purpose |
 |------|---------|
-| `web/prisma/seed.js` | Base catalog, CMS, admin user |
+| `web/prisma/seed.ts` | Base catalog, CMS, admin user (`prisma.user`), promoCountdown — run via `npm run db:seed` |
 | `web/prisma/seed-media-data.js` | Media manifest (stable IDs, r2Keys, links) — targets the **scraped** dataset (`db:seed:scraped`) |
 | `web/prisma/seed-media-urls.js` | Generated public URLs (committed after local seed) |
 | `web/prisma/seed-media.js` | Media seed entry (plain node, self-contained — fetch → R2 upload → transactional DB swap; `--purge` deletes stale R2 objects last) |
 
 **VPS holds only:** `$HOME/repo/car-retail` (git clone) and `~/dev/shared/car-retail/secrets/` (runtime env). No orphan seed files outside the clone.
 
-**Workflow:** change seed data locally → commit → push → on VPS `git pull` → run from checkout:
+**Canonical base seed:** `web/prisma/seed.ts` via `npm run db:seed` (`tsx prisma/seed.ts`). `tsx` is a **devDependency** — do **not** use `npm ci --omit=dev` for this step.
+
+**Preferred (migrate image):** the Compose `migrate` service is built from the Dockerfile `migrator` target (`npm ci` **with** devDeps, so `tsx` is already on `PATH`). After `git pull` + migrate image build:
+
+```bash
+cd $HOME/repo/car-retail
+docker compose --env-file ~/dev/shared/car-retail/secrets/deploy.env \
+  run --rm --entrypoint sh migrate \
+  -c 'npx prisma generate && npm run db:seed'
+```
+
+**One-shot host mount** (no migrate image): full `npm ci` so `tsx` installs, then the same script:
 
 ```bash
 cd $HOME/repo/car-retail/web
@@ -72,14 +83,19 @@ docker run --rm \
   --env-file ~/dev/shared/car-retail/secrets/app/.env \
   --network db-net \
   -v "$HOME/repo/car-retail/web:/app" \
-  -w /app node:22-alpine \
-  sh -c 'apk add --no-cache libc6-compat && npm ci --omit=dev && node prisma/seed.js'
+  -w /app node:24-alpine \
+  sh -c 'apk add --no-cache libc6-compat && npm ci && npx prisma generate && npm run db:seed'
+```
 
+Media seed (unchanged — plain Node, no `tsx`):
+
+```bash
+cd $HOME/repo/car-retail/web
 docker run --rm \
   --env-file ~/dev/shared/car-retail/secrets/app/.env \
   --network db-net \
   -v "$HOME/repo/car-retail/web:/app" \
-  -w /app node:22-alpine \
+  -w /app node:24-alpine \
   sh -c 'apk add --no-cache libc6-compat && npm ci && npx prisma generate && node prisma/seed-media.js --purge'
 ```
 
