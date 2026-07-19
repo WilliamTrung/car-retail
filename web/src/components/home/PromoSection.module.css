@@ -1,5 +1,9 @@
 .root {
-  background: var(--color-accent-soft);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-soft) 0%,
+    var(--color-ink-soft) 100%
+  );
   padding: var(--space-16) var(--container-pad);
 }
 

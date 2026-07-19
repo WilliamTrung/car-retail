@@ -23,7 +23,15 @@ export async function SiteHeader({ chrome }: Props) {
         {/* Client island emits: menuBtn, mobileActions, MobileNav (fragment) */}
         <MobileChromeControls nav={nav} hotline={hotline} zaloUrl={zaloUrl} />
 
-        <Link href="/" className={styles.logo} aria-label={t("homeAria")}>
+        <Link
+          href="/"
+          className={styles.logo}
+          aria-label={
+            logoText.accent
+              ? `${logoText.primary} ${logoText.accent}`
+              : logoText.primary
+          }
+        >
           <span className={styles.logoPrimary}>{logoText.primary}</span>
           {logoText.accent ? (
             <span className={styles.logoAccent}> {logoText.accent}</span>
@@ -49,7 +57,12 @@ export async function SiteHeader({ chrome }: Props) {
             </Button>
           ) : null}
           {hotline.tel ? (
-            <Button href={hotline.tel} variant="primary" size="md">
+            <Button
+              href={hotline.tel}
+              variant="primary"
+              size="md"
+              className={styles.hotlinePill}
+            >
               <Icon name="phone" size={18} />
               {hotline.display}
             </Button>

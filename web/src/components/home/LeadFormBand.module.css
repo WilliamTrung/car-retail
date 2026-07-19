@@ -1,5 +1,5 @@
 .root {
-  background: var(--color-brand-900);
+  background: var(--color-ink-900);
   color: var(--color-text-on-dark);
   padding: var(--space-16) var(--container-pad);
 }

@@ -317,7 +317,7 @@ async function main() {
     {
       id: "seed-menu-promotions",
       label: bi("Khuyến mãi", "Promotions"),
-      routeKey: "/news",
+      routeKey: "/promotions",
       placement: "HEADER",
       sortOrder: 3,
     },

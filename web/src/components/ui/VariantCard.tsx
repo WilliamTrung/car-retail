@@ -1,3 +1,4 @@
+import type { Locale } from "@/lib/view-models/common";
 import type { VariantVM } from "@/lib/view-models/model-detail";
 import { Chip } from "./Chip";
 import { PriceText } from "./PriceText";
@@ -8,6 +9,8 @@ type VariantCardProps = {
   selected?: boolean;
   name?: string;
   onSelect?: () => void;
+  locale?: Locale;
+  contactLabel?: string;
   className?: string;
 };
 
@@ -20,6 +23,8 @@ export function VariantCard({
   selected = false,
   name = "variant",
   onSelect,
+  locale = "vi",
+  contactLabel,
   className,
 }: VariantCardProps) {
   return (
@@ -43,7 +48,12 @@ export function VariantCard({
       <div className={styles.body}>
         <div className={styles.row}>
           <span className={styles.name}>{variant.name}</span>
-          <PriceText amount={variant.priceVnd} size="base" />
+          <PriceText
+            amount={variant.priceVnd}
+            size="base"
+            locale={locale}
+            contactLabel={contactLabel}
+          />
         </div>
         {variant.chips.length > 0 ? (
           <ul className={styles.chips}>

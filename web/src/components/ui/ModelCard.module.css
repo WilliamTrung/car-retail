@@ -18,6 +18,18 @@
   }
 }
 
+/* Shadowless dense-grid variant (catalog listing). */
+.flat {
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flat:hover {
+    box-shadow: none;
+    transform: translateY(-2px);
+  }
+}
+
 .media {
   border-radius: 0;
 }
@@ -62,6 +74,28 @@
   padding: 0;
   list-style: none;
 }
+
+.specChip {
+  gap: var(--space-1);
+}
+
+.chipIcon {
+  flex-shrink: 0;
+  font-size: 0.95em;
+  line-height: 1;
+}
+
+.chipValue {
+  font-variant-numeric: tabular-nums;
+}
+
+.chipUnit {
+  color: var(--color-text-muted);
+  font-weight: var(--text-caption-weight);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 
 .priceRow {
   margin: 0;

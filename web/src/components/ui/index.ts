@@ -17,4 +17,6 @@ export { VariantCard } from "./VariantCard";
 export { ShowroomCard } from "./ShowroomCard";
 export { FaqItem } from "./FaqItem";
 export { CountdownTimer } from "./CountdownTimer";
+export { DateBadge } from "./DateBadge";
+export { PromoCountdown } from "./PromoCountdown";
 export { LangSwitcher } from "./LangSwitcher";

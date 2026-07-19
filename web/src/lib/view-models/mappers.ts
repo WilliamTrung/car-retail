@@ -1,7 +1,7 @@
 import type { LocalizeHref } from "@/lib/i18n/localize-href";
 import type { Locale, Localized, SpecTranslate, UnitsMap, VehicleAttribute } from "./common";
 import { composeAttributeDisplay, resolveLocalized } from "./common";
-import type { ModelCardVM } from "./model-card";
+import type { ModelCardVM, SpecChipVM } from "./model-card";
 import type { ModelDetailVM, VariantVM } from "./model-detail";
 import type { ShowroomVM } from "./showroom";
 import type { SiteChromeVM } from "./site";
@@ -182,20 +182,231 @@ function toVehicleAttrs(
   return out;
 }
 
+type SpecChipKey = SpecChipVM["key"];
+
+const SPEC_CHIP_ORDER: SpecChipKey[] = ["range", "power", "seats"];
+
+const SPEC_CHIP_ICONS: Record<SpecChipKey, string> = {
+  range: "🔋",
+  power: "⚡",
+  seats: "💺",
+};
+
+/** Normalize key for alias match (lowercase, strip combining marks). */
+function normalizeAttrKey(key: string): string {
+  return key
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .replace(/[\s_-]+/g, "");
+}
+
+function slotForAttrKey(key: string): SpecChipKey | null {
+  const k = normalizeAttrKey(key);
+  // range / pin / quãng đường
+  if (
+    k === "range" ||
+    k === "pin" ||
+    k === "quangduong" ||
+    k.includes("range") ||
+    k.includes("quangduong")
+  ) {
+    return "range";
+  }
+  // power / công suất / kW / hp
+  if (
+    k === "power" ||
+    k === "kw" ||
+    k === "hp" ||
+    k === "ps" ||
+    k === "congsuat" ||
+    k.includes("power") ||
+    k.includes("congsuat")
+  ) {
+    return "power";
+  }
+  // seats / số chỗ / chỗ
+  if (
+    k === "seats" ||
+    k === "cho" ||
+    k === "socho" ||
+    k.includes("seat") ||
+    k.includes("socho")
+  ) {
+    return "seats";
+  }
+  return null;
+}
+
+function findAttrForSlot(
+  attrs: VehicleAttribute[],
+  slot: SpecChipKey,
+): VehicleAttribute | undefined {
+  return attrs.find((a) => slotForAttrKey(a.key) === slot);
+}
+
+function specChipDisplay(chip: SpecChipVM): string {
+  return chip.unit ? `${chip.value} ${chip.unit}` : chip.value;
+}
+
+/** Fixed Range · Power · Seats chips — never a lone bare "—" chip. */
 function composeSpecChips(
   attrs: VehicleAttribute[],
   units: UnitsMap,
   locale: Locale,
   t: SpecTranslate,
-  limit = 3,
-): string[] {
-  const chips: string[] = [];
-  for (const attr of attrs) {
-    if (chips.length >= limit) break;
-    chips.push(composeAttributeDisplay(attr, units, locale, t).display);
+): SpecChipVM[] {
+  return SPEC_CHIP_ORDER.map((slot) => {
+    const attr = findAttrForSlot(attrs, slot);
+    if (!attr) {
+      // Localized slot label + not-available (never bare "—" / empty unit).
+      return {
+        key: slot,
+        icon: SPEC_CHIP_ICONS[slot],
+        value: t(slot),
+        unit: t("notAvailable"),
+      };
+    }
+    const { display } = composeAttributeDisplay(attr, units, locale, t);
+    const valueStr = String(attr.value);
+    const unit = display.startsWith(valueStr)
+      ? display.slice(valueStr.length).trim()
+      : "";
+    return {
+      key: slot,
+      icon: SPEC_CHIP_ICONS[slot],
+      value: valueStr,
+      unit,
+    };
+  });
+}
+
+/** SpecStrip 7-slot schema (Range/Seats/Torque/Battery/Motor/Fast-charge/0-50). */
+type SpecStripSlot =
+  | "range"
+  | "seats"
+  | "torque"
+  | "battery"
+  | "motor"
+  | "chargeTimeFast"
+  | "accel050";
+
+const SPEC_STRIP_ORDER: SpecStripSlot[] = [
+  "range",
+  "seats",
+  "torque",
+  "battery",
+  "motor",
+  "chargeTimeFast",
+  "accel050",
+];
+
+function stripSlotForAttrKey(key: string): SpecStripSlot | null {
+  const k = normalizeAttrKey(key);
+  // Exclude batteryType from battery slot
+  if (k === "batterytype" || k.includes("batterytype")) return null;
+
+  if (
+    k === "range" ||
+    k === "pin" ||
+    k === "quangduong" ||
+    k.includes("range") ||
+    k.includes("quangduong")
+  ) {
+    return "range";
   }
-  while (chips.length < limit) chips.push("—");
-  return chips.slice(0, limit);
+  if (
+    k === "seats" ||
+    k === "cho" ||
+    k === "socho" ||
+    k.includes("seat") ||
+    k.includes("socho")
+  ) {
+    return "seats";
+  }
+  if (
+    k === "torque" ||
+    k === "nm" ||
+    k === "momemxoan" ||
+    k.includes("torque") ||
+    k.includes("momem")
+  ) {
+    return "torque";
+  }
+  if (k === "battery" || k.includes("battery") || k === "pin") {
+    return "battery";
+  }
+  // Motor ← power / động cơ / kW
+  if (
+    k === "motor" ||
+    k === "power" ||
+    k === "kw" ||
+    k === "hp" ||
+    k === "ps" ||
+    k === "dongco" ||
+    k === "congsuat" ||
+    k.includes("motor") ||
+    k.includes("power") ||
+    k.includes("congsuat") ||
+    k.includes("dongco")
+  ) {
+    return "motor";
+  }
+  if (
+    k === "chargetimefast" ||
+    k === "fastcharge" ||
+    k.includes("fastcharge") ||
+    k.includes("chargetime") ||
+    k.includes("sachnhanh")
+  ) {
+    return "chargeTimeFast";
+  }
+  // 0-50 / acceleration
+  if (
+    k === "050" ||
+    k === "accel050" ||
+    k === "zerotofifty" ||
+    k.includes("0to50") ||
+    k.includes("accel")
+  ) {
+    return "accel050";
+  }
+  return null;
+}
+
+function findAttrForStripSlot(
+  attrs: VehicleAttribute[],
+  slot: SpecStripSlot,
+): VehicleAttribute | undefined {
+  return attrs.find((a) => stripSlotForAttrKey(a.key) === slot);
+}
+
+function safeSpecLabel(t: SpecTranslate, key: string): string {
+  try {
+    const label = t(key);
+    return label || key;
+  } catch {
+    return key;
+  }
+}
+
+/** Always exactly 7 labeled rows; missing values → localized notAvailable. */
+function composeSpecStrip(
+  attrs: VehicleAttribute[],
+  units: UnitsMap,
+  locale: Locale,
+  t: SpecTranslate,
+): ModelDetailVM["specStrip"] {
+  const notAvailable = safeSpecLabel(t, "notAvailable");
+  return SPEC_STRIP_ORDER.map((slot) => {
+    const label = safeSpecLabel(t, slot);
+    const attr = findAttrForStripSlot(attrs, slot);
+    if (!attr) {
+      return { key: slot, label, display: notAvailable };
+    }
+    const { display } = composeAttributeDisplay(attr, units, locale, t);
+    return { key: slot, label, display };
+  });
 }
 
 function slugFor(model: ModelCardSource, locale: Locale): string {
@@ -239,7 +450,7 @@ export function toModelCardVM(
     imageUrl,
     imageAlt: resolveLocalized(m.heroMedia?.altText, locale) || name,
     isEv: isEvModel(m),
-    specChips: composeSpecChips(attrs, units, locale, t, 3),
+    specChips: composeSpecChips(attrs, units, locale, t),
     priceFromVnd: minVariantPrice(m.variants),
     promoLine: resolveLocalized(m.promoLine, locale) || null,
     segment: segmentOf(m),
@@ -260,7 +471,9 @@ function toVariantVM(
     id: variant.id ?? `variant-${index}`,
     name: resolveLocalized(variant.name, locale) || "—",
     priceVnd: variant.price ?? null,
-    chips: composeSpecChips(attrs, units, locale, t, 3).filter((c) => c !== "—"),
+    chips: composeSpecChips(attrs, units, locale, t)
+      .filter((c) => c.value !== "—")
+      .map(specChipDisplay),
     isDefault: index === 0,
     allowsDeposit: variant.allowDeposit !== false,
     allowsTestDrive: variant.allowTestDrive !== false,
@@ -299,7 +512,9 @@ export function toModelDetailVM(
       id: "default",
       name: card.name,
       priceVnd: card.priceFromVnd,
-      chips: card.specChips.filter((c) => c !== "—"),
+      chips: card.specChips
+        .filter((c) => c.value !== "—")
+        .map(specChipDisplay),
       isDefault: true,
       allowsDeposit: true,
       allowsTestDrive: true,
@@ -309,10 +524,7 @@ export function toModelDetailVM(
   }
 
   const attrs = toVehicleAttrs(m.attributes);
-  const specStrip = attrs.slice(0, 7).map((attr) => {
-    const { label, display } = composeAttributeDisplay(attr, units, locale, t);
-    return { key: attr.key, label, display };
-  });
+  const specStrip = composeSpecStrip(attrs, units, locale, t);
 
   const featureSections = (m.featureSections ?? []).map((fs, i) => ({
     title: resolveLocalized(fs.title, locale),
@@ -469,7 +681,7 @@ function routeKeyToHref(routeKey: string): string {
     home: "/",
     models: "/models",
     products: "/models",
-    promotions: "/news",
+    promotions: "/promotions",
     news: "/news",
     about: "/about",
     contact: "/contact",

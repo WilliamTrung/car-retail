@@ -1,10 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { Locale } from "@/lib/view-models/common";
 import type { ModelDetailVM, VariantVM } from "@/lib/view-models/model-detail";
+import type { PromoTiming } from "@/lib/view-models/home";
 import { Button } from "@/components/ui/Button";
 import { EcoChip } from "@/components/ui/Chip";
 import { PriceText } from "@/components/ui/PriceText";
+import { PromoCountdown } from "@/components/ui/PromoCountdown";
 import { VariantCard } from "@/components/ui/VariantCard";
 import styles from "./VariantSelector.module.css";
 
@@ -14,9 +17,12 @@ type CtaLabels = {
   call: string;
   zalo: string;
   contactPrice: string;
+  priceFrom: string;
   variantsLabel: string;
   promoLabel?: string;
   eco?: string;
+  ratingAria?: string;
+  ratingValue?: string;
 };
 
 type VariantSelectorProps = {
@@ -24,6 +30,7 @@ type VariantSelectorProps = {
     ModelDetailVM,
     "id" | "name" | "taglineOverline" | "isEv" | "variants" | "promo" | "priceFromVnd"
   >;
+  locale: Locale;
   paths: {
     testDrive: string;
     deposit: string;
@@ -41,7 +48,20 @@ function withQuery(base: string, params: Record<string, string>) {
   return `${url.pathname}${url.search}`;
 }
 
-export function VariantSelector({ model, paths, labels }: VariantSelectorProps) {
+/** Model-detail promo is always far-out — never mount a live timer. */
+function staticPromoTiming(dateRange: string | null | undefined): PromoTiming {
+  return {
+    mode: "static",
+    validUntilLabel: dateRange?.trim() || "",
+  };
+}
+
+export function VariantSelector({
+  model,
+  locale,
+  paths,
+  labels,
+}: VariantSelectorProps) {
   const defaultVariant =
     model.variants.find((v) => v.isDefault) ?? model.variants[0]!;
   const [selectedId, setSelectedId] = useState(defaultVariant.id);
@@ -63,6 +83,9 @@ export function VariantSelector({ model, paths, labels }: VariantSelectorProps) 
     };
   }, [model.id, paths.deposit, paths.testDrive, selected]);
 
+  const promoTiming = staticPromoTiming(model.promo?.dateRange);
+  const showPromo = Boolean(model.promo && model.promo.bullets.length > 0);
+
   return (
     <div className={styles.root}>
       <div className={styles.header}>
@@ -73,26 +96,43 @@ export function VariantSelector({ model, paths, labels }: VariantSelectorProps) 
           <p className={styles.overline}>{model.taglineOverline}</p>
         ) : null}
         <h1 className={styles.title}>{model.name}</h1>
-        <PriceText
-          amount={price}
-          size="lg"
-          contactLabel={labels.contactPrice}
-        />
+        {labels.ratingAria ? (
+          <p className={styles.rating} aria-label={labels.ratingAria}>
+            <span className={styles.stars} aria-hidden="true">
+              ★★★★★
+            </span>
+            {labels.ratingValue ? (
+              <span className={styles.ratingValue}>{labels.ratingValue}</span>
+            ) : null}
+          </p>
+        ) : null}
+        <p className={styles.priceRow}>
+          <span className={styles.from}>{labels.priceFrom}</span>
+          <PriceText
+            amount={price}
+            size="lg"
+            locale={locale}
+            contactLabel={labels.contactPrice}
+          />
+        </p>
       </div>
 
-      {model.promo && model.promo.bullets.length > 0 ? (
+      {showPromo && model.promo ? (
         <aside
           className={styles.promo}
           aria-label={labels.promoLabel ?? "Promo"}
         >
+          {promoTiming.mode === "static" && promoTiming.validUntilLabel ? (
+            <PromoCountdown
+              timing={promoTiming}
+              className={styles.promoBadge}
+            />
+          ) : null}
           <ul className={styles.promoList}>
-            {model.promo.bullets.map((b) => (
+            {model.promo.bullets.slice(0, 3).map((b) => (
               <li key={b}>{b}</li>
             ))}
           </ul>
-          {model.promo.dateRange ? (
-            <p className={styles.promoDate}>{model.promo.dateRange}</p>
-          ) : null}
         </aside>
       ) : null}
 
@@ -108,6 +148,8 @@ export function VariantSelector({ model, paths, labels }: VariantSelectorProps) 
             name="model-variant"
             selected={variant.id === selected.id}
             onSelect={() => setSelectedId(variant.id)}
+            locale={locale}
+            contactLabel={labels.contactPrice}
           />
         ))}
       </div>
@@ -116,18 +158,18 @@ export function VariantSelector({ model, paths, labels }: VariantSelectorProps) 
         <Button
           variant="primary"
           size="lg"
-          href={hrefs.testDrive}
-          className={styles.cta}
-        >
-          {labels.testDrive}
-        </Button>
-        <Button
-          variant="outline"
-          size="lg"
           href={hrefs.deposit}
           className={styles.cta}
         >
           {labels.deposit}
+        </Button>
+        <Button
+          variant="outline"
+          size="lg"
+          href={hrefs.testDrive}
+          className={styles.cta}
+        >
+          {labels.testDrive}
         </Button>
         {paths.call ? (
           <Button

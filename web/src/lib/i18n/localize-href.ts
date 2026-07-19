@@ -3,6 +3,8 @@ import type { Locale } from "@/lib/view-models/common";
 
 const STATIC_PATHS = new Set([
   "/",
+  "/models",
+  "/promotions",
   "/book-test-drive",
   "/deposit",
   "/news",

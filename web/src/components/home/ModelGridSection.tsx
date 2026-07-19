@@ -1,27 +1,39 @@
+"use client";
+
+import { useId, useMemo, useState } from "react";
+import type { Locale } from "@/lib/view-models/common";
 import type { ModelCardVM } from "@/lib/view-models/model-card";
 import { Button } from "@/components/ui/Button";
 import { ModelCard } from "@/components/ui/ModelCard";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import styles from "./ModelGridSection.module.css";
 
-type Segment = {
-  key: "personal" | "commercial";
-  title: string;
-  models: ModelCardVM[];
+export type LineupTabKey = "all" | "personal" | "service" | "van";
+
+export type LineupModel = ModelCardVM & {
+  lineupKey: Exclude<LineupTabKey, "all">;
 };
 
 type ModelGridSectionProps = {
   overline: string;
   title: string;
-  segments: Segment[];
+  locale?: Locale;
+  models: LineupModel[];
+  /** Index of the card that demos SmartImage error-fallback (null src). */
+  demoFallbackIndex?: number;
+  tabLabels: Record<LineupTabKey, string>;
   labels: {
     priceFrom: string;
+    contactPrice: string;
     viewDetails: string;
     testDrive: string;
     eco: string;
     viewAll: string;
+    tabsLabel: string;
   };
   viewAllHref?: string;
+  /** Total published count for “View all N models” (may exceed visible grid). */
+  totalCount: number;
 };
 
 const MOBILE_PREVIEW = 2;
@@ -29,17 +41,29 @@ const MOBILE_PREVIEW = 2;
 export function ModelGridSection({
   overline,
   title,
-  segments,
+  locale = "vi",
+  models,
+  demoFallbackIndex = 0,
+  tabLabels,
   labels,
-  viewAllHref = "/",
+  viewAllHref = "/models",
+  totalCount,
 }: ModelGridSectionProps) {
-  const visible = segments.filter((s) => s.models.length > 0);
-  if (!visible.length) return null;
+  const titleId = useId();
+  const tabsId = useId();
+  const [tab, setTab] = useState<LineupTabKey>("all");
 
-  const total = visible.reduce((n, s) => n + s.models.length, 0);
+  const filtered = useMemo(() => {
+    if (tab === "all") return models;
+    return models.filter((m) => m.lineupKey === tab);
+  }, [models, tab]);
+
+  if (!models.length) return null;
+
+  const tabs: LineupTabKey[] = ["all", "personal", "service", "van"];
 
   return (
-    <section className={styles.root} aria-labelledby="home-models-title">
+    <section className={styles.root} aria-labelledby={titleId}>
       <div className={styles.inner}>
         <SectionTitle
           overline={overline}
@@ -47,48 +71,84 @@ export function ModelGridSection({
           align="center"
           className={styles.heading}
         />
-        {/* visually hidden id target — SectionTitle renders h2 without id */}
-        <span id="home-models-title" className={styles.srOnly}>
+        {/* SectionTitle h2 has no id — bind aria via visually-hidden id target (not a heading). */}
+        <span id={titleId} className={styles.srOnly}>
           {title}
         </span>
 
-        {visible.map((segment) => (
-          <div key={segment.key} className={styles.segment}>
-            <h3 className={styles.segmentTitle}>{segment.title}</h3>
-            <ul className={styles.grid}>
-              {segment.models.map((model, i) => (
-                <li
-                  key={model.id}
-                  className={styles.card}
-                  data-mobile-hide={i >= MOBILE_PREVIEW ? "true" : undefined}
-                >
-                  <ModelCard
-                    model={model}
-                    labels={{
-                      priceFrom: labels.priceFrom,
-                      viewDetails: labels.viewDetails,
-                      testDrive: labels.testDrive,
-                      eco: labels.eco,
-                    }}
-                  />
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-
-        {total > MOBILE_PREVIEW ? (
-          <div className={styles.viewAllWrap}>
-            <Button
-              variant="outline"
-              size="lg"
-              href={viewAllHref}
-              className={styles.viewAll}
+        <div
+          className={styles.tabs}
+          role="tablist"
+          aria-label={labels.tabsLabel}
+          id={tabsId}
+        >
+          {tabs.map((key) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              id={`${tabsId}-${key}`}
+              aria-selected={tab === key}
+              className={styles.tab}
+              data-active={tab === key ? "true" : "false"}
+              onClick={() => setTab(key)}
             >
-              {labels.viewAll.replace("{count}", String(total))}
-            </Button>
-          </div>
+              {tabLabels[key]}
+            </button>
+          ))}
+        </div>
+
+        <ul
+          className={styles.grid}
+          role="tabpanel"
+          aria-labelledby={`${tabsId}-${tab}`}
+        >
+          {filtered.map((model, i) => {
+            const demo =
+              tab === "all" &&
+              demoFallbackIndex >= 0 &&
+              i === demoFallbackIndex;
+            const cardModel: ModelCardVM = demo
+              ? { ...model, imageUrl: null }
+              : model;
+            return (
+              <li
+                key={model.id}
+                className={styles.card}
+                data-mobile-hide={i >= MOBILE_PREVIEW ? "true" : undefined}
+              >
+                <ModelCard
+                  model={cardModel}
+                  locale={locale}
+                  labels={{
+                    priceFrom: labels.priceFrom,
+                    contactPrice: labels.contactPrice,
+                    viewDetails: labels.viewDetails,
+                    testDrive: labels.testDrive,
+                    eco: labels.eco,
+                  }}
+                />
+              </li>
+            );
+          })}
+        </ul>
+
+        {filtered.length === 0 ? (
+          <p className={styles.empty} role="status">
+            —
+          </p>
         ) : null}
+
+        <div className={styles.viewAllWrap}>
+          <Button
+            variant="outline"
+            size="lg"
+            href={viewAllHref}
+            className={styles.viewAll}
+          >
+            {labels.viewAll.replace("{count}", String(totalCount))}
+          </Button>
+        </div>
       </div>
     </section>
   );

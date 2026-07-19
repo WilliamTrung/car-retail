@@ -23,17 +23,53 @@
 
 .title {
   margin: 0;
-  font-size: var(--text-h2-size);
-  line-height: var(--text-h2-line);
-  font-weight: var(--text-h2-weight);
+  font-size: var(--text-h1-size);
+  line-height: var(--text-h1-line);
+  font-weight: var(--text-h1-weight);
   color: var(--color-text-900);
 }
 
 @media (max-width: 640px) {
   .title {
-    font-size: 28px;
-    line-height: 36px;
+    font-size: 34px;
+    line-height: 42px;
   }
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-gold-500);
+  font-size: var(--text-body-sm-size);
+  line-height: var(--text-body-sm-line);
+  font-weight: var(--text-caption-weight);
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  letter-spacing: 0;
+}
+
+.ratingValue {
+  color: var(--color-text-700);
+}
+
+.priceRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: var(--space-1) 0 0;
+}
+
+.from {
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-line);
+  font-weight: var(--text-body-weight);
+  color: var(--color-text-muted);
 }
 
 .variants {
@@ -43,12 +79,17 @@
 }
 
 .promo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
   padding: var(--space-4) var(--space-6);
-  /* QA D2 / design token accent/soft */
-  background: #fff1ec;
-  background: var(--color-accent-soft, #fff1ec);
-  border: 1px solid color-mix(in srgb, var(--color-accent-500) 35%, transparent);
+  background: var(--color-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--color-accent-500) 28%, transparent);
   border-radius: var(--radius-md);
+}
+
+.promoBadge {
+  align-self: flex-start;
 }
 
 .promoList {
@@ -60,13 +101,6 @@
   color: var(--color-text-900);
   font-size: var(--text-body-sm-size);
   line-height: var(--text-body-sm-line);
-}
-
-.promoDate {
-  margin: var(--space-3) 0 0;
-  font-size: var(--text-caption-size);
-  line-height: var(--text-caption-line);
-  color: var(--color-text-muted);
 }
 
 .ctas {

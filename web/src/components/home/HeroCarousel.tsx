@@ -17,6 +17,11 @@ import styles from "./HeroCarousel.module.css";
 
 const AUTO_MS = 5000;
 
+export type HeroTrustStat = {
+  value: string;
+  label: string;
+};
+
 type HeroCarouselProps = {
   slides: HeroSlideVM[];
   emptyFallback: HeroSlideVM;
@@ -28,8 +33,8 @@ type HeroCarouselProps = {
     pause: string;
     play: string;
   };
-  /** Mobile stacked layout uses hotline as secondary CTA when provided */
-  mobileSecondary?: { label: string; href: string } | null;
+  /** Trust strip under CTAs (Electric Ink split hero). */
+  trustStats?: HeroTrustStat[];
 };
 
 function prefersReducedMotion(): boolean {
@@ -41,7 +46,7 @@ export function HeroCarousel({
   slides,
   emptyFallback,
   labels,
-  mobileSecondary,
+  trustStats = [],
 }: HeroCarouselProps) {
   const list = slides.length > 0 ? slides : [emptyFallback];
   const multi = list.length > 1;
@@ -90,8 +95,7 @@ export function HeroCarousel({
     }
   };
 
-  const desktopSecondary = current.secondaryCta ?? null;
-  const phoneSecondary = mobileSecondary ?? desktopSecondary;
+  const secondary = current.secondaryCta ?? null;
 
   return (
     <section
@@ -125,56 +129,53 @@ export function HeroCarousel({
           {current.subtitle ? (
             <p className={styles.subtitle}>{current.subtitle}</p>
           ) : null}
+          {/* Exactly 1 primary + 1 secondary — no phone/third CTA (hero-choice-overload). */}
           <div className={styles.actions}>
-            <Button
-              variant="primary"
-              size="lg"
-              href={current.primaryCta.href}
-            >
+            <Button variant="primary" size="lg" href={current.primaryCta.href}>
               {current.primaryCta.label}
             </Button>
-            {desktopSecondary ? (
+            {secondary ? (
               <Button
                 variant="dark-outline"
                 size="lg"
-                href={desktopSecondary.href}
-                className={styles.secondaryDesktop}
+                href={secondary.href}
               >
-                {desktopSecondary.label}
-              </Button>
-            ) : null}
-            {phoneSecondary ? (
-              <Button
-                variant="dark-outline"
-                size="lg"
-                href={phoneSecondary.href}
-                className={styles.secondaryMobile}
-              >
-                <Icon name="phone" size={18} />
-                {phoneSecondary.label}
+                {secondary.label}
               </Button>
             ) : null}
           </div>
+          {trustStats.length > 0 ? (
+            <ul className={styles.trust}>
+              {trustStats.map((stat) => (
+                <li key={stat.label} className={styles.trustItem}>
+                  <span className={styles.trustValue}>{stat.value}</span>
+                  <span className={styles.trustLabel}>{stat.label}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </div>
 
-        <div className={styles.media}>
-          {list.map((slide, i) => (
-            <div
-              key={slide.id}
-              className={styles.slide}
-              data-active={i === safeIndex ? "true" : "false"}
-              aria-hidden={i !== safeIndex}
-            >
-              <SmartImage
-                src={slide.imageUrl}
-                alt={slide.imageAlt}
-                aspectRatio="4 / 3"
-                sizes="(max-width: 900px) 100vw, 50vw"
-                priority={i === 0}
-                placeholderCaption={slide.imageAlt || "Ảnh hero"}
-              />
-            </div>
-          ))}
+        <div className={styles.mediaWrap}>
+          <div className={styles.mediaGlow} aria-hidden="true" />
+          <div className={styles.media}>
+            {list.map((slide, i) => (
+              <div
+                key={slide.id}
+                className={styles.slide}
+                data-active={i === safeIndex ? "true" : "false"}
+                aria-hidden={i !== safeIndex}
+              >
+                <SmartImage
+                  src={slide.imageUrl}
+                  alt={slide.imageAlt}
+                  aspectRatio="4 / 3"
+                  sizes="(max-width: 900px) 100vw, 50vw"
+                  priority={i === 0}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

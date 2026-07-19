@@ -1,7 +1,7 @@
 export type { Locale, Localized, VehicleAttribute, UnitsMap, SpecTranslate } from "./common";
 export { composeAttributeDisplay, resolveLocalized } from "./common";
 
-export type { ModelCardVM } from "./model-card";
+export type { ModelCardVM, SpecChipVM } from "./model-card";
 export type { VariantVM, ModelDetailVM } from "./model-detail";
 export type { ShowroomVM } from "./showroom";
 export type {
@@ -13,6 +13,7 @@ export { toCreateLeadInput } from "./lead";
 export type {
   HeroSlideVM,
   PromoVM,
+  PromoTiming,
   NewsTeaserVM,
   DeliveryItemVM,
 } from "./home";

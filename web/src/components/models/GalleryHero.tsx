@@ -19,7 +19,6 @@ type GalleryHeroProps = {
     gallery?: string;
     thumbs?: string;
     swatches?: string;
-    placeholder?: string;
   };
 };
 
@@ -81,11 +80,7 @@ export function GalleryHero({
   };
 
   return (
-    <div
-      className={styles.root}
-      role="region"
-      aria-labelledby={labelId}
-    >
+    <div className={styles.root} role="region" aria-labelledby={labelId}>
       <p id={labelId} className={styles.srOnly}>
         {labels?.gallery ?? "Gallery"}
       </p>
@@ -95,9 +90,6 @@ export function GalleryHero({
         aspectRatio="4 / 3"
         sizes="(max-width: 900px) 100vw, 50vw"
         priority={priority}
-        placeholderCaption={
-          labels?.placeholder ?? `Ảnh ${gallery.alt || ""}`
-        }
         className={styles.main}
       />
 

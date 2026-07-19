@@ -9,16 +9,23 @@
   cursor: pointer;
   transition:
     border-color 0.15s ease,
-    box-shadow 0.15s ease;
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .card:hover {
-  border-color: var(--color-brand-500);
+  border-color: var(--color-brand-700);
+}
+
+.card:focus-within {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
 }
 
 .selected {
-  border-color: var(--color-brand-500);
-  box-shadow: 0 0 0 1px var(--color-brand-500);
+  border-color: var(--color-brand-700);
+  box-shadow: 0 0 0 1px var(--color-brand-700);
+  background: var(--color-ink-soft);
 }
 
 .input {

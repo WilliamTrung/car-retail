@@ -62,7 +62,13 @@ main {
   padding-inline: var(--container-pad);
 }
 
-/* §2.3 Text utilities */
+/* §1 Text utilities (Electric Ink) */
+.text-display {
+  font-size: var(--text-display-size);
+  line-height: var(--text-display-line);
+  font-weight: var(--text-display-weight);
+}
+
 .text-h1 {
   font-size: var(--text-h1-size);
   line-height: var(--text-h1-line);
@@ -153,15 +159,16 @@ main {
 
 /* §2.5 Motion — inert under prefers-reduced-motion: reduce */
 @media (prefers-reduced-motion: no-preference) {
+  /* accent-600 #C4330F */
   @keyframes pulse {
     0% {
-      box-shadow: 0 0 0 0 rgba(196, 55, 15, 0.55);
+      box-shadow: 0 0 0 0 rgba(196, 51, 15, 0.55);
     }
     70% {
-      box-shadow: 0 0 0 14px rgba(196, 55, 15, 0);
+      box-shadow: 0 0 0 14px rgba(196, 51, 15, 0);
     }
     100% {
-      box-shadow: 0 0 0 0 rgba(196, 55, 15, 0);
+      box-shadow: 0 0 0 0 rgba(196, 51, 15, 0);
     }
   }
 

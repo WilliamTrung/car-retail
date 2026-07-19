@@ -1,3 +1,4 @@
+import type { Locale } from "@/lib/view-models/common";
 import type { ModelCardVM } from "@/lib/view-models/model-card";
 import { Button } from "./Button";
 import { Chip, EcoChip } from "./Chip";
@@ -7,8 +8,12 @@ import styles from "./ModelCard.module.css";
 
 type ModelCardProps = {
   model: ModelCardVM;
+  locale?: Locale;
+  /** `flat` = shadowless catalog grid cards (Electric Ink dense grids). */
+  variant?: "default" | "flat";
   labels?: {
     priceFrom?: string;
+    contactPrice?: string;
     viewDetails?: string;
     testDrive?: string;
     eco?: string;
@@ -16,15 +21,28 @@ type ModelCardProps = {
   className?: string;
 };
 
-export function ModelCard({ model, labels, className }: ModelCardProps) {
+export function ModelCard({
+  model,
+  locale = "vi",
+  variant = "default",
+  labels,
+  className,
+}: ModelCardProps) {
   return (
-    <article className={[styles.card, className].filter(Boolean).join(" ")}>
+    <article
+      className={[
+        styles.card,
+        variant === "flat" ? styles.flat : null,
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <SmartImage
         src={model.imageUrl}
         alt={model.imageAlt}
         aspectRatio="4 / 3"
         sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        placeholderCaption={`Ảnh ${model.name}`}
         className={styles.media}
       />
       <div className={styles.body}>
@@ -39,8 +57,16 @@ export function ModelCard({ model, labels, className }: ModelCardProps) {
         <h3 className={styles.name}>{model.name}</h3>
         <ul className={styles.specs}>
           {model.specChips.map((chip) => (
-            <li key={chip}>
-              <Chip variant="spec">{chip}</Chip>
+            <li key={chip.key}>
+              <Chip variant="spec" className={styles.specChip}>
+                <span className={styles.chipIcon} aria-hidden>
+                  {chip.icon}
+                </span>
+                <span className={styles.chipValue}>{chip.value}</span>
+                {chip.unit ? (
+                  <span className={styles.chipUnit}>{chip.unit}</span>
+                ) : null}
+              </Chip>
             </li>
           ))}
         </ul>
@@ -48,7 +74,12 @@ export function ModelCard({ model, labels, className }: ModelCardProps) {
           <span className={styles.priceFrom}>
             {labels?.priceFrom ?? "Giá từ"}
           </span>{" "}
-          <PriceText amount={model.priceFromVnd} size="base" />
+          <PriceText
+            amount={model.priceFromVnd}
+            locale={locale}
+            size="base"
+            contactLabel={labels?.contactPrice}
+          />
         </p>
         {model.promoLine ? (
           <p className={styles.promo}>{model.promoLine}</p>

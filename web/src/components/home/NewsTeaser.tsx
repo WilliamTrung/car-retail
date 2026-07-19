@@ -26,7 +26,12 @@ export function NewsTeaser({
   return (
     <section className={styles.root} aria-labelledby="home-news-title">
       <div className={styles.inner}>
-        <SectionTitle overline={overline} title={title} align="center" />
+        <SectionTitle
+          overline={overline}
+          title={title}
+          align="center"
+          className={styles.heading}
+        />
         <span id="home-news-title" className={styles.srOnly}>
           {title}
         </span>

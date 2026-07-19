@@ -28,6 +28,10 @@
       "@/components/showrooms/*": ["./src/components/showrooms/*"],
       "@/components/models": ["./src/components/models/index.ts"],
       "@/components/models/*": ["./src/components/models/*"],
+      "@/components/promotions": ["./src/components/promotions/index.ts"],
+      "@/components/promotions/*": ["./src/components/promotions/*"],
+      "@/components/catalog": ["./src/components/catalog/index.ts"],
+      "@/components/catalog/*": ["./src/components/catalog/*"],
       "@/components/*": ["./components/*"],
       "@/styles/*": ["./styles/*"],
       "@/*": ["./src/*"]

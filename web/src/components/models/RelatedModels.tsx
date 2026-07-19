@@ -1,3 +1,4 @@
+import type { Locale } from "@/lib/view-models/common";
 import type { ModelCardVM } from "@/lib/view-models/model-card";
 import { ModelCard } from "@/components/ui/ModelCard";
 import { SectionTitle } from "@/components/ui/SectionTitle";
@@ -6,15 +7,22 @@ import styles from "./RelatedModels.module.css";
 type RelatedModelsProps = {
   models: ModelCardVM[];
   title: string;
+  locale?: Locale;
   labels?: {
     priceFrom?: string;
+    contactPrice?: string;
     viewDetails?: string;
     testDrive?: string;
     eco?: string;
   };
 };
 
-export function RelatedModels({ models, title, labels }: RelatedModelsProps) {
+export function RelatedModels({
+  models,
+  title,
+  locale = "vi",
+  labels,
+}: RelatedModelsProps) {
   if (models.length === 0) return null;
 
   return (
@@ -24,7 +32,7 @@ export function RelatedModels({ models, title, labels }: RelatedModelsProps) {
         <ul className={styles.grid}>
           {models.map((model) => (
             <li key={model.id}>
-              <ModelCard model={model} labels={labels} />
+              <ModelCard model={model} locale={locale} labels={labels} />
             </li>
           ))}
         </ul>

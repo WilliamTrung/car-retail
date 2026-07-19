@@ -1,12 +1,16 @@
 import type { LocalizeHref } from "@/lib/i18n/localize-href";
+import { daysUntil } from "@/lib/format";
 import type { Locale } from "@/lib/view-models/common";
 import { resolveLocalized } from "@/lib/view-models/common";
 import type {
+  DeliveryItemVM,
   HeroSlideVM,
   NewsTeaserVM,
+  PromoTiming,
   PromoVM,
 } from "@/lib/view-models/home";
 import { formatHotlineDisplay, toTelHref } from "@/lib/view-models/mappers";
+import type { LineupTabKey } from "./ModelGridSection";
 
 type Localizedish = { vi: string; en: string } | string | null | undefined;
 
@@ -38,19 +42,11 @@ type PromoCountdownSource = {
   label?: Localizedish;
 } | null | undefined;
 
-function routeKeyToHref(routeKey: string | null | undefined): string {
-  if (!routeKey) return "/book-test-drive";
-  if (routeKey.startsWith("/")) return routeKey;
-  const map: Record<string, string> = {
-    home: "/",
-    models: "/",
-    "test-drive": "/book-test-drive",
-    "book-test-drive": "/book-test-drive",
-    deposit: "/deposit",
-    news: "/news",
-  };
-  return map[routeKey] ?? `/${routeKey}`;
-}
+type DeliverySource = {
+  id: string;
+  imageUrl?: string | null;
+  caption?: Localizedish;
+};
 
 export function toHeroSlideVM(
   slide: HeroSlideSource,
@@ -58,6 +54,7 @@ export function toHeroSlideVM(
   defaults: {
     primaryLabel: string;
     secondaryLabel: string;
+    primaryHref: string;
     secondaryHref: string;
     imageAltFallback: string;
   },
@@ -65,8 +62,8 @@ export function toHeroSlideVM(
 ): HeroSlideVM {
   const title = resolveLocalized(slide.title, locale) || defaults.primaryLabel;
   const ctaLabel = resolveLocalized(slide.ctaLabel, locale);
-  const primaryHref = routeKeyToHref(slide.ctaRouteKey);
-
+  // Force book-test-drive primary — CMS routeKey must not introduce a competing destination.
+  const primaryHref = defaults.primaryHref;
   return {
     id: slide.id,
     promoChip: resolveLocalized(slide.promoChip, locale) || null,
@@ -125,15 +122,40 @@ type PromoMessages = {
   titleFallback: string;
   bullets: string[];
   dateRangeNote: string;
+  /** Template with `{date}` — e.g. "Còn hiệu lực đến {date}" / "Valid until {date}". */
+  validUntil: string;
   ctaLabel: string;
   ctaHref: string;
 };
+
+function formatPromoDate(endsAt: string, locale: Locale): string {
+  return new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(endsAt));
+}
+
+function resolvePromoTiming(
+  endsAt: string | null,
+  messages: PromoMessages,
+  locale: Locale,
+): PromoTiming {
+  if (endsAt && daysUntil(endsAt) <= 14) {
+    return { mode: "live", endsAt };
+  }
+  const validUntilLabel = endsAt
+    ? messages.validUntil.replace("{date}", formatPromoDate(endsAt, locale))
+    : messages.dateRangeNote;
+  return { mode: "static", validUntilLabel };
+}
 
 /**
  * Compose PromoVM from SiteSettings.promoCountdown + message copy.
  * Facade exposes `{ enabled, endAt, label }` only — bullets/date note from messages.
  * - `enabled: false` → hide section (null)
  * - missing / enabled → show; endsAt only when enabled + future ISO
+ * - daysUntil(endsAt) ≤ 14 → live countdown; else static DateBadge
  */
 export function toPromoVM(
   promo: PromoCountdownSource,
@@ -156,6 +178,7 @@ export function toPromoVM(
     title: label || messages.titleFallback,
     bullets: messages.bullets.slice(0, 5),
     endsAt,
+    timing: resolvePromoTiming(endsAt, messages, locale),
     dateRangeNote: messages.dateRangeNote,
     ctaLabel: messages.ctaLabel,
     ctaHref: messages.ctaHref,
@@ -168,4 +191,94 @@ export function resolveHotline(phone: string | null | undefined): {
 } {
   if (!phone) return { display: "", tel: "" };
   return { display: formatHotlineDisplay(phone), tel: toTelHref(phone) };
+}
+
+/** Classify published model into lineup tab (All/Personal/Service/Van). */
+export function classifyLineupKey(source: {
+  slug?: Localizedish;
+  name?: Localizedish;
+  segment?: { key?: string | null; line?: { key?: string | null } | null } | null;
+  segmentKey?: string | null;
+}): Exclude<LineupTabKey, "all"> {
+  const lineKey = (source.segment?.line?.key ?? "").toLowerCase();
+  const segKey = (
+    source.segmentKey ||
+    source.segment?.key ||
+    ""
+  ).toLowerCase();
+  const slug = resolveLocalized(source.slug, "en").toLowerCase();
+  const name = resolveLocalized(source.name, "en").toLowerCase();
+  const hay = `${lineKey} ${segKey} ${slug} ${name}`;
+
+  if (hay.includes("van") || hay.includes("cargo")) return "van";
+  if (
+    hay.includes("fleet") ||
+    hay.includes("service") ||
+    hay.includes("commercial") ||
+    hay.includes("limo") ||
+    hay.includes("metro") ||
+    hay.includes("shuttle")
+  ) {
+    return "service";
+  }
+  return "personal";
+}
+
+/**
+ * Normalize delivery captions to entity-bound `{model · branch}`.
+ * Parses common seed formats; falls back to paired model/branch entities.
+ */
+export function toDeliveryItemVM(
+  photo: DeliverySource,
+  locale: Locale,
+  entities: { models: string[]; branches: string[] },
+  index: number,
+): DeliveryItemVM {
+  const raw = resolveLocalized(photo.caption, locale).trim();
+  const caption = bindDeliveryCaption(raw, entities, index, locale);
+
+  return {
+    id: photo.id,
+    imageUrl: photo.imageUrl ?? null,
+    caption,
+  };
+}
+
+function bindDeliveryCaption(
+  raw: string,
+  entities: { models: string[]; branches: string[] },
+  index: number,
+  locale: Locale,
+): string {
+  const cleaned = raw
+    .replace(/\s*[—–-]\s*/g, " · ")
+    .replace(/\s*handover\s*/gi, " ")
+    .replace(/\s*bàn giao\s*/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const parts = cleaned
+    .split(/\s*·\s*/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  if (parts.length >= 2) {
+    const model = parts[0]!;
+    const branch = parts
+      .slice(1)
+      .join(" · ")
+      .replace(/^(chi nhánh|branch)\s+/i, "")
+      .trim();
+    return `${model} · ${branch}`;
+  }
+
+  const model =
+    entities.models[index % Math.max(entities.models.length, 1)] ||
+    (locale === "vi" ? "Xe Volta" : "Volta model");
+  const branch =
+    entities.branches[index % Math.max(entities.branches.length, 1)] ||
+    "Showroom";
+
+  // Generic / unparseable caption → entity-bound fallback (content-mismatch fix).
+  return `${model} · ${branch}`;
 }

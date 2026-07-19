@@ -36,8 +36,7 @@ export function HeaderNav({ nav, allProductsLabel }: Props) {
     <ul className={styles.navList}>
       {nav.map((item) => {
         const products = isProductsNav(item);
-        // Products has no /models index — land on home model grid; keep dropdown.
-        const href = (products ? "/" : item.href) as "/";
+        const href = item.href as "/";
         const active = isActiveHref(pathname, href);
         return (
           <li
@@ -57,7 +56,7 @@ export function HeaderNav({ nav, allProductsLabel }: Props) {
             {products ? (
               <div className={styles.dropdown} role="menu">
                 <Link
-                  href={href}
+                  href={"/models" as "/"}
                   className={styles.dropdownLink}
                   role="menuitem"
                 >

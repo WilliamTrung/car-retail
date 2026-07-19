@@ -9,10 +9,13 @@ import {
   ModelGridSection,
   NewsTeaser,
   PromoSection,
+  classifyLineupKey,
   resolveHotline,
+  toDeliveryItemVM,
   toHeroSlideVM,
   toNewsTeaserVM,
   toPromoVM,
+  type LineupModel,
 } from "@/components/home";
 import { LeadForm } from "@/components/leads/LeadForm";
 import {
@@ -22,6 +25,7 @@ import {
   getHotlines,
   getPublishedModels,
   getServiceBlocks,
+  getShowrooms,
   getSiteSettings,
   getUnits,
 } from "@/lib/queries/public";
@@ -29,7 +33,6 @@ import {
   toModelCardVM,
   unitsToMap,
   type Locale,
-  type ModelCardVM,
 } from "@/lib/view-models";
 import type { DeliveryItemVM } from "@/lib/view-models/home";
 import { resolveLocalized } from "@/lib/view-models/common";
@@ -46,22 +49,38 @@ export default async function HomePage({ params }: Props) {
 
   const t = await getTranslations("home");
   const tc = await getTranslations("common");
+  const tPrice = await getTranslations("price");
+  const tPromo = await getTranslations("promo");
   const tSpec = await getTranslations("spec");
 
-  const [settings, slides, models, services, news, units, hotlines, deliveryPhotos] =
-    await Promise.all([
-      getSiteSettings(),
-      getHeroSlides(),
-      getPublishedModels(),
-      getServiceBlocks(),
-      getFeaturedNews(3),
-      getUnits(),
-      getHotlines(),
-      getDeliveryPhotos(),
-    ]);
+  const [
+    settings,
+    slides,
+    models,
+    services,
+    news,
+    units,
+    hotlines,
+    deliveryPhotos,
+    showrooms,
+  ] = await Promise.all([
+    getSiteSettings(),
+    getHeroSlides(),
+    getPublishedModels(),
+    getServiceBlocks(),
+    getFeaturedNews(3),
+    getUnits(),
+    getHotlines(),
+    getDeliveryPhotos(),
+    getShowrooms(),
+  ]);
 
   const unitsMap = unitsToMap(units);
   const localizeHref = createLocalizeHref(locale);
+  const bookHref = localizeHref("/book-test-drive");
+  const modelsHref = localizeHref("/models");
+  const promotionsHref = localizeHref("/promotions");
+
   const specT = (key: string) => {
     try {
       return tSpec(key);
@@ -77,7 +96,8 @@ export default async function HomePage({ params }: Props) {
       {
         primaryLabel: t("heroPrimaryCta"),
         secondaryLabel: t("heroSecondaryCta"),
-        secondaryHref: localizeHref("/"),
+        primaryHref: "/book-test-drive",
+        secondaryHref: modelsHref,
         imageAltFallback: t("heroImageAlt"),
       },
       localizeHref,
@@ -89,25 +109,23 @@ export default async function HomePage({ params }: Props) {
     promoChip: t("heroPromoChip"),
     title: t("heroTitle"),
     subtitle: t("heroSubtitle"),
-    primaryCta: { label: t("heroPrimaryCta"), href: localizeHref("/book-test-drive") },
-    secondaryCta: { label: t("heroSecondaryCta"), href: localizeHref("/") },
+    primaryCta: { label: t("heroPrimaryCta"), href: bookHref },
+    secondaryCta: { label: t("heroSecondaryCta"), href: modelsHref },
     imageUrl: null,
     imageAlt: t("heroImageAlt"),
   };
 
-  // Enrich empty-fallback promo chip onto first CMS slide when CMS has no chip field
   if (heroSlides[0] && !heroSlides[0].promoChip) {
     heroSlides[0] = { ...heroSlides[0], promoChip: t("heroPromoChip") };
   }
 
-  const modelCards: ModelCardVM[] = models.map((m) =>
-    toModelCardVM(m, unitsMap, specT, locale, localizeHref),
-  );
+  const lineupModels: LineupModel[] = models.map((m) => {
+    const card = toModelCardVM(m, unitsMap, specT, locale, localizeHref);
+    return { ...card, lineupKey: classifyLineupKey(m) };
+  });
 
-  const personal = modelCards.filter((m) => m.segment === "personal").slice(0, 3);
-  const commercial = modelCards
-    .filter((m) => m.segment === "commercial")
-    .slice(0, 3);
+  // Cap grid density: prefer up to 3 per lineup tab, but keep full list for All.
+  const lineupPreview = lineupModels.slice(0, 9);
 
   const benefits = services.slice(0, 4).map((block) => ({
     id: block.id,
@@ -128,19 +146,30 @@ export default async function HomePage({ params }: Props) {
     titleFallback: t("promoTitle"),
     bullets: promoBullets,
     dateRangeNote: t("promoDateRange"),
+    validUntil: tPromo("validUntil"),
     ctaLabel: t("promoCta"),
-    ctaHref: localizeHref("/book-test-drive"),
+    ctaHref: promotionsHref,
   });
 
   const newsItems = news.map((post) =>
     toNewsTeaserVM(post, locale, t("newsTag"), localizeHref),
   );
 
-  const deliveries: DeliveryItemVM[] = deliveryPhotos.map((photo) => ({
-    id: photo.id,
-    imageUrl: photo.imageUrl,
-    caption: resolveLocalized(photo.caption, locale),
-  }));
+  const modelNames = models
+    .map((m) => resolveLocalized(m.name, locale))
+    .filter(Boolean);
+  const branchNames = showrooms
+    .map((s) => resolveLocalized(s.name, locale))
+    .filter(Boolean);
+
+  const deliveries: DeliveryItemVM[] = deliveryPhotos.map((photo, i) =>
+    toDeliveryItemVM(
+      photo,
+      locale,
+      { models: modelNames, branches: branchNames },
+      i,
+    ),
+  );
 
   const primaryPhone =
     [...hotlines].sort((a, b) => a.sortOrder - b.sortOrder)[0]?.phone ?? "";
@@ -151,57 +180,58 @@ export default async function HomePage({ params }: Props) {
       (s) => (s.platform ?? "").toLowerCase() === "zalo",
     )?.url ?? "https://zalo.me/";
 
-  const mobileSecondary = hotline.tel
-    ? {
-        label: t("heroCallCta", { phone: hotline.display || primaryPhone }),
-        href: hotline.tel,
-      }
-    : null;
-
   const leadModels = models.map((m) => ({
     id: m.id,
     name: resolveLocalized(m.name, locale),
   }));
+
+  const trustStats = [
+    { value: t("heroTrustDeliveriesValue"), label: t("heroTrustDeliveriesLabel") },
+    { value: t("heroTrustShowroomsValue"), label: t("heroTrustShowroomsLabel") },
+    { value: t("heroTrustWarrantyValue"), label: t("heroTrustWarrantyLabel") },
+  ];
 
   return (
     <main className={styles.main}>
       <HeroCarousel
         slides={heroSlides}
         emptyFallback={emptyFallback}
+        trustStats={trustStats}
         labels={{
           carousel: t("carouselLabel"),
           previous: t("carouselPrev"),
           next: t("carouselNext"),
-          // raw: component interpolates {n} per dot via .replace
           goToSlide: t.raw("carouselGoTo"),
           pause: t("carouselPause"),
           play: t("carouselPlay"),
         }}
-        mobileSecondary={mobileSecondary}
       />
 
-      <BenefitStrip items={benefits} />
+      <BenefitStrip items={benefits} sectionLabel={t("benefitsLabel")} />
 
       <ModelGridSection
         overline={t("modelsOverline")}
         title={t("modelsTitle")}
-        segments={[
-          { key: "personal", title: t("segmentPersonal"), models: personal },
-          {
-            key: "commercial",
-            title: t("segmentCommercial"),
-            models: commercial,
-          },
-        ]}
+        locale={locale}
+        models={lineupPreview}
+        demoFallbackIndex={1}
+        totalCount={models.length}
+        tabLabels={{
+          all: t("segmentAll"),
+          personal: t("segmentPersonal"),
+          service: t("segmentService"),
+          van: t("segmentVan"),
+        }}
         labels={{
           priceFrom: tc("priceFrom"),
+          contactPrice: tPrice("contactFallback"),
           viewDetails: tc("viewDetails"),
           testDrive: tc("testDriveConsult"),
           eco: tc("ecoChip"),
-          // raw: component interpolates {count} via .replace
           viewAll: t.raw("viewAllModels"),
+          tabsLabel: t("lineupTabsLabel"),
         }}
-        viewAllHref={localizeHref("/")}
+        viewAllHref={modelsHref}
       />
 
       <CtaBand

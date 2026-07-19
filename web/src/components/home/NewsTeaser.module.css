@@ -8,6 +8,10 @@
   margin: 0 auto;
 }
 
+.heading {
+  margin-bottom: 0;
+}
+
 .srOnly {
   position: absolute;
   width: 1px;

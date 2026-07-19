@@ -3,8 +3,15 @@
   top: 0;
   z-index: 50;
   height: var(--header-h);
-  background: var(--color-bg);
+  background: color-mix(in srgb, var(--color-bg) 92%, transparent);
   border-bottom: 1px solid var(--color-border-200);
+  backdrop-filter: blur(10px);
+}
+
+@supports not (backdrop-filter: blur(10px)) {
+  .header {
+    background: var(--color-bg);
+  }
 }
 
 .inner {
@@ -28,9 +35,14 @@
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--color-brand-900);
+  color: var(--color-ink-900);
   cursor: pointer;
   order: 1;
+}
+
+.menuBtn:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
 }
 
 .logo {
@@ -46,8 +58,14 @@
   order: 2;
 }
 
+.logo:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
 .logoPrimary {
-  color: var(--color-brand-900);
+  color: var(--color-ink-900);
 }
 
 .logoAccent {
@@ -87,12 +105,18 @@
 
 .navLink:hover {
   color: var(--color-brand-700);
-  background: var(--color-brand-soft);
+  background: var(--color-ink-soft);
+}
+
+.navLink:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
 }
 
 .navLink[aria-current="page"] {
-  color: var(--color-brand-700);
+  color: var(--color-ink-900);
   font-weight: 700;
+  background: var(--color-ink-soft);
 }
 
 .chevron {
@@ -111,7 +135,7 @@
   padding: var(--space-2);
   background: var(--color-bg);
   border: 1px solid var(--color-border-200);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
   opacity: 0;
   visibility: hidden;
@@ -146,7 +170,7 @@
 }
 
 .dropdownLink:hover {
-  background: var(--color-brand-soft);
+  background: var(--color-ink-soft);
   color: var(--color-brand-700);
 }
 
@@ -156,6 +180,16 @@
   gap: var(--space-3);
   flex-shrink: 0;
   order: 4;
+}
+
+.hotlinePill {
+  border-radius: var(--radius-pill) !important;
+  background: var(--color-ink-900) !important;
+  color: var(--color-text-on-dark) !important;
+}
+
+.hotlinePill:hover {
+  filter: brightness(1.08);
 }
 
 .mobileActions {

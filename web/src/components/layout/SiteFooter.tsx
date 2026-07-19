@@ -163,7 +163,12 @@ export async function SiteFooter({ chrome, description }: Props) {
           <p className={styles.copy}>{legal.copyright}</p>
         ) : (
           <p className={styles.copy}>
-            {t("copyrightFallback", { year: new Date().getFullYear() })}
+            {t("copyrightFallback", {
+              year: new Date().getFullYear(),
+              brand:
+                legal.companyName ||
+                [logoText.primary, logoText.accent].filter(Boolean).join(" "),
+            })}
           </p>
         )}
         <div className={styles.legalLinks}>

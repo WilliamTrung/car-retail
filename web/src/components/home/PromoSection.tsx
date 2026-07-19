@@ -1,7 +1,7 @@
 import type { PromoVM } from "@/lib/view-models/home";
 import { Button } from "@/components/ui/Button";
-import { CountdownTimer } from "@/components/ui/CountdownTimer";
 import { Icon } from "@/components/ui/Icon";
+import { PromoCountdown } from "@/components/ui/PromoCountdown";
 import styles from "./PromoSection.module.css";
 
 type PromoSectionProps = {
@@ -36,13 +36,11 @@ export function PromoSection({ promo, countdownLabels }: PromoSectionProps) {
               ))}
             </ul>
           ) : null}
-          {promo.endsAt ? (
-            <CountdownTimer
-              endsAt={promo.endsAt}
-              labels={countdownLabels}
-              className={styles.timer}
-            />
-          ) : null}
+          <PromoCountdown
+            timing={promo.timing}
+            labels={countdownLabels}
+            className={styles.timer}
+          />
           {promo.dateRangeNote ? (
             <p className={styles.dateNote}>{promo.dateRangeNote}</p>
           ) : null}

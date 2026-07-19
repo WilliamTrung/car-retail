@@ -30,6 +30,8 @@ export function localePath(locale: string, pathname: string): string {
   const base = getSiteUrl();
   const viMap: Record<string, string> = {
     "/": "/vi",
+    "/models": "/vi/models",
+    "/promotions": "/vi/khuyen-mai",
     "/book-test-drive": "/vi/dang-ky-lai-thu",
     "/deposit": "/vi/dat-coc",
     "/news": "/vi/tin-tuc",
@@ -41,6 +43,8 @@ export function localePath(locale: string, pathname: string): string {
   };
   const enMap: Record<string, string> = {
     "/": "/en",
+    "/models": "/en/models",
+    "/promotions": "/en/promotions",
     "/book-test-drive": "/en/book-test-drive",
     "/deposit": "/en/deposit",
     "/news": "/en/news",

@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { BenefitItem } from "@/components/ui/BenefitItem";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import styles from "./BenefitStrip.module.css";
 
@@ -12,6 +11,8 @@ export type BenefitItemData = {
 
 type BenefitStripProps = {
   items: BenefitItemData[];
+  /** Localized region label (not a visible heading). */
+  sectionLabel: string;
 };
 
 function iconFor(key: string | null | undefined): IconName {
@@ -27,19 +28,24 @@ function BenefitIcon({ iconKey }: { iconKey?: string | null }): ReactNode {
   return <Icon name={iconFor(iconKey)} size={28} />;
 }
 
-export function BenefitStrip({ items }: BenefitStripProps) {
+export function BenefitStrip({ items, sectionLabel }: BenefitStripProps) {
   if (!items.length) return null;
 
   return (
-    <section className={styles.root} aria-label="Benefits">
+    <section className={styles.root} aria-label={sectionLabel}>
+      {/* Single landmark label only — item titles are not headings (duplicate-headings fix). */}
       <ul className={styles.inner}>
         {items.map((item) => (
           <li key={item.id} className={styles.item}>
-            <BenefitItem
-              icon={<BenefitIcon iconKey={item.iconKey} />}
-              title={item.title}
-              text={item.text}
-            />
+            <div className={styles.benefit}>
+              <div className={styles.icon} aria-hidden="true">
+                <BenefitIcon iconKey={item.iconKey} />
+              </div>
+              <div className={styles.copy}>
+                <p className={styles.title}>{item.title}</p>
+                <p className={styles.text}>{item.text}</p>
+              </div>
+            </div>
           </li>
         ))}
       </ul>

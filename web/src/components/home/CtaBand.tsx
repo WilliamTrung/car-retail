@@ -20,10 +20,12 @@ export function CtaBand({
   if (!hotline.tel && !zaloUrl) return null;
 
   return (
-    <section className={styles.root}>
+    <section className={styles.root} aria-labelledby="home-cta-title">
       <div className={styles.inner}>
         <div className={styles.copy}>
-          <h2 className={styles.title}>{title}</h2>
+          <h2 id="home-cta-title" className={styles.title}>
+            {title}
+          </h2>
           {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
         </div>
         <div className={styles.actions}>
@@ -34,7 +36,13 @@ export function CtaBand({
             </Button>
           ) : null}
           {zaloUrl ? (
-            <Button variant="zalo" size="lg" href={zaloUrl} target="_blank" rel="noopener noreferrer">
+            <Button
+              variant="zalo"
+              size="lg"
+              href={zaloUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Icon name="zalo" size={18} />
               {zaloLabel}
             </Button>

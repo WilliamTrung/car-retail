@@ -12,7 +12,7 @@
   border: 0;
   padding: 0;
   margin: 0;
-  background: color-mix(in srgb, var(--color-brand-900) 48%, transparent);
+  background: color-mix(in srgb, var(--color-ink-900) 48%, transparent);
   cursor: pointer;
 }
 
@@ -42,7 +42,7 @@
   font-size: var(--text-h4-size);
   line-height: var(--text-h4-line);
   font-weight: var(--text-h4-weight);
-  color: var(--color-brand-900);
+  color: var(--color-ink-900);
 }
 
 .closeBtn {
@@ -53,8 +53,8 @@
   height: 44px;
   border: 0;
   border-radius: var(--radius-sm);
-  background: var(--color-surface-100);
-  color: var(--color-brand-900);
+  background: var(--color-ink-soft);
+  color: var(--color-ink-900);
   cursor: pointer;
 }
 
@@ -83,8 +83,13 @@
 }
 
 .link:hover {
-  background: var(--color-brand-soft);
+  background: var(--color-ink-soft);
   color: var(--color-brand-700);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
 }
 
 .actions {

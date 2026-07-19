@@ -1,36 +1,46 @@
 /**
- * Design tokens — Penpot "01 Design System"
- * Normative source: docs/frontend-architecture.md §2.1–§2.4
+ * Design tokens — Penpot V3·01 Design System "Electric Ink"
+ * Normative source: docs/frontend-architecture-v3.md §1
  */
 
 :root {
-  /* §2.1 Colors */
-  --color-brand-900: #0c2439;
-  --color-brand-700: #123a5e;
-  --color-brand-500: #2b7de0;
-  --color-zalo: var(--color-brand-500);
-  --color-brand-soft: #eaf1f8;
-  --color-accent-500: #e8481f;
-  --color-accent-600: #c4370f;
+  /* §1 Colors — Electric Ink */
+  --color-ink-900: #0b1522;
+  --color-ink-800: #12233a;
+  --color-ink-soft: #eef3fa;
+  --color-brand-700: #1c3a5e;
+  --color-brand-500: #2563eb;
+  --color-accent-500: #ea3c1e;
+  --color-accent-600: #c4330f;
   --color-accent-soft: #fff1ec;
-  --color-eco-500: #1fa97a;
-  --color-surface-50: #f4f6f9;
-  --color-surface-100: #eaeef4;
+  --color-eco-500: #0f8a5f;
+  --color-eco-soft: #e3f5ec;
+  --color-surface-50: #f6f8fb;
+  --color-surface-100: #edf1f7;
+  --color-surface-200: #e1e8f1;
   --color-bg: #ffffff;
-  --color-text-900: #1f2937;
-  --color-text-muted: #5b6672;
+  --color-text-900: #111c2b;
+  --color-text-700: #384456;
+  --color-text-muted: #677486;
   --color-text-on-dark: #ffffff;
-  --color-border-200: #e3e8ef;
-  --color-gold-500: #f5a623;
-  --color-footer-navy: #0b1f32;
+  --color-border-200: #e2e8f1;
+  --color-gold-500: #f2b01e;
+  --color-amber-500: #f59e0b;
+  --color-zalo: #2b7de0;
+  --color-footer-navy: #0b1522;
 
-  /* §2.2 Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  /* Backward-compat aliases (components still bind brand-900 / brand-soft) */
+  --color-brand-900: var(--color-ink-900);
+  --color-brand-soft: var(--color-ink-soft);
+
+  /* §1 Radius */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
   --radius-pill: 999px;
 
-  /* §2.2 Spacing (8px scale) */
+  /* §1 Spacing (8px scale) */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -41,32 +51,36 @@
   --space-16: 64px;
   --space-24: 96px;
 
-  /* §2.2 Elevation */
-  --shadow-card: 0 4px 16px rgba(16, 42, 67, 0.08);
-  --shadow-raised: 0 8px 28px rgba(0, 0, 0, 0.14);
+  /* §1 Elevation */
+  --shadow-card: 0 6px 24px rgba(11, 21, 34, 0.08);
+  --shadow-raised: 0 14px 40px rgba(11, 21, 34, 0.16);
 
-  /* §2.2 Container / chrome reserves */
-  --container-max: 1280px;
+  /* §1 Container / chrome reserves */
+  --container-max: 1200px;
   --container-pad: clamp(16px, 4vw, 80px);
   --header-h: 72px;
   --bottombar-h: 64px;
 
-  /* §2.3 Typography — Be Vietnam Pro scale */
+  /* §1 Typography — Be Vietnam Pro scale */
   /* --font-sans is owned by next/font (Be_Vietnam_Pro variable on <html>) */
-  --text-h1-size: 48px;
-  --text-h1-line: 56px;
+  --text-display-size: 60px;
+  --text-display-line: 64px;
+  --text-display-weight: 800;
+
+  --text-h1-size: 44px;
+  --text-h1-line: 52px;
   --text-h1-weight: 800;
 
-  --text-h2-size: 34px;
-  --text-h2-line: 42px;
+  --text-h2-size: 32px;
+  --text-h2-line: 40px;
   --text-h2-weight: 700;
 
   --text-h3-size: 24px;
-  --text-h3-line: 32px;
+  --text-h3-line: 30px;
   --text-h3-weight: 600;
 
   --text-h4-size: 20px;
-  --text-h4-line: 28px;
+  --text-h4-line: 26px;
   --text-h4-weight: 600;
 
   --text-body-lg-size: 18px;
@@ -78,24 +92,24 @@
   --text-body-weight: 400;
 
   --text-body-sm-size: 14px;
-  --text-body-sm-line: 20px;
+  --text-body-sm-line: 22px;
   --text-body-sm-weight: 400;
 
-  --text-caption-size: 12px;
-  --text-caption-line: 16px;
+  --text-caption-size: 13px;
+  --text-caption-line: 18px;
   --text-caption-weight: 500;
 
-  --text-overline-size: 13px;
+  --text-overline-size: 12px;
   --text-overline-line: 16px;
   --text-overline-weight: 700;
   --text-overline-tracking: 0.08em;
 
-  --text-price-lg-size: 30px;
+  --text-price-lg-size: 32px;
   --text-price-lg-line: 36px;
   --text-price-lg-weight: 800;
 
   --text-price-size: 22px;
-  --text-price-line: 28px;
+  --text-price-line: 26px;
   --text-price-weight: 700;
 
   --text-button-size: 16px;
@@ -103,10 +117,10 @@
   --text-button-weight: 600;
 
   --text-nav-size: 15px;
-  --text-nav-line: 20px;
+  --text-nav-line: 22px;
   --text-nav-weight: 500;
 
-  /* §2.4 Breakpoints (reference vars — use literal px in @media) */
+  /* §1 Breakpoints (reference vars — use literal px in @media) */
   --bp-sm: 640px;
   --bp-md: 900px;
   --bp-lg: 1200px;
@@ -115,6 +129,8 @@
 /* Mobile type overrides (≤640px / --bp-sm) */
 @media (max-width: 640px) {
   :root {
+    --text-display-size: 40px;
+    --text-display-line: 44px;
     --text-h1-size: 34px;
     --text-h1-line: 42px;
     --text-h2-size: 28px;
