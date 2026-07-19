@@ -84,7 +84,11 @@ describe("toModelDto colorSwatches and promo", () => {
       ...baseRow,
       colorSwatches: [
         { name: { vi: "Trắng", en: "White" }, hex: "#FFFFFF" },
-        { name: { vi: "Đen", en: "Black" }, hex: "#000000" },
+        {
+          name: { vi: "Đen", en: "Black" },
+          hex: "#000000",
+          swatchMediaId: "media-1",
+        },
       ],
       promo: {
         bullets: [
@@ -96,7 +100,11 @@ describe("toModelDto colorSwatches and promo", () => {
     });
     expect(dto.colorSwatches).toEqual([
       { name: { vi: "Trắng", en: "White" }, hex: "#FFFFFF" },
-      { name: { vi: "Đen", en: "Black" }, hex: "#000000" },
+      {
+        name: { vi: "Đen", en: "Black" },
+        hex: "#000000",
+        swatchMediaId: "media-1",
+      },
     ]);
     expect(dto.promo).toEqual({
       bullets: [

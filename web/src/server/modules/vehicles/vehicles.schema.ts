@@ -49,6 +49,7 @@ export type SegmentUpdateInput = z.infer<typeof SegmentUpdateSchema>;
 export const ColorSwatchSchema = z.object({
   name: LocalizedTextSchema,
   hex: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  swatchMediaId: z.string().nullable().optional(),
 });
 export type ColorSwatch = z.infer<typeof ColorSwatchSchema>;
 

@@ -110,6 +110,9 @@ async function main() {
     { key: "kWh", value: bi("kWh", "kWh") },
     { key: "seats", value: bi("chỗ", "seats") },
     { key: "kg", value: bi("kg", "kg") },
+    { key: "nm", value: bi("Nm", "Nm") },
+    { key: "min", value: bi("phút", "min") },
+    { key: "s", value: bi("s", "s") },
   ];
   for (const unit of units) {
     await prisma.unit.upsert({
@@ -124,8 +127,12 @@ async function main() {
     { key: "range", groupKey: "performance", sortOrder: 1 },
     { key: "power", groupKey: "performance", sortOrder: 2 },
     { key: "battery", groupKey: "performance", sortOrder: 3 },
-    { key: "seats", groupKey: "dimensions", sortOrder: 4 },
-    { key: "payload", groupKey: "cargo", sortOrder: 5 },
+    { key: "torque", groupKey: "performance", sortOrder: 4 },
+    { key: "motor", groupKey: "performance", sortOrder: 5 },
+    { key: "fastCharge", groupKey: "performance", sortOrder: 6 },
+    { key: "zeroToFifty", groupKey: "performance", sortOrder: 7 },
+    { key: "seats", groupKey: "dimensions", sortOrder: 8 },
+    { key: "payload", groupKey: "cargo", sortOrder: 9 },
   ];
   for (const ak of attributeKeys) {
     await prisma.attributeKey.upsert({
@@ -479,6 +486,17 @@ async function main() {
     }
   }
 
+  const cityEvAttributes = [
+    { key: "range", value: 320, unit: "km" },
+    { key: "power", value: 100, unit: "kW" },
+    { key: "torque", value: 180, unit: "nm" },
+    { key: "battery", value: 42, unit: "kWh" },
+    { key: "motor", value: 100, unit: "kW" },
+    { key: "fastCharge", value: 24, unit: "min" },
+    { key: "zeroToFifty", value: 3.5, unit: "s" },
+    { key: "seats", value: 5, unit: "seats" },
+  ];
+
   const cityEv = await prisma.vehicleModel.upsert({
     where: { id: "seed-model-city-ev" },
     update: {
@@ -486,6 +504,7 @@ async function main() {
       gallery: [...cityEvGallery],
       promo: cityEvPromo,
       heroMediaId: cityEvGallery[0],
+      attributes: cityEvAttributes,
     },
     create: {
       id: "seed-model-city-ev",
@@ -501,15 +520,22 @@ async function main() {
       gallery: [...cityEvGallery],
       promo: cityEvPromo,
       heroMediaId: cityEvGallery[0],
-      attributes: [
-        { key: "range", value: 320, unit: "km" },
-        { key: "power", value: 100, unit: "kW" },
-        { key: "seats", value: 5, unit: "seats" },
-      ],
+      attributes: cityEvAttributes,
       published: true,
       sortOrder: 1,
     },
   });
+
+  const familySuvAttributes = [
+    { key: "range", value: 480, unit: "km" },
+    { key: "power", value: 160, unit: "kW" },
+    { key: "torque", value: 350, unit: "nm" },
+    { key: "battery", value: 82, unit: "kWh" },
+    { key: "motor", value: 160, unit: "kW" },
+    { key: "fastCharge", value: 28, unit: "min" },
+    { key: "zeroToFifty", value: 4.2, unit: "s" },
+    { key: "seats", value: 7, unit: "seats" },
+  ];
 
   const familySuv = await prisma.vehicleModel.upsert({
     where: { id: "seed-model-family-suv" },
@@ -517,6 +543,7 @@ async function main() {
       colorSwatches: familySuvSwatches,
       promo: familySuvPromo,
       gallery: [...familySuvGallery],
+      attributes: familySuvAttributes,
     },
     create: {
       id: "seed-model-family-suv",
@@ -531,20 +558,29 @@ async function main() {
       colorSwatches: familySuvSwatches,
       promo: familySuvPromo,
       gallery: [...familySuvGallery],
-      attributes: [
-        { key: "range", value: 480, unit: "km" },
-        { key: "power", value: 160, unit: "kW" },
-        { key: "battery", value: 82, unit: "kWh" },
-        { key: "seats", value: 7, unit: "seats" },
-      ],
+      attributes: familySuvAttributes,
       published: true,
       sortOrder: 2,
     },
   });
 
+  const urbanMpvAttributes = [
+    { key: "range", value: 400, unit: "km" },
+    { key: "torque", value: 250, unit: "nm" },
+    { key: "battery", value: 70, unit: "kWh" },
+    { key: "motor", value: 120, unit: "kW" },
+    { key: "fastCharge", value: 30, unit: "min" },
+    { key: "zeroToFifty", value: 5.0, unit: "s" },
+    { key: "seats", value: 7, unit: "seats" },
+  ];
+
   const urbanMpv = await prisma.vehicleModel.upsert({
     where: { id: "seed-model-urban-mpv" },
-    update: { colorSwatches: urbanMpvSwatches, gallery: [...urbanMpvGallery] },
+    update: {
+      colorSwatches: urbanMpvSwatches,
+      gallery: [...urbanMpvGallery],
+      attributes: urbanMpvAttributes,
+    },
     create: {
       id: "seed-model-urban-mpv",
       segmentId: mpvSegment.id,
@@ -553,18 +589,29 @@ async function main() {
       tagline: bi("Đa dụng cho gia đình", "Versatile family MPV"),
       colorSwatches: urbanMpvSwatches,
       gallery: [...urbanMpvGallery],
-      attributes: [
-        { key: "range", value: 400, unit: "km" },
-        { key: "seats", value: 7, unit: "seats" },
-      ],
+      attributes: urbanMpvAttributes,
       published: true,
       sortOrder: 1,
     },
   });
 
+  const cargoVanAttributes = [
+    { key: "range", value: 260, unit: "km" },
+    { key: "payload", value: 850, unit: "kg" },
+    { key: "torque", value: 220, unit: "nm" },
+    { key: "battery", value: 50, unit: "kWh" },
+    { key: "motor", value: 90, unit: "kW" },
+    { key: "fastCharge", value: 35, unit: "min" },
+    { key: "zeroToFifty", value: 6.5, unit: "s" },
+  ];
+
   const cargoVan = await prisma.vehicleModel.upsert({
     where: { id: "seed-model-cargo-van" },
-    update: { colorSwatches: cargoVanSwatches, gallery: [...cargoVanGallery] },
+    update: {
+      colorSwatches: cargoVanSwatches,
+      gallery: [...cargoVanGallery],
+      attributes: cargoVanAttributes,
+    },
     create: {
       id: "seed-model-cargo-van",
       segmentId: vanSegment.id,
@@ -573,18 +620,31 @@ async function main() {
       tagline: bi("Vận tải đô thị", "Urban cargo delivery"),
       colorSwatches: cargoVanSwatches,
       gallery: [...cargoVanGallery],
-      attributes: [
-        { key: "range", value: 260, unit: "km" },
-        { key: "payload", value: 850, unit: "kg" },
-      ],
+      attributes: cargoVanAttributes,
       published: true,
       sortOrder: 1,
     },
   });
 
+  const metroEvAttributes = [
+    { key: "range", value: 210, unit: "km" },
+    { key: "power", value: 30, unit: "kW" },
+    { key: "torque", value: 110, unit: "nm" },
+    { key: "battery", value: 32, unit: "kWh" },
+    { key: "motor", value: 30, unit: "kW" },
+    { key: "fastCharge", value: 22, unit: "min" },
+    { key: "zeroToFifty", value: 5.8, unit: "s" },
+    { key: "seats", value: 4, unit: "seats" },
+  ];
+
   const metroEv = await prisma.vehicleModel.upsert({
     where: { id: "seed-model-metro" },
-    update: { colorSwatches: cityEvSwatches, gallery: [...metroGallery], segmentId: fleetSegment.id },
+    update: {
+      colorSwatches: cityEvSwatches,
+      gallery: [...metroGallery],
+      segmentId: fleetSegment.id,
+      attributes: metroEvAttributes,
+    },
     create: {
       id: "seed-model-metro",
       segmentId: fleetSegment.id,
@@ -597,19 +657,31 @@ async function main() {
       ),
       colorSwatches: cityEvSwatches,
       gallery: [...metroGallery],
-      attributes: [
-        { key: "range", value: 210, unit: "km" },
-        { key: "power", value: 30, unit: "kW" },
-        { key: "seats", value: 4, unit: "seats" },
-      ],
+      attributes: metroEvAttributes,
       published: true,
       sortOrder: 2,
     },
   });
 
+  const limoGreenAttributes = [
+    { key: "range", value: 450, unit: "km" },
+    { key: "power", value: 150, unit: "kW" },
+    { key: "torque", value: 310, unit: "nm" },
+    { key: "battery", value: 78, unit: "kWh" },
+    { key: "motor", value: 150, unit: "kW" },
+    { key: "fastCharge", value: 27, unit: "min" },
+    { key: "zeroToFifty", value: 4.8, unit: "s" },
+    { key: "seats", value: 7, unit: "seats" },
+  ];
+
   const limoGreen = await prisma.vehicleModel.upsert({
     where: { id: "seed-model-limo" },
-    update: { colorSwatches: urbanMpvSwatches, gallery: [...limoGallery], segmentId: fleetSegment.id },
+    update: {
+      colorSwatches: urbanMpvSwatches,
+      gallery: [...limoGallery],
+      segmentId: fleetSegment.id,
+      attributes: limoGreenAttributes,
+    },
     create: {
       id: "seed-model-limo",
       segmentId: fleetSegment.id,
@@ -622,11 +694,7 @@ async function main() {
       ),
       colorSwatches: urbanMpvSwatches,
       gallery: [...limoGallery],
-      attributes: [
-        { key: "range", value: 450, unit: "km" },
-        { key: "power", value: 150, unit: "kW" },
-        { key: "seats", value: 7, unit: "seats" },
-      ],
+      attributes: limoGreenAttributes,
       published: true,
       sortOrder: 3,
     },

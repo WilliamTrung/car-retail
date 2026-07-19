@@ -27,14 +27,12 @@ export function NewsTeaser({
     <section className={styles.root} aria-labelledby="home-news-title">
       <div className={styles.inner}>
         <SectionTitle
+          id="home-news-title"
           overline={overline}
           title={title}
           align="center"
           className={styles.heading}
         />
-        <span id="home-news-title" className={styles.srOnly}>
-          {title}
-        </span>
         <ul className={styles.grid}>
           {items.map((item) => (
             <li key={item.id}>

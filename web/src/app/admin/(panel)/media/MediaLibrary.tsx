@@ -18,6 +18,9 @@ const FOLDERS: MediaFolderDto[] = [
   "SITE",
 ];
 
+/** Must stay ≤ next.config experimental.serverActions.bodySizeLimit. */
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
 type Props = {
   initialAssets: MediaAssetDto[];
 };
@@ -33,6 +36,11 @@ export function MediaLibrary({ initialAssets }: Props) {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
+    const file = data.get("file");
+    if (file instanceof File && file.size > MAX_UPLOAD_BYTES) {
+      setMessage(t("fileTooLarge"));
+      return;
+    }
     const vi = String(data.get("altVi") ?? "").trim();
     const en = String(data.get("altEn") ?? "").trim();
     data.delete("altVi");

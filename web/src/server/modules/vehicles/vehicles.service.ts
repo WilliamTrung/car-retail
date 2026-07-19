@@ -73,12 +73,22 @@ export function getModelWithDetails(id: string) {
     async () => {
       const row = await repo.findPublishedModelWithDetails(id);
       if (!row) return null;
+      const dto = toModelDto(row);
       return {
-        ...toModelDto(row),
+        ...dto,
         heroMedia: row.heroMedia ? toMediaAssetDto(row.heroMedia) : null,
         featureSections: row.featureSections.map(toFeatureSectionDto),
         faqs: row.faqs.map(toModelFaqDto),
         galleryMedia: row.galleryMedia.map((asset) => toMediaAssetDto(asset)),
+        colorSwatches: dto.colorSwatches.map((s) => {
+          const asset = s.swatchMediaId
+            ? row.mediaById.get(s.swatchMediaId)
+            : undefined;
+          return {
+            ...s,
+            imageMedia: asset ? toMediaAssetDto(asset) : null,
+          };
+        }),
         segment: row.segment
           ? {
               ...toSegmentDto(row.segment),

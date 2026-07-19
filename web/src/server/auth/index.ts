@@ -73,16 +73,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user, account }) {
-      // Fresh credentials login → create revocable Session row
+      // Credentials sign-in: create EXACTLY ONE Session row per login.
+      // Auth.js may re-invoke jwt() with `account` still set (sign-in
+      // round-trip, and again when revalidateTag forces an RSC re-render
+      // that re-runs auth()). Creating again would mint a second row,
+      // overwrite token.sessionToken, and orphan the cookie-tracked row
+      // → revocation check returns null → logout-on-save.
       if (account?.provider === "credentials" && user?.id) {
-        const sessionToken = randomUUID();
-        const expires = new Date(Date.now() + SESSION_MAX_AGE_SEC * 1000);
-        await adapter.createSession?.({
-          sessionToken,
-          userId: user.id,
-          expires,
-        });
-        token.sessionToken = sessionToken;
+        // Idempotent: only mint when JWT does not already track a Session.
+        // Re-fires reuse the existing token.sessionToken.
+        if (!token.sessionToken) {
+          const sessionToken = randomUUID();
+          const expires = new Date(Date.now() + SESSION_MAX_AGE_SEC * 1000);
+          await adapter.createSession?.({
+            sessionToken,
+            userId: user.id,
+            expires,
+          });
+          token.sessionToken = sessionToken;
+        }
+
         token.sub = user.id;
         token.role = user.role;
         token.email = user.email ?? undefined;
@@ -90,7 +100,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return token;
       }
 
-      // Subsequent requests: Session row must still exist (revocation check)
+      // Subsequent requests: Session row must still exist (revocation check).
+      // A valid cookie-tracked row must survive revalidateTag-driven re-renders —
+      // only hard-logout when the row is missing or expired (real revoke / TTL).
       if (!token.sessionToken) {
         return null;
       }

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import styles from "./SectionTitle.module.css";
 
 type SectionTitleProps = {
+  id?: string;
   overline?: string;
   title: string;
   subtitle?: string;
@@ -11,6 +12,7 @@ type SectionTitleProps = {
 };
 
 export function SectionTitle({
+  id,
   overline,
   title,
   subtitle,
@@ -29,7 +31,9 @@ export function SectionTitle({
         .join(" ")}
     >
       {overline ? <p className={styles.overline}>{overline}</p> : null}
-      <h2 className={styles.title}>{title}</h2>
+      <h2 id={id} className={styles.title}>
+        {title}
+      </h2>
       {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
       {children}
     </header>

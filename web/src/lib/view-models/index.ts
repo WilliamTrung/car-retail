@@ -17,6 +17,19 @@ export type {
   NewsTeaserVM,
   DeliveryItemVM,
 } from "./home";
+export type {
+  OfferType,
+  PromotionSource,
+  PromoListingCardVM,
+  SpotlightPromoVM,
+  PromoListMessages,
+} from "./promotion";
+export {
+  PROMOTIONS,
+  toPromoListingCardVM,
+  toSpotlightPromoVM,
+  toPromoListVM,
+} from "./promotion";
 export type { SiteChromeVM } from "./site";
 
 export {

@@ -115,15 +115,28 @@ export async function findPublishedModelWithDetails(id: string) {
         (g): g is string => typeof g === "string" && g.length > 0,
       )
     : [];
-  const galleryAssets = galleryIds.length
-    ? await prisma.mediaAsset.findMany({ where: { id: { in: galleryIds } } })
+  const swatchMediaIds = Array.isArray(model.colorSwatches)
+    ? (model.colorSwatches as unknown[])
+        .map((s) =>
+          s &&
+          typeof s === "object" &&
+          "swatchMediaId" in s &&
+          typeof (s as { swatchMediaId: unknown }).swatchMediaId === "string"
+            ? (s as { swatchMediaId: string }).swatchMediaId
+            : null,
+        )
+        .filter((id): id is string => Boolean(id && id.length > 0))
     : [];
-  const byId = new Map(galleryAssets.map((a) => [a.id, a]));
+  const mediaIds = [...new Set([...galleryIds, ...swatchMediaIds])];
+  const mediaAssets = mediaIds.length
+    ? await prisma.mediaAsset.findMany({ where: { id: { in: mediaIds } } })
+    : [];
+  const byId = new Map(mediaAssets.map((a) => [a.id, a]));
   const galleryMedia = galleryIds
     .map((gid) => byId.get(gid))
     .filter((a): a is NonNullable<typeof a> => Boolean(a));
 
-  return { ...model, galleryMedia };
+  return { ...model, galleryMedia, mediaById: byId };
 }
 
 export async function createVariant(data: Prisma.VehicleVariantCreateInput) {

@@ -290,11 +290,41 @@
   "promotions": {
     "breadcrumbHome": "Home",
     "breadcrumbCurrent": "Promotions",
+    "pageOverline": "Volta Auto offers",
     "title": "Current promotions",
     "subtitle": "Monthly offers, registration-fee support, and gift packages when you order at a Volta Auto showroom.",
-    "listHeading": "Promotion list",
+    "activeCount": "{count} active offers",
+    "listHeading": "All offers",
+    "spotlightOverline": "Featured offer",
+    "filtersTitle": "Filter by offer type",
+    "filterAll": "All",
+    "offerType": {
+      "site_wide": "Site-wide",
+      "by_model": "By model",
+      "financing": "Financing",
+      "trade_in": "Trade-in",
+      "special_group": "Special group"
+    },
+    "sortLabel": "Sort",
+    "sort": {
+      "endingSoon": "Ending soon"
+    },
+    "applicableLabel": "Applies to",
+    "allModels": "All models",
+    "validUntil": "Valid until {date}",
+    "conditionsLabel": "Terms & conditions",
+    "detailCta": "Details",
+    "claimCta": "Claim offer",
+    "filterEmpty": "No offers match this filter",
+    "clearFilter": "Clear filter",
     "empty": "No promotions are available right now. Please check back soon.",
-    "cardCta": "Register for this offer"
+    "emptyTitle": "No offers yet",
+    "emptyCtaModels": "Browse models",
+    "emptyCtaHome": "Back home",
+    "cardCta": "Register for this offer",
+    "leadOverline": "Claim an offer",
+    "leadTitle": "Leave your details — offer consult in 5 minutes",
+    "leadSubtitle": "Pick a model you like; we'll call back with the best matching package."
   },
   "catalog": {
     "breadcrumbHome": "Home",
@@ -610,6 +640,7 @@
       "unknownType": "Unknown file type",
       "confirmDelete": "Delete this asset permanently?",
       "r2NotConfigured": "Media storage is not configured. Ask an administrator to configure Cloudflare R2.",
+      "fileTooLarge": "File is too large. Maximum size is 10 MB.",
       "loadError": "Could not load media assets.",
       "loading": "Loading assets…",
       "chooseMedia": "Choose media",

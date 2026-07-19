@@ -16,15 +16,12 @@ export function DeliveryGallery({ overline, title, items }: DeliveryGalleryProps
     <section className={styles.root} aria-labelledby="home-delivery-title">
       <div className={styles.inner}>
         <SectionTitle
+          id="home-delivery-title"
           overline={overline}
           title={title}
           align="center"
           className={styles.heading}
         />
-        {/* id target for aria — not a second heading */}
-        <span id="home-delivery-title" className={styles.srOnly}>
-          {title}
-        </span>
         <div className={styles.scroller}>
           <ul className={styles.track}>
             {items.map((item) => (

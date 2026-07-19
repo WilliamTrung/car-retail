@@ -400,7 +400,7 @@ export function ModelEditor({ model, lines, units, attributeKeys, templates }: P
           </FormField>
           <div className={styles.itemHeader}>
             <h3>{t("models.colorSwatches")}</h3>
-            <button type="button" onClick={() => setSwatches([...swatches, { name: EMPTY_LOCALIZED, hex: "#000000" }])}>{t("models.addColor")}</button>
+            <button type="button" onClick={() => setSwatches([...swatches, { name: EMPTY_LOCALIZED, hex: "#000000", swatchMediaId: null }])}>{t("models.addColor")}</button>
           </div>
           {swatches.map((swatch, index) => (
             <div className={styles.item} key={index}>
@@ -412,6 +412,11 @@ export function ModelEditor({ model, lines, units, attributeKeys, templates }: P
                 <span className={styles.swatch} style={{ backgroundColor: swatch.hex }} aria-hidden />
                 <button type="button" className={styles.danger} onClick={() => setSwatches(swatches.filter((_, itemIndex) => itemIndex !== index))}>{t("common.delete")}</button>
               </div>
+              <MediaPicker
+                folder="VEHICLES"
+                value={swatch.swatchMediaId ? { mediaId: swatch.swatchMediaId, publicUrl: "" } : null}
+                onChange={(image) => setSwatches(swatches.map((item, itemIndex) => itemIndex === index ? { ...item, swatchMediaId: image?.mediaId ?? null } : item))}
+              />
             </div>
           ))}
           <div className={styles.itemHeader}>

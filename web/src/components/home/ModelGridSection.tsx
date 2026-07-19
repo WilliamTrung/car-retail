@@ -66,15 +66,12 @@ export function ModelGridSection({
     <section className={styles.root} aria-labelledby={titleId}>
       <div className={styles.inner}>
         <SectionTitle
+          id={titleId}
           overline={overline}
           title={title}
           align="center"
           className={styles.heading}
         />
-        {/* SectionTitle h2 has no id — bind aria via visually-hidden id target (not a heading). */}
-        <span id={titleId} className={styles.srOnly}>
-          {title}
-        </span>
 
         <div
           className={styles.tabs}

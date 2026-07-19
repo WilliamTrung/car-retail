@@ -290,11 +290,41 @@
   "promotions": {
     "breadcrumbHome": "Trang chủ",
     "breadcrumbCurrent": "Khuyến mãi",
+    "pageOverline": "Ưu đãi Volta Auto",
     "title": "Khuyến mãi đang diễn ra",
     "subtitle": "Ưu đãi tháng, hỗ trợ lệ phí và gói quà khi đặt xe tại showroom Volta Auto.",
-    "listHeading": "Danh sách khuyến mãi",
+    "activeCount": "{count} ưu đãi đang áp dụng",
+    "listHeading": "Tất cả ưu đãi",
+    "spotlightOverline": "Ưu đãi nổi bật",
+    "filtersTitle": "Lọc theo loại ưu đãi",
+    "filterAll": "Tất cả",
+    "offerType": {
+      "site_wide": "Toàn hệ thống",
+      "by_model": "Theo dòng xe",
+      "financing": "Trả góp",
+      "trade_in": "Thu cũ đổi mới",
+      "special_group": "Đối tượng đặc biệt"
+    },
+    "sortLabel": "Sắp xếp",
+    "sort": {
+      "endingSoon": "Sắp hết hạn"
+    },
+    "applicableLabel": "Áp dụng",
+    "allModels": "Tất cả các dòng xe",
+    "validUntil": "Áp dụng đến {date}",
+    "conditionsLabel": "Điều kiện áp dụng",
+    "detailCta": "Chi tiết",
+    "claimCta": "Nhận ưu đãi",
+    "filterEmpty": "Không có ưu đãi phù hợp bộ lọc",
+    "clearFilter": "Xóa bộ lọc",
     "empty": "Hiện chưa có chương trình khuyến mãi. Vui lòng quay lại sau.",
-    "cardCta": "Đăng ký nhận ưu đãi"
+    "emptyTitle": "Chưa có ưu đãi",
+    "emptyCtaModels": "Xem dòng xe",
+    "emptyCtaHome": "Về trang chủ",
+    "cardCta": "Đăng ký nhận ưu đãi",
+    "leadOverline": "Đăng ký nhận ưu đãi",
+    "leadTitle": "Để lại thông tin — tư vấn ưu đãi trong 5 phút",
+    "leadSubtitle": "Chọn dòng xe quan tâm, chúng tôi gọi lại với gói phù hợp nhất."
   },
   "catalog": {
     "breadcrumbHome": "Trang chủ",
@@ -610,6 +640,7 @@
       "unknownType": "Không rõ loại tệp",
       "confirmDelete": "Xóa vĩnh viễn tài nguyên này?",
       "r2NotConfigured": "Kho media chưa được cấu hình. Hãy yêu cầu quản trị viên cấu hình Cloudflare R2.",
+      "fileTooLarge": "Tệp quá lớn. Kích thước tối đa là 10 MB.",
       "loadError": "Không thể tải danh sách media.",
       "loading": "Đang tải tài nguyên…",
       "chooseMedia": "Chọn media",

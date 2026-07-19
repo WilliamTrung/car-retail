@@ -47,6 +47,8 @@ export type ModelDetailSource = ModelCardSource & {
     name?: Localizedish;
     hex?: string | null;
     imageUrl?: string | null;
+    swatchMediaId?: string | null;
+    imageMedia?: { publicUrl?: string | null } | null;
   }> | null;
   featureSections?: Array<{
     title?: Localizedish;
@@ -548,7 +550,7 @@ export function toModelDetailVM(
     .map((s) => ({
       name: resolveLocalized(s.name, locale),
       hex: s.hex ?? "#000000",
-      imageUrl: s.imageUrl ?? null,
+      imageUrl: s.imageUrl ?? s.imageMedia?.publicUrl ?? null,
     }))
     .filter((s) => s.name || s.hex);
 

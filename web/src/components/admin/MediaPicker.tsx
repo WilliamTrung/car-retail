@@ -36,6 +36,9 @@ type MultiProps = BaseProps & {
 
 export type MediaPickerProps = SingleProps | MultiProps;
 
+/** Must stay ≤ next.config experimental.serverActions.bodySizeLimit. */
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
 const toSelection = (asset: MediaAssetDto): MediaPickerSelection => ({
   mediaId: asset.id,
   publicUrl: asset.publicUrl,
@@ -89,9 +92,15 @@ export function MediaPicker(props: MediaPickerProps) {
   async function upload(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
+    const data = new FormData(form);
+    const file = data.get("file");
+    if (file instanceof File && file.size > MAX_UPLOAD_BYTES) {
+      setMessage(t("fileTooLarge"));
+      return;
+    }
     setUploading(true);
     setMessage(null);
-    const result = await uploadMediaAction(new FormData(form));
+    const result = await uploadMediaAction(data);
     setUploading(false);
     if (!result.ok) {
       setMessage(
