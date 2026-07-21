@@ -27,6 +27,7 @@ vi.mock("@/server/modules/vehicles/vehicles.repository", () => ({
   findTemplateByIdOrKey: vi.fn(),
   updateModel: vi.fn(),
   listPublishedModels: vi.fn(),
+  findPublishedModelBySlug: vi.fn(),
   listAdminModels: vi.fn(),
   listLines: vi.fn(),
   createLine: vi.fn(),
@@ -58,6 +59,7 @@ import {
 import * as repo from "@/server/modules/vehicles/vehicles.repository";
 import {
   applyTemplate,
+  getModelBySlug,
   getPublishedModels,
 } from "@/server/modules/vehicles/vehicles.service";
 
@@ -67,6 +69,8 @@ describe("toModelDto colorSwatches and promo", () => {
     segmentId: "seg-1",
     name: { vi: "VF 8", en: "VF 8" },
     slug: { vi: "vf-8", en: "vf-8" },
+    slugKey: "vf-8",
+    slugKeyEn: "vf-8",
     tagline: null,
     description: null,
     meta: null,
@@ -181,6 +185,134 @@ describe("applyTemplateAttributes", () => {
   });
 });
 
+describe("vehicles.getModelBySlug", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const now = new Date();
+  const limoRow = {
+    id: "seed-model-limo",
+    segmentId: "seg-fleet",
+    name: { vi: "Limo Green", en: "Limo Green" },
+    slug: { vi: "limo-green", en: "limo-green" },
+    slugKey: "limo-green",
+    slugKeyEn: "limo-green",
+    tagline: null,
+    description: null,
+    meta: null,
+    heroMediaId: null,
+    gallery: [],
+    colorSwatches: [],
+    promo: null,
+    attributes: [
+      { key: "torque", value: 310, unit: "nm" },
+      { key: "fastCharge", value: 27, unit: "min" },
+      { key: "zeroToFifty", value: 4.8, unit: "s" },
+    ],
+    published: true,
+    sortOrder: 3,
+    createdAt: now,
+    updatedAt: now,
+    heroMedia: null,
+    variants: [],
+    segment: null,
+  };
+
+  it("returns the model from findPublishedModelBySlug (not list scan)", async () => {
+    vi.mocked(repo.findPublishedModelBySlug).mockResolvedValue(
+      limoRow as unknown as Awaited<
+        ReturnType<typeof repo.findPublishedModelBySlug>
+      >,
+    );
+
+    const model = await getModelBySlug("vi", "limo-green");
+
+    expect(repo.findPublishedModelBySlug).toHaveBeenCalledWith(
+      "limo-green",
+      "vi",
+    );
+    expect(repo.listPublishedModels).not.toHaveBeenCalled();
+    expect(model?.id).toBe("seed-model-limo");
+    expect(model?.attributes).toEqual(
+      expect.arrayContaining([
+        { key: "torque", value: 310, unit: "nm" },
+        { key: "fastCharge", value: 27, unit: "min" },
+        { key: "zeroToFifty", value: 4.8, unit: "s" },
+      ]),
+    );
+  });
+
+  const divergentRow = {
+    ...limoRow,
+    id: "seed-model-city-ev",
+    name: { vi: "Xe điện đô thị", en: "City EV" },
+    slug: { vi: "xe-dien-do-thi", en: "city-ev" },
+    slugKey: "xe-dien-do-thi",
+    slugKeyEn: "city-ev",
+  };
+
+  it("resolves divergent VI slug via findPublishedModelBySlug", async () => {
+    vi.mocked(repo.findPublishedModelBySlug).mockResolvedValue(
+      divergentRow as unknown as Awaited<
+        ReturnType<typeof repo.findPublishedModelBySlug>
+      >,
+    );
+
+    const model = await getModelBySlug("vi", "xe-dien-do-thi");
+
+    expect(repo.findPublishedModelBySlug).toHaveBeenCalledWith(
+      "xe-dien-do-thi",
+      "vi",
+    );
+    expect(model?.id).toBe("seed-model-city-ev");
+  });
+
+  it("resolves divergent EN slug via findPublishedModelBySlug", async () => {
+    vi.mocked(repo.findPublishedModelBySlug).mockResolvedValue(
+      divergentRow as unknown as Awaited<
+        ReturnType<typeof repo.findPublishedModelBySlug>
+      >,
+    );
+
+    const model = await getModelBySlug("en", "city-ev");
+
+    expect(repo.findPublishedModelBySlug).toHaveBeenCalledWith("city-ev", "en");
+    expect(model?.id).toBe("seed-model-city-ev");
+  });
+
+  it("returns null on cross-locale slug leakage", async () => {
+    vi.mocked(repo.findPublishedModelBySlug).mockResolvedValue(null);
+
+    const viaEnWithViSlug = await getModelBySlug("en", "xe-dien-do-thi");
+    const viaViWithEnSlug = await getModelBySlug("vi", "city-ev");
+
+    expect(viaEnWithViSlug).toBeNull();
+    expect(viaViWithEnSlug).toBeNull();
+    expect(repo.findPublishedModelBySlug).toHaveBeenCalledWith(
+      "xe-dien-do-thi",
+      "en",
+    );
+    expect(repo.findPublishedModelBySlug).toHaveBeenCalledWith("city-ev", "vi");
+  });
+
+  it("returns null when slug is not found", async () => {
+    vi.mocked(repo.findPublishedModelBySlug).mockResolvedValue(null);
+
+    const model = await getModelBySlug("en", "missing-slug");
+
+    expect(model).toBeNull();
+  });
+
+  it("returns null when repository row is unpublished", async () => {
+    vi.mocked(repo.findPublishedModelBySlug).mockResolvedValue(null);
+
+    const model = await getModelBySlug("en", "limo-green");
+
+    expect(model).toBeNull();
+  });
+});
+
 describe("vehicles.getPublishedModels", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -194,6 +326,8 @@ describe("vehicles.getPublishedModels", () => {
         segmentId: "seg-suv",
         name: { vi: "VF 8", en: "VF 8" },
         slug: { vi: "vf-8", en: "vf-8" },
+        slugKey: "vf-8",
+        slugKeyEn: "vf-8",
         tagline: null,
         description: null,
         meta: null,
@@ -258,6 +392,8 @@ describe("vehicles.applyTemplate service", () => {
       segmentId: "seg-1",
       name: { vi: "VF", en: "VF" },
       slug: { vi: "vf", en: "vf" },
+      slugKey: "vf",
+      slugKeyEn: "vf",
       tagline: null,
       description: null,
       meta: null,
@@ -285,6 +421,8 @@ describe("vehicles.applyTemplate service", () => {
         segmentId: "seg-1",
         name: { vi: "VF", en: "VF" },
         slug: { vi: "vf", en: "vf" },
+        slugKey: "vf",
+        slugKeyEn: "vf",
         tagline: null,
         description: null,
         meta: null,
@@ -332,6 +470,8 @@ describe("vehicles.applyTemplate service", () => {
       segmentId: "seg-1",
       name: { vi: "VF", en: "VF" },
       slug: { vi: "vf", en: "vf" },
+      slugKey: "vf",
+      slugKeyEn: "vf",
       tagline: null,
       description: null,
       meta: null,
@@ -356,6 +496,8 @@ describe("vehicles.applyTemplate service", () => {
         segmentId: "seg-1",
         name: { vi: "VF", en: "VF" },
         slug: { vi: "vf", en: "vf" },
+        slugKey: "vf",
+        slugKeyEn: "vf",
         tagline: null,
         description: null,
         meta: null,

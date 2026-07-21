@@ -68,6 +68,35 @@ function requireEnv(name: string): string {
   return value.trim();
 }
 
+/** Canonical seed model ids keyed by public slug (vi === en today). */
+const CANONICAL_SEED_MODELS = [
+  { id: "seed-model-city-ev", slugKey: "city-ev-compact", slugKeyEn: "city-ev-compact" },
+  { id: "seed-model-family-suv", slugKey: "family-suv-electric", slugKeyEn: "family-suv-electric" },
+  { id: "seed-model-urban-mpv", slugKey: "urban-mpv-plus", slugKeyEn: "urban-mpv-plus" },
+  { id: "seed-model-cargo-van", slugKey: "cargo-van-e", slugKeyEn: "cargo-van-e" },
+  { id: "seed-model-metro", slugKey: "metro-ev", slugKeyEn: "metro-ev" },
+  { id: "seed-model-limo", slugKey: "limo-green", slugKeyEn: "limo-green" },
+] as const;
+
+async function purgeCanonicalSlugCollisions() {
+  for (const { id, slugKey, slugKeyEn } of CANONICAL_SEED_MODELS) {
+    const purged = await prisma.vehicleModel.deleteMany({
+      where: {
+        id: { not: id },
+        OR: [
+          { slugKey },
+          { slugKeyEn },
+          { slug: { path: ["vi"], equals: slugKey } },
+          { slug: { path: ["en"], equals: slugKeyEn } },
+        ],
+      },
+    });
+    if (purged.count > 0) {
+      console.log(`Purged ${purged.count} duplicate model(s) for slug ${slugKey}.`);
+    }
+  }
+}
+
 const suvTemplateItems = [
   { key: "range", unit: "km", defaultValue: 450, showInStrip: true, sortOrder: 1, groupKey: "performance" },
   { key: "power", unit: "kW", defaultValue: 150, showInStrip: true, sortOrder: 2, groupKey: "performance" },
@@ -96,6 +125,8 @@ async function main() {
   if (purged.count > 0) {
     console.log(`Purged ${purged.count} stray E2E smoke model(s).`);
   }
+
+  await purgeCanonicalSlugCollisions();
 
   const adminEmail = requireEnv("SEED_ADMIN_EMAIL");
   const adminPassword = requireEnv("SEED_ADMIN_PASSWORD");
@@ -505,12 +536,16 @@ async function main() {
       promo: cityEvPromo,
       heroMediaId: cityEvGallery[0],
       attributes: cityEvAttributes,
+      slugKey: "city-ev-compact",
+      slugKeyEn: "city-ev-compact",
     },
     create: {
       id: "seed-model-city-ev",
       segmentId: suvSegment.id,
       name: bi("City EV Compact", "City EV Compact"),
       slug: bi("city-ev-compact", "city-ev-compact"),
+      slugKey: "city-ev-compact",
+      slugKeyEn: "city-ev-compact",
       tagline: bi("Linh hoạt cho đô thị", "Agile urban mobility"),
       description: bi(
         "Xe điện cỡ nhỏ, phù hợp di chuyển nội đô hàng ngày.",
@@ -544,12 +579,16 @@ async function main() {
       promo: familySuvPromo,
       gallery: [...familySuvGallery],
       attributes: familySuvAttributes,
+      slugKey: "family-suv-electric",
+      slugKeyEn: "family-suv-electric",
     },
     create: {
       id: "seed-model-family-suv",
       segmentId: suvSegment.id,
       name: bi("Family SUV Electric", "Family SUV Electric"),
       slug: bi("family-suv-electric", "family-suv-electric"),
+      slugKey: "family-suv-electric",
+      slugKeyEn: "family-suv-electric",
       tagline: bi("Không gian rộng rãi", "Spacious family comfort"),
       description: bi(
         "SUV điện 5+2 chỗ với quãng đường dài và an toàn cao.",
@@ -580,12 +619,16 @@ async function main() {
       colorSwatches: urbanMpvSwatches,
       gallery: [...urbanMpvGallery],
       attributes: urbanMpvAttributes,
+      slugKey: "urban-mpv-plus",
+      slugKeyEn: "urban-mpv-plus",
     },
     create: {
       id: "seed-model-urban-mpv",
       segmentId: mpvSegment.id,
       name: bi("Urban MPV Plus", "Urban MPV Plus"),
       slug: bi("urban-mpv-plus", "urban-mpv-plus"),
+      slugKey: "urban-mpv-plus",
+      slugKeyEn: "urban-mpv-plus",
       tagline: bi("Đa dụng cho gia đình", "Versatile family MPV"),
       colorSwatches: urbanMpvSwatches,
       gallery: [...urbanMpvGallery],
@@ -611,12 +654,16 @@ async function main() {
       colorSwatches: cargoVanSwatches,
       gallery: [...cargoVanGallery],
       attributes: cargoVanAttributes,
+      slugKey: "cargo-van-e",
+      slugKeyEn: "cargo-van-e",
     },
     create: {
       id: "seed-model-cargo-van",
       segmentId: vanSegment.id,
       name: bi("Cargo Van E", "Cargo Van E"),
       slug: bi("cargo-van-e", "cargo-van-e"),
+      slugKey: "cargo-van-e",
+      slugKeyEn: "cargo-van-e",
       tagline: bi("Vận tải đô thị", "Urban cargo delivery"),
       colorSwatches: cargoVanSwatches,
       gallery: [...cargoVanGallery],
@@ -644,12 +691,16 @@ async function main() {
       gallery: [...metroGallery],
       segmentId: fleetSegment.id,
       attributes: metroEvAttributes,
+      slugKey: "metro-ev",
+      slugKeyEn: "metro-ev",
     },
     create: {
       id: "seed-model-metro",
       segmentId: fleetSegment.id,
       name: bi("Metro EV", "Metro EV"),
       slug: bi("metro-ev", "metro-ev"),
+      slugKey: "metro-ev",
+      slugKeyEn: "metro-ev",
       tagline: bi("Xe dịch vụ nội đô", "Urban service EV"),
       description: bi(
         "Sedan điện nhỏ gọn cho dịch vụ vận tải hành khách nội đô.",
@@ -681,12 +732,16 @@ async function main() {
       gallery: [...limoGallery],
       segmentId: fleetSegment.id,
       attributes: limoGreenAttributes,
+      slugKey: "limo-green",
+      slugKeyEn: "limo-green",
     },
     create: {
       id: "seed-model-limo",
       segmentId: fleetSegment.id,
       name: bi("Limo Green", "Limo Green"),
       slug: bi("limo-green", "limo-green"),
+      slugKey: "limo-green",
+      slugKeyEn: "limo-green",
       tagline: bi("MPV dịch vụ 7 chỗ", "7-seat service MPV"),
       description: bi(
         "MPV điện 7 chỗ tối ưu cho dịch vụ đưa đón và kinh doanh vận tải.",

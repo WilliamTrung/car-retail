@@ -3,6 +3,8 @@ import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
+import { waitForHydration } from "./helpers/browser";
+
 const SEEDED_MODEL_SLUG = "city-ev-compact";
 const SEEDED_MST = "0000000000";
 const SEEDED_SHOWROOM_ID = "seed-showroom-1";
@@ -333,6 +335,9 @@ test.describe("keyboard & focus-visible", () => {
     const thumbCount = await thumbs.count();
     test.skip(thumbCount < 2, "Need ≥2 gallery thumbs");
 
+    // T-0078: focusing before hydration leaves activeElement on BODY and the
+    // React key handler unbound — wait for the fiber first.
+    await waitForHydration(page, "[data-thumb]");
     await thumbs.first().focus();
     await page.keyboard.press("ArrowRight");
     await expect(thumbs.nth(1)).toBeFocused();

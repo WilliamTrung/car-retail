@@ -1,14 +1,6 @@
 import { existsSync, readFileSync } from "fs";
 import { extname, isAbsolute, join } from "path";
-
-const MIME = {
-  webp: "image/webp",
-  png: "image/png",
-  jpg: "image/jpeg",
-  jpeg: "image/jpeg",
-  gif: "image/gif",
-  avif: "image/avif",
-};
+import { resolveSeedContentType } from "./seed-media-mime.js";
 
 /** @param {string} url */
 export function extFromUrl(url) {
@@ -28,7 +20,10 @@ export function readLocalSeedImage(localPath, baseDir) {
   }
   const buffer = readFileSync(abs);
   const ext = extname(abs).slice(1).toLowerCase() || "jpg";
-  const contentType = MIME[ext] || `image/${ext}`;
+  const contentType = resolveSeedContentType({
+    filename: abs,
+    ext,
+  });
   return { buffer, contentType, ext, absPath: abs };
 }
 
@@ -45,7 +40,11 @@ export async function fetchSeedImage(url) {
     throw new Error(`HTTP ${res.status} for ${url}`);
   }
   const buffer = Buffer.from(await res.arrayBuffer());
-  const contentType = res.headers.get("content-type") || `image/${extFromUrl(url)}`;
   const ext = extFromUrl(url);
+  const contentType = resolveSeedContentType({
+    filename: url,
+    ext,
+    declaredMime: res.headers.get("content-type"),
+  });
   return { buffer, contentType, ext };
 }

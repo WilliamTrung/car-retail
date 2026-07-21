@@ -51,19 +51,36 @@ export async function findModelById(id: string) {
   });
 }
 
+const publishedModelListInclude = {
+  heroMedia: true,
+  variants: {
+    where: { published: true },
+    orderBy: { sortOrder: "asc" as const },
+  },
+  segment: { include: { line: true } },
+};
+
 export async function listPublishedModels() {
   return prisma.vehicleModel.findMany({
     where: { published: true },
-    include: {
-      heroMedia: true,
-      variants: {
-        where: { published: true },
-        orderBy: { sortOrder: "asc" },
-      },
-      segment: { include: { line: true } },
-    },
+    include: publishedModelListInclude,
     orderBy: { sortOrder: "asc" },
   });
+}
+
+/** Deterministic published-model lookup by URL slug (slugKey / slugKeyEn). */
+export async function findPublishedModelBySlug(slug: string, locale: string) {
+  const row = await prisma.vehicleModel.findUnique({
+    where: locale === "en" ? { slugKeyEn: slug } : { slugKey: slug },
+    include: publishedModelListInclude,
+  });
+  if (!row?.published) return null;
+
+  const slugJson = row.slug as { vi?: string; en?: string };
+  const localeSlug = locale === "en" ? slugJson.en : slugJson.vi;
+  if (localeSlug !== slug) return null;
+
+  return row;
 }
 
 export async function listAdminModels() {

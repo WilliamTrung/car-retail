@@ -1,6 +1,7 @@
 "use server";
 
 import { AuthError } from "next-auth";
+import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 import { signIn, signOut } from "@/server/auth";
@@ -21,11 +22,13 @@ export async function loginAction(
     return { error: "Email and password are required." };
   }
 
+  const locale = await getLocale();
+
   try {
     await signIn("credentials", {
       email,
       password,
-      redirectTo: "/admin",
+      redirectTo: `/${locale}/admin`,
     });
   } catch (error) {
     // Successful signIn throws NEXT_REDIRECT — rethrow non-Auth errors.
@@ -40,13 +43,17 @@ export async function loginAction(
 
 /** Destroy DB Session + clear cookie. */
 export async function logoutAction(): Promise<void> {
-  await signOut({ redirectTo: "/admin/login" });
+  const locale = await getLocale();
+  await signOut({ redirectTo: `/${locale}/admin/login` });
 }
 
 /** Non-form helper: redirect back to login with query param on failure. */
 export async function loginFormAction(formData: FormData): Promise<void> {
   const result = await loginAction({}, formData);
   if (result.error) {
-    redirect(`/admin/login?error=${encodeURIComponent(result.error)}`);
+    const locale = await getLocale();
+    redirect(
+      `/${locale}/admin/login?error=${encodeURIComponent(result.error)}`,
+    );
   }
 }

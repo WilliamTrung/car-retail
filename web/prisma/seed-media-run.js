@@ -255,6 +255,15 @@ export async function runSeedMedia(prisma, opts = {}) {
 
   console.log("Stage 2/4 — uploading to R2 (existing objects kept)…");
   for (const payload of payloads) {
+    if (
+      !payload.contentType ||
+      payload.contentType === "application/octet-stream" ||
+      payload.contentType === "text/html"
+    ) {
+      throw new Error(
+        `Refusing R2 upload for ${payload.entry.id} with Content-Type=${payload.contentType ?? "(absent)"}`,
+      );
+    }
     payload.publicUrl = await uploadToR2(
       payload.r2Key,
       payload.buffer,

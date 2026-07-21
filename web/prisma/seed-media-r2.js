@@ -7,7 +7,9 @@
  * Mirrors src/server/storage/r2.ts behaviour for the subset the seeds need.
  */
 import {
+  CopyObjectCommand,
   DeleteObjectCommand,
+  HeadObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
@@ -112,6 +114,37 @@ export async function listAllR2Keys() {
       : undefined;
   } while (continuationToken);
   return keys;
+}
+
+/** @param {string} key */
+export async function headR2ContentType(key) {
+  const r2 = getR2Client();
+  const out = await r2.client.send(
+    new HeadObjectCommand({ Bucket: r2.config.bucket, Key: key }),
+  );
+  return out.ContentType;
+}
+
+/**
+ * In-place Content-Type fix via CopyObject MetadataDirective=REPLACE.
+ * @param {string} key
+ * @param {string} contentType
+ */
+export async function replaceR2ContentType(key, contentType) {
+  const r2 = getR2Client();
+  const copySource = `${r2.config.bucket}/${key
+    .split("/")
+    .map((seg) => encodeURIComponent(seg))
+    .join("/")}`;
+  await r2.client.send(
+    new CopyObjectCommand({
+      Bucket: r2.config.bucket,
+      Key: key,
+      CopySource: copySource,
+      MetadataDirective: "REPLACE",
+      ContentType: contentType,
+    }),
+  );
 }
 
 /** Delete every object in the bucket. Destructive — callers must guard. */

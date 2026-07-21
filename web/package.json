@@ -19,6 +19,8 @@
     "db:seed:scraped": "node prisma/seed-bootstrap.js && node prisma/seed-scraped.js",
     "db:seed:media": "node prisma/seed-media.js",
     "db:seed:media:reference": "tsx scripts/seed-media-reference.js",
+    "r2:backfill-content-type": "node scripts/r2-backfill-content-type.js",
+    "r2:apply-cors": "node scripts/apply-r2-cors.js",
     "db:reset": "tsx scripts/reset-all.js",
     "db:reseed": "tsx scripts/reset-all.js --purge && npm run db:seed:scraped && npm run db:seed:media -- --purge",
     "predeploy:check": "node scripts/predeploy-check.mjs",

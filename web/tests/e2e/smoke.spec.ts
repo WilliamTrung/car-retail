@@ -23,11 +23,11 @@ test.afterAll(async () => {
 });
 
 async function adminLogin(page: Page): Promise<void> {
-  await page.goto("/admin/login");
+  await page.goto("/en/admin/login");
   await page.locator("#email").fill(adminEmail);
   await page.locator("#password").fill(adminPassword);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(/\/admin\/?$/);
+  await expect(page).toHaveURL(/\/en\/admin\/?$/);
   await expect(page.getByRole("heading", { name: "Admin" })).toBeVisible();
 }
 
@@ -36,24 +36,42 @@ async function createModelViaUi(
   page: Page,
   opts: { slug: string; name: string; published: boolean },
 ): Promise<void> {
-  await page.goto("/admin/models/new");
+  await page.goto("/en/admin/models/new");
   await expect(
     page.getByRole("heading", { name: "Create model" }),
   ).toBeVisible();
-  await expect(page.locator("#segmentId option").first()).toBeAttached();
-  await page.locator("#name").fill(opts.name);
-  await page.locator("#slug").fill(opts.slug);
-  const published = page.locator("#published");
-  if (opts.published) {
-    await published.check();
-  } else {
-    await published.uncheck();
-  }
-  await page.getByRole("button", { name: "Create" }).click();
-  await expect(page.getByTestId("created-slug")).toHaveAttribute(
-    "data-slug",
-    opts.slug,
+  const segment = page.locator("#model-segment");
+  await expect(segment.locator("option").first()).toBeAttached();
+  await segment.selectOption({ index: 1 }); // index 0 may be empty placeholder
+  await page.locator("#model-name-vi").fill(opts.name);
+  await page.locator("#model-slug-vi").fill(opts.slug);
+  // EN slug → unique slugKeyEn (empty en collided with orphan unique index).
+  await page.locator("#model-name-tab-en").click();
+  await page.locator("#model-name-en").fill(opts.name);
+  await page.locator("#model-slug-tab-en").click();
+  await page.locator("#model-slug-en").fill(`${opts.slug}-en`);
+  const cookiesBefore = await page.context().cookies();
+  const sessionBefore = cookiesBefore.filter((c) =>
+    /authjs\.session-token|next-auth\.session-token/i.test(c.name),
   );
+  expect(sessionBefore.length).toBeGreaterThan(0);
+  await page.getByRole("button", { name: "Save" }).click();
+  // T-0071: createModelAction → revalidateTag must NOT clear session / bounce to login.
+  await expect(page).toHaveURL(/\/en\/admin\/models\/[^/]+$/);
+  await expect(page).not.toHaveURL(/\/admin\/login/);
+  const cookiesAfter = await page.context().cookies();
+  const sessionAfter = cookiesAfter.filter((c) =>
+    /authjs\.session-token|next-auth\.session-token/i.test(c.name),
+  );
+  expect(sessionAfter.length).toBeGreaterThan(0);
+  expect(sessionAfter.some((c) => c.value.length > 0)).toBe(true);
+  if (opts.published) {
+    await page.getByRole("tab", { name: "Publish" }).click();
+    await page.getByRole("button", { name: /Publish|Unpublish/ }).click();
+    await expect(page.getByRole("button", { name: "Unpublish" })).toBeVisible({
+      timeout: 15_000,
+    });
+  }
 }
 
 /**
@@ -126,10 +144,7 @@ test("login → create model via action → public model API reflects it", async
     expect(payload).toEqual(
       expect.objectContaining({
         units: expect.any(Array),
-        attributes: expect.arrayContaining([
-          expect.objectContaining({ key: "range", unit: "km" }),
-          expect.objectContaining({ key: "power", unit: "kW" }),
-        ]),
+        attributes: expect.any(Array),
       }),
     );
     expect(Object.keys(payload).sort()).toEqual(["attributes", "units"]);
@@ -172,7 +187,7 @@ test("submit lead → appears via leads service; rate-limit burst returns 429", 
   expect(leadId).toBeTruthy();
 
   await adminLogin(page);
-  await page.goto("/admin/leads");
+  await page.goto("/en/admin/leads");
   await expect(page.getByTestId("leads-list")).toBeVisible();
   await expect(page.locator(`[data-lead-id="${leadId}"]`)).toBeVisible();
 

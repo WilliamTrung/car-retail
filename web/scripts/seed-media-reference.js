@@ -10,6 +10,7 @@
  */
 import { PrismaClient } from "@prisma/client";
 import { loadDotenv } from "../prisma/load-dotenv.js";
+import { resolveSeedContentType } from "../prisma/seed-media-mime.js";
 import { isR2Configured, uploadToR2 } from "../src/server/storage/r2.ts";
 
 loadDotenv();
@@ -75,8 +76,13 @@ async function fetchImage(url) {
     throw new Error(`HTTP ${res.status} for ${url}`);
   }
   const buffer = Buffer.from(await res.arrayBuffer());
-  const contentType = res.headers.get("content-type") || `image/${extFromUrl(url)}`;
-  return { buffer, contentType, ext: extFromUrl(url) };
+  const ext = extFromUrl(url);
+  const contentType = resolveSeedContentType({
+    filename: url,
+    ext,
+    declaredMime: res.headers.get("content-type"),
+  });
+  return { buffer, contentType, ext };
 }
 
 /**

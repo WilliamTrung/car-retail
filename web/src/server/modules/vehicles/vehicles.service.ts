@@ -6,7 +6,6 @@ import { err, ok, type Result } from "@/server/result";
 import {
   applyTemplateAttributes,
   parseAttributes,
-  pickLocale,
   toFeatureSectionDto,
   toLineDto,
   toModelDto,
@@ -62,9 +61,25 @@ export function getPublishedModels() {
   );
 }
 
-export async function getModelBySlug(locale: string, slug: string) {
-  const models = await getPublishedModels();
-  return models.find((m) => pickLocale(m.slug, locale) === slug) ?? null;
+export function getModelBySlug(locale: string, slug: string) {
+  return cachedRead(
+    ["public-model-slug", locale, slug],
+    async () => {
+      const row = await repo.findPublishedModelBySlug(slug, locale);
+      if (!row) return null;
+      return {
+        ...toModelDto(row),
+        heroMedia: row.heroMedia ? toMediaAssetDto(row.heroMedia) : null,
+        segment: row.segment
+          ? {
+              ...toSegmentDto(row.segment),
+              line: toLineDto(row.segment.line),
+            }
+          : null,
+      };
+    },
+    [TAGS.models],
+  );
 }
 
 export function getModelWithDetails(id: string) {
@@ -266,6 +281,9 @@ export async function createModel(input: unknown): Promise<Result<ModelDto>> {
   const row = await repo.createModel({
     name: d.name,
     slug: d.slug,
+    slugKey: d.slug.vi,
+    // Match migration backfill: empty en falls back to vi (unique slugKeyEn).
+    slugKeyEn: d.slug.en || d.slug.vi,
     tagline: d.tagline ?? undefined,
     description: d.description ?? undefined,
     meta: d.meta ?? undefined,
@@ -299,7 +317,13 @@ export async function updateModel(
   const d = parsed.data;
   const row = await repo.updateModel(id, {
     ...(d.name !== undefined ? { name: d.name } : {}),
-    ...(d.slug !== undefined ? { slug: d.slug } : {}),
+    ...(d.slug !== undefined
+      ? {
+          slug: d.slug,
+          slugKey: d.slug.vi,
+          slugKeyEn: d.slug.en || d.slug.vi,
+        }
+      : {}),
     ...(d.tagline !== undefined ? { tagline: jsonField(d.tagline) } : {}),
     ...(d.description !== undefined
       ? { description: jsonField(d.description) }

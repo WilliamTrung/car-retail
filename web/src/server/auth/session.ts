@@ -1,3 +1,4 @@
+import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import type { Session } from "next-auth";
 
@@ -30,7 +31,7 @@ export type AdminSession = Session & {
 
 /**
  * Require an authenticated admin. Optional `module` gates by RBAC.
- * - Unauthenticated → redirect `/admin/login` (Server Components / Actions).
+ * - Unauthenticated → redirect `/{locale}/admin/login` (Server Components / Actions).
  * - Authenticated but wrong role → `ForbiddenError`.
  */
 export async function requireAdmin(
@@ -38,7 +39,8 @@ export async function requireAdmin(
 ): Promise<AdminSession> {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/admin/login");
+    const locale = await getLocale();
+    redirect(`/${locale}/admin/login`);
   }
 
   const role = session.user.role;

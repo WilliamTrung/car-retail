@@ -7,7 +7,7 @@ import {
   uploadMediaAction,
   type MediaAssetDto,
   type MediaFolderDto,
-} from "@/app/admin/(panel)/media/actions";
+} from "@/app/[locale]/(admin)/admin/(panel)/media/actions";
 import { AdminModal } from "./AdminModal";
 import styles from "./MediaPicker.module.css";
 

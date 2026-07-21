@@ -69,6 +69,8 @@ describe("vehicles.createModel", () => {
       segmentId: "seg-1",
       name: { vi: "Test", en: "Test" },
       slug: { vi: "test", en: "test" },
+      slugKey: "test",
+      slugKeyEn: "test",
       tagline: null,
       description: null,
       meta: null,
@@ -96,6 +98,12 @@ describe("vehicles.createModel", () => {
       expect(result.data.id).toBe("m-new");
       expect(result.data.published).toBe(true);
     }
+    expect(repo.createModel).toHaveBeenCalledWith(
+      expect.objectContaining({
+        slugKey: "test",
+        slugKeyEn: "test",
+      }),
+    );
     expect(revalidateTags).toHaveBeenCalledWith("models");
   });
 });

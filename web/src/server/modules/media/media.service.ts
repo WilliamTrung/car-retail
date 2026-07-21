@@ -6,6 +6,7 @@ import {
   isR2Configured,
   uploadToR2,
 } from "@/server/storage/r2";
+import { resolveUploadMimeType } from "@/server/storage/mime";
 import { toMediaAssetDto } from "./media.mapper";
 import * as repo from "./media.repository";
 import {
@@ -51,8 +52,19 @@ export async function uploadMedia(
   }
 
   const d = parsed.data;
+  const mime = resolveUploadMimeType({
+    filename: d.filename,
+    declaredMime: d.mimeType,
+    body,
+  });
+  if (!mime.ok) {
+    return err({
+      code: "VALIDATION_ERROR",
+      message: mime.message,
+    });
+  }
+  const mimeType = mime.mimeType;
   const key = buildR2Key(d.folder, d.filename);
-  const mimeType = d.mimeType || "application/octet-stream";
   const publicUrl = await uploadToR2(key, body, mimeType);
 
   const row = await repo.create({

@@ -1,5 +1,7 @@
 import {
+  CopyObjectCommand,
   DeleteObjectCommand,
+  HeadObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
@@ -112,6 +114,44 @@ export async function listAllR2Keys(): Promise<string[]> {
   } while (continuationToken);
 
   return keys;
+}
+
+export async function headR2ContentType(
+  key: string,
+): Promise<string | undefined> {
+  const r2 = getR2Client();
+  const out = await r2.client.send(
+    new HeadObjectCommand({
+      Bucket: r2.config.bucket,
+      Key: key,
+    }),
+  );
+  return out.ContentType;
+}
+
+/**
+ * Rewrite object metadata in place (same key) so Content-Type is corrected
+ * without re-uploading bytes. Used by the R2 Content-Type backfill.
+ */
+export async function replaceR2ContentType(
+  key: string,
+  contentType: string,
+): Promise<void> {
+  const r2 = getR2Client();
+  const copySource = `${r2.config.bucket}/${key
+    .split("/")
+    .map((seg) => encodeURIComponent(seg))
+    .join("/")}`;
+
+  await r2.client.send(
+    new CopyObjectCommand({
+      Bucket: r2.config.bucket,
+      Key: key,
+      CopySource: copySource,
+      MetadataDirective: "REPLACE",
+      ContentType: contentType,
+    }),
+  );
 }
 
 /** Delete every object in the configured R2 bucket. */

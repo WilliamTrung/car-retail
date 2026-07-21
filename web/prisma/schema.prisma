@@ -157,6 +157,8 @@ model VehicleModel {
   segment     VehicleSegment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
   name        Json // { vi, en }
   slug        Json // { vi, en }
+  slugKey     String   @unique // canonical vi slug — DB uniqueness + findUnique lookup
+  slugKeyEn   String   @unique // canonical en slug — DB uniqueness + findUnique lookup
   tagline     Json?
   description Json?
   meta        Json? // { vi: { title, description }, en: {...} }
