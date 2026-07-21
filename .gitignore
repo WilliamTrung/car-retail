@@ -73,6 +73,7 @@ web/.env.docker
 
 # Playwright test results
 web/test-results/
+.playwright-diag/
 
 # Scraped design/photo reference material (VinFast-branded, NEVER ship - see .reference/*/README.md)
 .reference/
